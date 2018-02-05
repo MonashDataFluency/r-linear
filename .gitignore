@@ -1,3 +1,14 @@
+r-linear.Rproj
+r-linear.sublime-*
+
+# knit cache directories
+*_cache/
+*_files/
+
+# Mac OS likes creating this
+.DS_Store
+
+
 # History files
 .Rhistory
 .Rapp.history
@@ -31,3 +42,5 @@ vignettes/*.pdf
 # Temporary files created by R markdown
 *.utf8.md
 *.knit.md
+.Rproj.user
+

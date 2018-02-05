@@ -1,0 +1,34 @@
+---
+title: "Linear thinking"
+output: 
+    ioslides_presentation:
+        widescreen: true
+        smaller: true
+        css: style.css
+---
+
+## What is a linear model?
+
+
+## Geometric intuition
+
+Our noise distribution's probability density is a function of the distance from zero. This means it is a spherical blob.
+
+Matrix multiplication and the set of vectors this can produce also have a geometric interpretation.
+
+This means various geometric ideas are applicable:
+
+* distances (Pythagorus!)
+* rotations
+* right angles
+* subspaces: points, lines, planes, etc
+
+
+
+## Hypothesis testing
+
+
+## Geometry of a hypothesis test
+
+
+## Rejecting a single hypothesis is severely lacking in ambition

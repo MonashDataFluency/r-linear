@@ -1,0 +1,29 @@
+---
+title: "Linear models in R"
+output: 
+    html_document:
+        theme: cerulean
+        css: style.css
+---
+
+## Slides
+
+* [Linear thinking](slides/linear_thinking.html)
+
+## Further reading
+
+
+
+## Authors
+
+This course is developed by the Monash Bioinformatics Platform:
+
+* Paul Harrison
+* Kirill Tsyganov
+
+<a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="figures/CC-BY.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
+
+## Source code
+
+* [GitHub repository](https://github.com/MonashBioinformaticsPlatform/r-more)
+
