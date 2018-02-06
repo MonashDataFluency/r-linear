@@ -89,7 +89,54 @@
           </hgroup>
   </slide>
 
-<slide class=""><hgroup><h2>What is a linear model?</h2></hgroup><article  id="what-is-a-linear-model" class="smaller ">
+<slide class=""><hgroup><h2>Popper</h2></hgroup><article  id="popper" class="smaller ">
+
+<p>Unreasonable hypothesis guessing.</p>
+
+</article></slide><slide class=""><hgroup><h2>What is a linear model?</h2></hgroup><article  id="what-is-a-linear-model" class="smaller ">
+
+</article></slide><slide class=""><hgroup><h2>Example: Framingham risk model</h2></hgroup><article  id="example-framingham-risk-model" class="smaller ">
+
+<p>Example: <a href='https://www.framinghamheartstudy.org/risk-functions/atrial-fibrillation/heart-failure-afib.php' title=''>Risk of heart failure in people with atrial fibrilation</a></p>
+
+<p>Enter patient details in a spreadsheet to obtain a prediction. Prediction is a weighted sum of predictors.</p>
+
+<p>(There is then a mathematical function that converts this weighted sum to a probability. Won&#39;t go into details of this today.)</p>
+
+<p>Predictors:</p>
+
+<ul>
+<li>Continuous</li>
+<li>Categorical, encoded as 0 or 1</li>
+<li>Interaction, obtained by multiplying two predictors together</li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>Example: Framingham risk model</h2></hgroup><article  id="example-framingham-risk-model-1" class="smaller ">
+
+<p>The weights given to each predictor are called coefficients, denoted \(\beta\) (beta).</p>
+
+<p>Weights are estimated (fit) based on observation of people sampled from a population.</p>
+
+<p>(If some experimental intervention was performed on some people, this could also serve as a predictor.)</p>
+
+<p>Weights are informative.</p>
+
+<p>Predictors included in model are statistically significant. The study has rejected the hypothesis that these predictors are not informative about heart failure.</p>
+
+</article></slide><slide class=""><hgroup><h2>Model fitting</h2></hgroup><article  id="model-fitting" class="smaller ">
+
+</article></slide><slide class=""><hgroup><h2>Predictors</h2></hgroup><article  id="predictors" class="smaller ">
+
+<p>Predictors can be:</p>
+
+<ul>
+<li>a constant (usually 1)</li>
+<li>something we can measure about each unit</li>
+<li>some varying treatment we made to each unit</li>
+<li>any mathematical manipulation or combination of the above that we care to dream up</li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>Noise</h2></hgroup><article  id="noise" class="smaller ">
 
 </article></slide><slide class=""><hgroup><h2>Geometric intuition</h2></hgroup><article  id="geometric-intuition" class="smaller ">
 
@@ -105,6 +152,23 @@
 <li>right angles</li>
 <li>subspaces: points, lines, planes, etc</li>
 </ul>
+
+</article></slide><slide class=""><hgroup><h2>Noise assumptions to check</h2></hgroup><article  id="noise-assumptions-to-check" class="smaller ">
+
+<p>Can survive some deviation from Gaussian distribution. Central Limit Theorem means errors in estimated coefficients tend to Gaussian.</p>
+
+<p>Data consisting of only a few discrete values can be a problem.</p>
+
+<p>Noise should be uniform, eg across different groups, &quot;homoscedastic&quot;.</p>
+
+<p>Noise should not contain large outliers.</p>
+
+<ul>
+<li><p>The variance or even the mean might not even exist to be estimated, and then the Central Limit Theorem will not apply.</p></li>
+<li><p>Don&#39;t cause a Global Financial Crisis! See <a href='http://www.fooledbyrandomness.com/' title=''>Nassim Taleb</a>.</p></li>
+</ul>
+
+<p>Various possible solutions. The first thing to try is transformation, eg log(y).</p>
 
 </article></slide><slide class=""><hgroup><h2>Hypothesis testing</h2></hgroup><article  id="hypothesis-testing" class="smaller ">
 

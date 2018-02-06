@@ -1,0 +1,139 @@
+---
+title: "Linear models in R"
+output: html_document
+---
+
+# Loading packages
+
+
+```{r eval=FALSE}
+# To install needed packages:
+#   install.packages("tidyverse")
+#   install.packages("multcomp")
+#   install.packages("broom")
+```
+
+```{r message=F}
+library(tidyverse)
+library(multcomp)
+```
+
+Much of what we will be using is built in to R without loading any packages.
+
+From the [Tidyverse](https://www.tidyverse.org/) we will be using:
+
+* `readr::read_csv` as a convenient way to specify a data frame.
+* `dplyr` for data frame manipulations.
+* `ggplot2` for graphing.
+
+See [here](https://monashbioinformaticsplatform.github.io/r-more/topics/tidyverse.html) for our introduction to the Tidyverse.
+
+We will also be using:
+
+* `multcomp::glht` to calculate contrast p-values and confidence intervals.
+
+
+# Vector operations
+
+```{r}
+a <- c(3,4)
+b <- c(5,6)
+```
+
+Geometrically, a vector $x$ is a point in a `length(x)`-dimensional space.
+
+```{r}
+length(a)
+````
+
+R performs operations elementwise:
+
+```{r}
+a + b
+a * b
+```
+
+We will be using the dot product $a \cdot b$ a lot, which is:
+
+```{r}
+sum(a*b)
+```
+
+The geometric length of a vector is $\sqrt{x \cdot x}$ (Pythagorus!):
+
+```{r}
+sqrt(sum(a*a))
+sqrt(sum(a^2))
+```
+
+
+# Matrix operations
+
+We can create a matrix with `matrix`, `rbind` (row bind), or `cbind` (column bind).
+
+```{r}
+matrix(c(1,2,3,4), nrow=2, ncol=2)
+rbind(c(1,3), c(2,4))
+cbind(c(1,2), c(3,4))
+
+mat <- rbind(
+    c(1,0),
+    c(1,0),
+    c(1,1),
+    c(1,1))
+mat
+class(mat)
+```
+
+Matrix multiplication is performed with `%*%`. The dot product of each row of the left hand side matrix and each column of the right hand side matrix is calculated. I always imagine each column of the right hand side rising up, tipping over to the left, and doing a little dance with the rows of the left hand side matrix. `%*%` treats a vector as a single column matrix.
+
+```{r}
+mat %*% c(3,2)
+as.vector(mat %*% c(3,2))
+```
+
+The matrix transpose is obtained with `t`.
+
+```{r}
+t(mat)
+```
+
+
+
+# A very simple linear model
+
+```{r}
+simple <- data_frame( y=c(10,11) )
+
+X_simple <- model.matrix(~ 1, data=simple)
+X_simple
+fit_simple <- lm(y ~ 1, data=simple)
+fit_simple
+
+predict(fit_simple, simple, interval="confidence")
+resid(fit_simple)
+sigma(fit_simple)
+
+X0_simple <- model.matrix(~ 0, data=simple)
+X0_simple
+dim(X0_simple)
+fit0_simple <- lm(y ~ 0, data=simple)
+
+anova(fit0_simple, fit_simple)
+t.test(simple$y)
+
+ht_simple <- glht(fit_simple, "`(Intercept)` = 0")
+summary(ht_simple)
+
+# Challenge: Try some values other than 0
+summary(glht(fit_simple, "`(Intercept)` = 5"))
+
+
+confint(ht_simple)
+
+```
+
+
+
+
+

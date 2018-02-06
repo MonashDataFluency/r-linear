@@ -7,7 +7,60 @@ output:
         css: style.css
 ---
 
+## Popper
+
+Unreasonable hypothesis guessing.
+
+
 ## What is a linear model?
+
+
+## Example: Framingham risk model
+
+Example: [Risk of heart failure in people with atrial fibrilation](https://www.framinghamheartstudy.org/risk-functions/atrial-fibrillation/heart-failure-afib.php)
+
+Enter patient details in a spreadsheet to obtain a prediction. Prediction is a weighted sum of predictors. 
+
+(There is then a mathematical function that converts this weighted sum to a probability. Won't go into details of this today.)
+
+Predictors:
+
+* Continuous
+* Categorical, encoded as 0 or 1
+* Interaction, obtained by multiplying two predictors together
+
+
+## Example: Framingham risk model
+
+The weights given to each predictor are called coefficients, denoted $\beta$ (beta).
+
+Weights are estimated (fit) based on observation of people sampled from a population.
+
+(If some experimental intervention was performed on some people, this could also serve as a predictor.)
+
+Weights are informative.
+
+Predictors included in model are statistically significant. The study has rejected the hypothesis that these predictors are not informative about heart failure.
+
+
+
+## Model fitting
+
+
+
+
+## Predictors
+
+Predictors can be:
+
+* a constant (usually 1)
+* something we can measure about each unit
+* some varying treatment we made to each unit
+* any mathematical manipulation or combination of the above that we care to dream up
+
+
+## Noise
+
 
 
 ## Geometric intuition
@@ -25,6 +78,23 @@ This means various geometric ideas are applicable:
 
 
 
+## Noise assumptions to check
+
+Can survive some deviation from Gaussian distribution. Central Limit Theorem means errors in estimated coefficients tend to Gaussian.
+
+Data consisting of only a few discrete values can be a problem.
+
+Noise should be uniform, eg across different groups, "homoscedastic".
+
+Noise should not contain large outliers.
+
+* The variance or even the mean might not even exist to be estimated, and then the Central Limit Theorem will not apply.
+
+* Don't cause a Global Financial Crisis! See [Nassim Taleb](http://www.fooledbyrandomness.com/).
+
+Various possible solutions. The first thing to try is transformation, eg log(y).
+
+
 ## Hypothesis testing
 
 
@@ -32,3 +102,7 @@ This means various geometric ideas are applicable:
 
 
 ## Rejecting a single hypothesis is severely lacking in ambition
+
+
+
+

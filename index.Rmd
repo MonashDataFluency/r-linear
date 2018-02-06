@@ -6,17 +6,23 @@ output:
         css: style.css
 ---
 
-## Slides
+* [Slideshow](slides/linear_thinking.html)
+* [Linear models in R](topics/linear_models.html)
 
-* [Linear thinking](slides/linear_thinking.html)
+<br>
+
+[Answers to challenges.](topics/answers.html) No peeking during class!
 
 ## Further reading
 
+* [PH525x - Biomedical Data Science](http://genomicsclass.github.io/book/), see especially chapter 5. These are the course notes for [edX HarvardX PH525x](https://courses.edx.org/courses/HarvardX/PH525x/1T2014/course/)
+
+* Books "Linear Models with R" and "Extending the Linear Model with R" by Julian J. Faraway.
 
 
 ## Authors
 
-This course is developed by the Monash Bioinformatics Platform:
+This course is developed by the [Monash Bioinformatics Platform](http://bioinformatics.erc.monash.edu/):
 
 * Paul Harrison
 * Kirill Tsyganov
@@ -27,3 +33,6 @@ This course is developed by the Monash Bioinformatics Platform:
 
 * [GitHub repository](https://github.com/MonashBioinformaticsPlatform/r-more)
 
+<p style="margin-top: 5em; text-align: right">
+<a href="http://bioinformatics.erc.monash.edu"><img src="figures/MBP-banner.png" width="675"></a>
+</p>

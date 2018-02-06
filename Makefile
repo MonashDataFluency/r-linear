@@ -1,6 +1,8 @@
 
 RMDS=index.Rmd \
-     slides/linear_thinking.Rmd
+     slides/linear_thinking.Rmd \
+     topics/linear_models.Rmd \
+     topics/answers.Rmd
 
 HTMLS=$(patsubst %.Rmd,%.html,$(RMDS))
 

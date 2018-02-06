@@ -1,0 +1,9 @@
+html_document:
+    toc: true
+    toc_depth: 1
+    theme: cerulean
+    css: ../style.css
+    includes:
+        after_body: footer.html
+
+
