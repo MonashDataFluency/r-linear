@@ -18,8 +18,9 @@ HTMLS=$(patsubst %.Rmd,%.html,$(RMDS))
 
 all : $(HTMLS)
 
-%.html : %.Rmd
+%.html : %.Rmd diagram.R
 	Rscript -e 'rmarkdown::render("$<", "all")'
+
 
 #%_uneval.html : %.Rmd Makefile
 #	python unevalify.py <$< >topics/temp.Rmd

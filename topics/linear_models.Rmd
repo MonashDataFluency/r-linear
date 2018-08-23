@@ -99,6 +99,17 @@ t(mat)
 ```
 
 
+# Linear models
+
+* unpaired t-test
+* paired t-test
+* line
+* curve
+
+* challenges
+    * batched test
+
+
 
 # A very simple linear model
 
@@ -128,10 +139,32 @@ summary(ht_simple)
 # Challenge: Try some values other than 0
 summary(glht(fit_simple, "`(Intercept)` = 5"))
 
+glht(fit_simple, rbind(c(1)), rhs=c(5)) %>% summary()
 
 confint(ht_simple)
 
 ```
+
+
+# Confidence intervals
+
+
+
+
+# limma
+
+A difference between `glht` and limma's `contrasts.fit` is that limma uses columns as contrasts, rather than rows.
+
+
+
+
+
+
+
+
+
+
+
 
 
 
