@@ -6,6 +6,12 @@ output:
         css: style.css
 ---
 
+## Files
+
+* [r-linear-files.zip](r-linear-files.zip) - Files used in this workshop.
+
+## Workshop notes
+
 * [Slideshow](slides/linear_thinking.html)
 * [Linear models in R](topics/linear_models.html)
 
@@ -22,7 +28,7 @@ output:
 
 ## Authors
 
-This course is developed by the [Monash Bioinformatics Platform](http://bioinformatics.erc.monash.edu/):
+This course is developed by the [Monash Bioinformatics Platform](https://www.monash.edu/researchinfrastructure/bioinformatics):
 
 * Paul Harrison
 * Kirill Tsyganov

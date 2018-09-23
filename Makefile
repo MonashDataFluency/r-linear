@@ -16,9 +16,9 @@ HTMLS=$(patsubst %.Rmd,%.html,$(RMDS))
 #        topics/tidyverse_uneval.html \
 #        topics/sequences_and_features_uneval.html
 
-all : $(HTMLS)
+all : $(HTMLS) r-linear-files.zip
 
-%.html : %.Rmd diagram.R
+%.html : %.Rmd diagram.R topics/_output.yaml slides/style.css
 	Rscript -e 'rmarkdown::render("$<", "all")'
 
 
@@ -28,11 +28,11 @@ all : $(HTMLS)
 #	mv topics/temp.html $@
 #	rm topics/temp.Rmd
 
-#r-more-files/%.R : topics/%.Rmd purify.py
-#	python purify.py <$< >$@
+r-linear-files/%.R : topics/%.Rmd purify.py
+	python3 purify.py <$< >$@
 
-#r-more-files.zip : r-more-files/* r-more-files/fastqc-output/* $(RS)
-#	zip -FSr r-more-files.zip r-more-files
+r-linear-files.zip : r-linear-files/linear_models.R r-linear-files/*
+	zip -FSr r-linear-files.zip r-linear-files
 
 clean :
 	rm -f $(HTMLS)

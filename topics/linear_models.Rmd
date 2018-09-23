@@ -10,10 +10,9 @@ output: html_document
 # To install needed packages:
 #   install.packages("tidyverse")
 #   install.packages("multcomp")
-#   install.packages("broom")
 ```
 
-```{r message=F}
+```{r message=F, warning=F}
 library(tidyverse)
 library(multcomp)
 ```
@@ -33,18 +32,16 @@ We will also be using:
 * `multcomp::glht` to calculate contrast p-values and confidence intervals.
 
 
-# Vector operations
+# Vectors and matrices
+
+## Vector operations
 
 ```{r}
 a <- c(3,4)
 b <- c(5,6)
-```
 
-Geometrically, a vector $x$ is a point in a `length(x)`-dimensional space.
-
-```{r}
 length(a)
-````
+```
 
 R performs operations elementwise:
 
@@ -53,13 +50,13 @@ a + b
 a * b
 ```
 
-We will be using the dot product $a \cdot b$ a lot, which is:
+We will be using the dot product a lot. This is:
 
 ```{r}
 sum(a*b)
 ```
 
-The geometric length of a vector is $\sqrt{x \cdot x}$ (Pythagorus!):
+The *geometric* length of a vector is (by Pythagorus):
 
 ```{r}
 sqrt(sum(a*a))
@@ -67,7 +64,7 @@ sqrt(sum(a^2))
 ```
 
 
-# Matrix operations
+## Matrix operations
 
 We can create a matrix with `matrix`, `rbind` (row bind), or `cbind` (column bind).
 
@@ -76,30 +73,201 @@ matrix(c(1,2,3,4), nrow=2, ncol=2)
 rbind(c(1,3), c(2,4))
 cbind(c(1,2), c(3,4))
 
-mat <- rbind(
+X <- rbind(
     c(1,0),
     c(1,0),
     c(1,1),
     c(1,1))
-mat
-class(mat)
-```
-
-Matrix multiplication is performed with `%*%`. The dot product of each row of the left hand side matrix and each column of the right hand side matrix is calculated. I always imagine each column of the right hand side rising up, tipping over to the left, and doing a little dance with the rows of the left hand side matrix. `%*%` treats a vector as a single column matrix.
-
-```{r}
-mat %*% c(3,2)
-as.vector(mat %*% c(3,2))
+X
+class(X)
 ```
 
 The matrix transpose is obtained with `t`.
 
 ```{r}
-t(mat)
+t(X)
+```
+
+Matrix multiplication is performed with `%*%`. The dot product of each row of the left hand side matrix and each column of the right hand side matrix is calculated. `%*%` treats a vector as a single column matrix. Actually all we need today is to multiply a matrix by a vector, in which case we get the dot product of each row of the matrix with the vector.
+
+```{r}
+X %*% a
+as.vector(X %*% a)
 ```
 
 
-# Linear models
+# Fitting linear models
+
+## Single numerical predictor
+
+The age (year) and height (cm) of 10 people has been measured. We want a model that can predict height based on age.
+
+```{r}
+people <- read_csv(
+    "age, height
+      10,    131
+      14,    147
+      16,    161
+       9,    136
+      16,    170
+      15,    160
+      15,    153
+      21,    187
+       9,    145
+      21,    195")
+
+ggplot(people, aes(x=age, y=height)) + geom_point()
+```
+
+```{r}
+fit <- lm(height ~ age, data=people)
+
+fit
+```
+
+Coefficients are extracted with `coef`:
+
+```{r}
+coef(fit)
+```
+
+The residual standard deviation is extracted with `sigma`:
+
+```{r}
+sigma(fit)
+```
+
+Behind the scenes a matrix of predictors has been produced from the mysterious notation `~ age`. We can examine it explicitly:
+
+```
+model.matrix(fit)
+```
+
+`model.matrix` can be used without first calling `lm`.
+
+```{r}
+model.matrix(~ age, data=people)
+```
+
+10 observations minus 2 columns in the model matrix leaves 8 residual degrees of freedom:
+
+```{r}
+df.residual(fit)
+```
+
+
+### Prediction
+
+`predict` predicts. By default it produces predictions on the original dataset.
+
+```{r}
+predict(fit)
+predict(fit, interval="confidence")
+```
+
+We can also calculate predictions manually.
+
+```{r}
+X <- model.matrix(fit)
+beta <- coef(fit)
+as.vector( X %*% beta )
+```
+
+`predict` can be used with new data.
+
+```{r}
+new_people <- data_frame(age=5:25)
+predict(fit, new_people)
+```
+
+```{r}
+new_predictions <- cbind(
+    new_people, 
+    predict(fit, new_people, interval="confidence"))
+
+ggplot() +
+    geom_ribbon(aes(x=age, ymin=lwr, ymax=upr), data=new_predictions, fill="grey") +
+    geom_line(aes(x=age, y=fit), data=new_predictions, color="blue") +
+    geom_point(aes(x=age, y=height), data=people) +
+    labs(y="height (cm)", x="age (year)", 
+         subtitle="Ribbon shows 95% confidence interval of the model")
+```
+
+If you have ever used `geom_smooth`, it should now be a little less mysterious.
+
+```{r}
+ggplot(people, aes(x=age, y=height)) + geom_smooth(method="lm") + geom_point()
+```
+
+
+### Residuals
+
+The residuals are the differences between predicted and actual values.
+
+```{r}
+residuals(fit)
+```
+
+```{r}
+plot(predict(fit), residuals(fit))
+```
+
+Residuals should be close to normally distributed. 
+
+```{r}
+qqnorm(residuals(fit))
+qqline(residuals(fit))
+```
+
+Ideally the points would lie on the line. Are they far enough away to worry about? We can simulate some data to judge against. 
+Try this several times:
+
+```{r}
+sim <- rnorm(10, mean=0, sd=sigma(fit))
+qqnorm(sim)
+qqline(sim)
+```
+
+`plot(fit)` produces a series of more sophisticated diagnostic plots.
+
+```{r eval=F}
+plot(fit)
+```
+
+
+
+
+## Single factor predictor, two levels
+
+
+### Challenge - the meanings of coefficients {.challenge}
+
+Examine the model matrix. What are the meanings of the two coefficients that have been fitted?
+
+Suppose instead we fit:
+
+```{r eval=F}
+fit <- lm( ~ 0 + ...
+```
+
+What do the coefficients in this new model represent? Does it fit the data better or worse than the original model?
+
+
+## Single factor predictor, more levels
+
+
+
+
+
+
+## Gene expression example
+
+### Curve fitting
+
+### Transformation
+
+
+
 
 * unpaired t-test
 * paired t-test
@@ -109,6 +277,35 @@ t(mat)
 * challenges
     * batched test
 
+
+
+
+# Testing hypotheses
+
+## Single numerical predictor
+
+```{r}
+fit1 <- lm(height ~ age, data=people)
+fit0 <- lm(height ~ 1, data=people)
+
+anova(fit0, fit1)
+```
+
+We reject the null hypothesis that height is a constant.
+
+The p-value exactly matches that of a Pearson's correlation test:
+
+```{r}
+cor.test(people$age, people$height)
+```
+
+**Warning:** This is not the only way to use the `anova` function, but I think this is the safest way. Once we start using multiple predictors, the meaning of the output from `anova` with a single model is likely to be not quite what you want. Read the documentation carefully. The `aov` function also has traps for the unwary. Use `lm`, and `anova` with two nested models as in this document and the meaning should be as you would expect.
+
+`summary` also outputs p-values. Too many p-values. It doesn't respect the hierarchy of terms in the model. The p-value for dropping the intercept is nonsense with the age term still present:
+
+```{r}
+summary(fit1)
+```
 
 
 # A very simple linear model
@@ -154,8 +351,6 @@ confint(ht_simple)
 # limma
 
 A difference between `glht` and limma's `contrasts.fit` is that limma uses columns as contrasts, rather than rows.
-
-
 
 
 
