@@ -1,4 +1,3 @@
-
 # Extract code blocks from an .Rmd file
 
 import sys, textwrap

@@ -15,9 +15,11 @@ output:
 * [Slideshow](slides/linear_thinking.html)
 * [Linear models in R](topics/linear_models.html)
 
+<!--
 <br>
 
 [Answers to challenges.](topics/answers.html) No peeking during class!
+-->
 
 ## Further reading
 

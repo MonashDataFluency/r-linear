@@ -87,10 +87,8 @@ as.vector(X %*% a)
 
 
 
-#/////////////////////////////
-# 3 Fitting linear models ----
-
-# 3.1 Single numerical predictor ----
+#//////////////////////////////////
+# 3 Single numerical predictor ----
 #
 # The age (year) and height (cm) of 10 people has been measured. We want
 # a model that can predict height based on age.
@@ -136,7 +134,7 @@ model.matrix(~ age, data=people)
 
 df.residual(fit)
 
-# 3.1.1 Prediction ----
+# 3.1 Prediction ----
 #
 # predict predicts. By default it produces predictions on the original
 # dataset.
@@ -171,7 +169,7 @@ ggplot() +
 
 ggplot(people, aes(x=age, y=height)) + geom_smooth(method="lm") + geom_point()
 
-# 3.1.2 Residuals ----
+# 3.2 Residuals ----
 #
 # The residuals are the differences between predicted and actual values.
 
@@ -196,112 +194,376 @@ qqline(sim)
 
 plot(fit)
 
-# 3.2 Single factor predictor, two levels ----
 
-# 3.2.1 Challenge - the meanings of coefficients ----
+
+#///////////////////////////////////////////
+# 4 Single factor predictor, two levels ----
+#
+# Consider a simple experiment where some outcome is measured for an
+# untreated and a treated group. This can be viewed as a one-way
+# ANalysis Of Variance (ANOVA) experiment. (This is one of two senses in
+# which the term ANOVA will be used today.)
+
+outcomes <- read_csv(
+       "group, outcome
+    untreated,  4.98
+    untreated,  5.17
+    untreated,  5.66
+    untreated,  4.87
+      treated,  8.07
+      treated, 11.02
+      treated,  9.91")
+
+outcomes$group <- factor(outcomes$group, c("untreated", "treated"))
+
+outfit <- lm(outcome ~ group, data=outcomes)
+outfit
+
+df.residual(outfit)
+sigma(outfit)
+
+model.matrix(outfit)
+
+# 4.1 Challenge - the meanings of coefficients ----
 #
 # Examine the model matrix. What are the meanings of the two
 # coefficients that have been fitted?
 #
 # Suppose instead we fit:
 
-fit <- lm( ~ 0 + ...
+outfit2 <- lm(outcome ~ 0 + group, data=outcomes)
 
 # What do the coefficients in this new model represent? Does it fit the
 # data better or worse than the original model?
 #
-# 3.3 Single factor predictor, more levels ----
-
-# 3.4 Gene expression example ----
-
-# 3.4.1 Curve fitting ----
-
-# 3.4.2 Transformation ----
+# 4.2 Testing a hypothesis ----
 #
-# * unpaired t-test
-# * paired t-test
-# * line
-# * curve
+# Besides data with categorical predictors, the term ANOVA is used to
+# refer to the use of the F test. Significance is judged based on
+# comparing the Residual Sums of Squares of two models. We fit a model
+# representing a null hypothesis. This model formula must nest within
+# our original model formula: any prediction it can make can also be
+# made by the original model formula. We compare the models using the
+# anova function.
+
+outfit0 <- lm(outcome ~ 1, data=outcomes)
+
+anova(outfit0, outfit)
+
+# **Warning:** This is not the only way to use the anova( ) function,
+# but I think this is the safest way. Once we start using multiple
+# predictors, the meaning of the output from anova with a single model
+# is likely to be not quite what you want. Read the documentation
+# carefully. The aov( ) function also has traps for the unwary. Use lm(
+# ), and anova( ) with two nested models as in this document and the
+# meaning should be as you would expect.
 #
-# * challenges
-#     * batched test
+# summary( ) also outputs p-values. Too many p-values, summary( )
+# doesn't respect the hierarchy of terms in the model. The p-value for
+# dropping the intercept is nonsense.
+
+summary(outfit)
+
+# confint( ) tells us not only that the difference between groups is
+# non-zero but places a confidence interval on the difference. If the
+# p-value were 0.05, the confidence interval would just touch zero.
+# Whenever we reject a hypothesis that a single coefficient is zero, we
+# may also conclude that we know its sign.
+
+confint(outfit)
+
+# These results exactly match those of a t-test.
+
+t.test(outcome ~ group, data=outcomes, var.equal=TRUE)
+
+# 4.3 Challenge - does height change with age? ----
+#
+# Return to the people dataset. Can we reject the hypothesis that height
+# is unrelated to age?
+#
+# Compare the result to the outcome of a correlation test using
+# cor.test( ).
+#
+
+
+#/////////////////////////////////////
+# 5 Multiple factors, many levels ----
+#
+# Particle sizes of PVC plastic produced by a machine are measured. The
+# machine is operated by three different people, and eight different
+# batches of resin are used. Two measurements are made for each
+# combination of these two experimental factors.
+#
+# (This example is adapted from a data-set in the faraway package.)
+
+pvc <- read_csv("r-linear-files/pvc.csv")
+pvc$operator <- factor(pvc$operator)
+pvc$resin <- factor(pvc$resin)
+
+ggplot(pvc, aes(x=resin, y=psize)) + geom_point() + facet_grid(~operator)
+
+# 5.1 Main effects ----
+
+pvcfit1 <- lm(psize ~ operator + resin, data=pvc)
+
+summary(pvcfit1)
+confint(pvcfit1)
+
+# 5.2 Heteroscedasticity ----
+
+ggplot(pvc, aes(x=resin, y=residuals(pvcfit1))) +
+    geom_point() + geom_hline(yintercept=0) + facet_grid(~operator)
+
+# Our assumption that the residual noise is uniformly normally
+# distributed may not hold. Carl's data seems to have greater standard
+# deviation than Alice or Bob's. When comparing Alice and Bob's results,
+# including Carl's data in the model may alter the outcome.
+
+# 5.3 Interactions ----
+
+pvcfit2 <- lm(psize ~ operator + resin + operator:resin, data=pvc)
+# or
+pvcfit2 <- lm(psize ~ operator*resin, data=pvc)
+
+anova(pvcfit1, pvcfit2)
+
+# 5.4 Contrasts and confidence intervals ----
+#
+# anova lets us test if a particular factor interaction is needed at
+# all, and summary allows us to see if any levels of a factor differ
+# from the first level. However we may wish to compare an arbitrary pair
+# of levels in a factor, or even some more complicated combination of
+# levels. This can be done using contrasts.
+#
+# Say we want to compare Bob and Carl's particle sizes. We will use the
+# pvcfit model as a starting point.
+
+coef(pvcfit1)
+K <- rbind(Carl_vs_Bob = c(0, -1,1, 0,0,0,0,0,0,0))
+
+K %*% coef(pvcfit1)
+
+# This is the estimated difference in particle size between Carl and
+# Bob, but can we trust it? The glht function from multcomp can tell us.
+# GLHT stands for General Linear Hypothesis Test, "general" meaning it
+# can be used with various other types of models besides plain linear
+# models.
+
+result <- glht(pvcfit1, K)
+result
+summary(result)
+confint(result)
+
+K <- rbind(
+    Bob_vs_Alice  = c(0,  1,0, 0,0,0,0,0,0,0),
+    Carl_vs_Alice = c(0,  1,0, 0,0,0,0,0,0,0),
+    Carl_vs_Bob   = c(0, -1,1, 0,0,0,0,0,0,0))
+result <- glht(pvcfit1, K)
+summary(result)
+confint(result)
+
+
+
+#///////////////////////////////
+# 6 Gene expression example ----
+#
+# Tooth growth in mouse embryos is studied using RNA-Seq. The RNA
+# expression levels of several genes are examined in the cells that form
+# the upper and lower first molars, in eight individual mouse embryos
+# that have been disected after different times of embryo development.
+# The measurements are in terms of "Reads Per Million", essentially the
+# fraction of RNA in each sample belonging to each gene, times 1
+# million.
+#
+# (This data was extracted from ARCHS4. In the Gene Expression Omnibus
+# (GEO), it is entry GSE76316. The sample descriptions in GEO were out
+# of order. Reading the associated paper and the genes they talk about,
+# I *think* I have corrected the order of samples.)
+
+teeth <- read_csv("r-linear-files/teeth.csv")
+
+# ((( A convenience to examine different model fits )))
+
+more_data <- expand.grid(
+        day=seq(14.3,18.2,by=0.05),
+        tooth=as_factor(c("lower","upper"))) %>%
+    mutate(mouse=paste0("ind",round((day-14.5)*2+1)))
+
+look <- function(y, fit=NULL) {
+    p <- ggplot(teeth,aes(x=day,group=tooth))
+    if (!is.null(fit)) {
+        more_ci <- cbind(more_data, predict(fit, more_data, interval="confidence"))
+        p <- p + geom_ribbon(data=more_ci, aes(ymin=lwr,ymax=upr),alpha=0.25) + geom_line(data=more_ci,aes(y=fit,color=tooth))
+    }
+    p + geom_point(aes(y=y,color=tooth))
+}
+
+tfit <- lm(gene_ace ~ mouse + tooth, data=teeth)
+
+look(teeth$gene_ace, tfit)
+
+# 6.1 Paired t-test ----
+
+# 6.2 Transformation ----
+
+# 6.3 Curve fitting ----
+
+# 6.4 Time is confounded with individual ----
+#
+# Another example of confounding would be an experiment in which each
+# treatment is done in a separate batch.
+#
+# Highly correlated predictors can also be problematic, even if not
+# perfectly confounded.
 
 
 
 #//////////////////////////
-# 4 Testing hypotheses ----
-
-# 4.1 Single numerical predictor ----
-
-fit1 <- lm(height ~ age, data=people)
-fit0 <- lm(height ~ 1, data=people)
-
-anova(fit0, fit1)
-
-# We reject the null hypothesis that height is a constant.
+# 7 Testing many genes ----
 #
-# The p-value exactly matches that of a Pearson's correlation test:
+# Actually in this gene expression dataset, the expression level of all
+# genes was measured!
 
-cor.test(people$age, people$height)
+counts_df <- read_csv("r-linear-files/teeth-read-counts.csv")
 
-# **Warning:** This is not the only way to use the anova function, but I
-# think this is the safest way. Once we start using multiple predictors,
-# the meaning of the output from anova with a single model is likely to
-# be not quite what you want. Read the documentation carefully. The aov
-# function also has traps for the unwary. Use lm, and anova with two
-# nested models as in this document and the meaning should be as you
-# would expect.
+counts <- counts_df %>%
+    column_to_rownames("gene") %>%
+    as.matrix()
+
+counts[1:5,]
+
+# The column names match our teeth data frame.
+
+teeth$sample
+
+# A usual first step in RNA-Seq analysis is to convert read counts to
+# Reads Per Million, and log2 transform the results. There are some
+# subtlties here which we breeze over lightly: We use "TMM"
+# normalization as a small adjustment to the total number of reads in
+# each sample. A small constant is added to the counts to avoid
+# calculating log2(0). The edgeR and limma manuals describe these in
+# more detail.
+
+library(edgeR)
+library(limma)
+
+dgelist <- calcNormFactors(DGEList(counts))
+
+dgelist$samples
+
+log2_cpms <- cpm(dgelist, log=TRUE, prior.count=0.25)
+
+# There is little chance of detecting differential expression in genes
+# with very few genes. Including these genes will require a larger False
+# Discovery Rate correction, and also confuses limma's hyper-parameter
+# estimation. Let's only retain genes with an average of 5 reads per
+# sample or more.
+
+keep <- rowMeans(log2_cpms) >= -3
+log2_cpms_filtered <- log2_cpms[keep,]
+
+nrow(log2_cpms)
+nrow(log2_cpms_filtered)
+
+# We will use limma to detect differentially expressed genes. limma
+# doesn't automatically convert a formula into a model matrix, so we
+# have to do this step manually.
+
+design <- model.matrix(~ tooth + mouse, data=teeth)
+
+fit <- lmFit(log2_cpms_filtered, design)
+
+fit$coefficients[1:5,]
+
+# Significance testing in limma is by the use of contrasts. A difference
+# between glht and limma's contrasts.fit is that limma uses columns as
+# contrasts, rather than rows.
+
+K <- rbind(upper = c(0, 1, 0,0,0,0,0,0,0))
+cfit <- contrasts.fit(fit, t(K))
+
+# Empirical Bayes squeezing of the residual variance acts as though we
+# have some number of extra "prior" observations of the variance. These
+# are also counted as extra degrees of freedom in F tests. The "prior"
+# observations act to squeeze the estimated residual variance toward a
+# trend line that is a function of the average expression level.
+
+efit <- eBayes(cfit, trend=TRUE)
+efit$df.prior
+plotSA(efit)
+points(efit$Amean, efit$s2.post^0.25, col="red", cex=0.3)
+
+topTable(efit)
+
+all_results <- topTable(efit, n=Inf)
+
+significant <- all_results$adj.P.Val <= 0.05
+table(significant)
+
+ggplot(all_results, aes(x=AveExpr, y=logFC)) +
+    geom_point(size=0.1, color="grey") +
+    geom_point(data=all_results[significant,], size=0.1)
+
+# 7.1 False Coverage Rate corrected CIs ----
 #
-# summary also outputs p-values. Too many p-values. It doesn't respect
-# the hierarchy of terms in the model. The p-value for dropping the
-# intercept is nonsense with the age term still present:
+# Confidence Intervals should also be of interest.
 
-summary(fit1)
+topTable(efit, confint=0.95)
 
+# However we should adjust for multiple testing. A False Coverage Rate
+# corrected CI can be constructed corresponding to a set of genes judged
+# significant. The smaller the selection of genes selected as a
+# proportion of the whole, the greater the correction required. To
+# ensure a false coverage rate of q, we use the confidence interval
+# (1-q*n_genes_selected/n_genes_total)*100%.
 
+fcr_confint <- 1-0.05*mean(significant)
 
-#//////////////////////////////////
-# 5 A very simple linear model ----
+all_results <- topTable(efit, confint=fcr_confint, n=Inf)
 
-simple <- data_frame( y=c(10,11) )
+ggplot(all_results, aes(x=AveExpr, y=logFC)) +
+    geom_point(size=0.1, color="grey") +
+    geom_errorbar(data=all_results[significant,], aes(ymin=CI.L, ymax=CI.R), color="red") +
+    geom_point(data=all_results[significant,], size=0.1)
 
-X_simple <- model.matrix(~ 1, data=simple)
-X_simple
-fit_simple <- lm(y ~ 1, data=simple)
-fit_simple
+# The FCR corrected CIs used here have the same q, 0.05, as we used as
+# the cutoff for adj.P.Val. This means they never pass through zero.
 
-predict(fit_simple, simple, interval="confidence")
-resid(fit_simple)
-sigma(fit_simple)
-
-X0_simple <- model.matrix(~ 0, data=simple)
-X0_simple
-dim(X0_simple)
-fit0_simple <- lm(y ~ 0, data=simple)
-
-anova(fit0_simple, fit_simple)
-t.test(simple$y)
-
-ht_simple <- glht(fit_simple, "`(Intercept)` = 0")
-summary(ht_simple)
-
-# Challenge: Try some values other than 0
-summary(glht(fit_simple, "`(Intercept)` = 5"))
-
-glht(fit_simple, rbind(c(1)), rhs=c(5)) %>% summary()
-
-confint(ht_simple)
-
-
-
-
-#////////////////////////////
-# 6 Confidence intervals ----
-
-
-
-#/////////////
-# 7 limma ----
+# 7.2 ANOVA test ----
 #
-# A difference between glht and limma's contrasts.fit is that limma uses
-# columns as contrasts, rather than rows.
+# limma can also test a constraint over several contrasts at once. We
+# illustrate this verbosely:
+
+K2 <- rbind(
+    ind2_vs_ind1 = c(0, 0, 1,0,0,0,0,0,0),
+    ind3_vs_ind1 = c(0, 0, 0,1,0,0,0,0,0),
+    ind4_vs_ind1 = c(0, 0, 0,0,1,0,0,0,0),
+    ind5_vs_ind1 = c(0, 0, 0,0,0,1,0,0,0),
+    ind6_vs_ind1 = c(0, 0, 0,0,0,0,1,0,0),
+    ind7_vs_ind1 = c(0, 0, 0,0,0,0,0,1,0),
+    ind8_vs_ind1 = c(0, 0, 0,0,0,0,0,0,1))
+
+cfit2 <- contrasts.fit(fit, t(K2))
+efit2 <- eBayes(cfit2, trend=TRUE)
+topTable(efit2)
+
+# A shortcut would be to use contrasts.fit(fit, coefficients=3:9) here
+# instead, or to specify a set of coefficients directly to topTable().
+
+# 7.3 Challenge - find genes that changed between specific mouse embryos ----
+#
+# Construct and use contrasts to find genes that changed between:
+#
+# 1. ind1 and ind8
+#
+# 2. ind2 and ind3
+#
+# 7.4 Challenge - find smoothly changing genes ----
+#
+# Use limma to find genes where the hypothesis that they are changing
+# linearly or quadratically over time is significantly better than the
+# hypothesis that they are not changing over time.
+#
+# Your model should allow that the upper and lower teeth may differ in
+# expression level by a constant amount. As an extension, also allow
+# that they they may follow different curves.

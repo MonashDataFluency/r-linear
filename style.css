@@ -47,7 +47,7 @@ pre {
     background: #ddf;
 }
 
-.challenge > :first-child {
+.challenge > :first-child, .challenge > :nth-child(2) {
     margin-top: 0;
 }
 

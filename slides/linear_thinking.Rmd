@@ -1,5 +1,6 @@
 ---
 title: "Linear thinking"
+author: "Paul Harrison @paulfharrison"
 output: 
     ioslides_presentation:
         widescreen: true
@@ -22,22 +23,44 @@ Learn to predict a response variable as
 * some of the predictors could be categorical
 * and there could be interactions
 
-Test
+<br/>
 
-* which variables and interactions the data supports as predictors
-* what confidence interval to give on their strength as predictors
+* test which variables and interactions the data supports as predictors
+* test what confidence interval to give on their strength as predictors
 
 
-## Linear models
+## Linear models in context
 
 "linear model" "general linear model" "linear predictor" "regression" "multiple regression" "multiple linear regression" "multiple linear regression model" ...
 
-Many common statistical methods can be seen as the use of linear models in a particular way.
+Linear modelling encompasses much of statistics
 
-Many advanced statistical methods use linear models as a starting point.
+>* t test
+>* correlation test
+>* ANOVA
 
-> * Will finish today by looking at limma, used for RNA-Seq, microarrays, mass spectrometry, etc.
+and is the starting point for most of the rest.
 
+More on this at the end.
+
+
+## Linear models in R
+
+S language (predecessor to R) was revamped in
+
+...
+
+substantially to support linear models:
+
+* `data.frame` type introduced to hold data for modelling.
+
+* `factor` type introduced to hold categorical data.
+
+* `~` formulas specify terms in models.
+
+* Manipulation of "S3" objects holding fitted models.
+
+Primary reference is "Statistical models in S".
 
 
 ## Notation
@@ -82,6 +105,7 @@ Without the `as.vector` the result would be a single column matrix.
 
 (It's also possible to multiply two matrices with `%*%` but we won't need this today.)
 
+
 ## Geometry
 
 ### Distances
@@ -106,9 +130,23 @@ In each case there is also an **orthogonal subspace** with $n-p$ dimensions.
 Do section: Vectors and matrices
 
 
+## Models
+
+A **model** can be used to predict a **response** variable based on a set of **predictor** variables.
+
+The prediction will usually be imperfect, due to random noise.
+
+<br>
+
+(Alternative terms: depedent variable, independent variables.)
+
+(Using causal language, but really only modelling an association.)
+
+
+
 ## Linear model
 
-We imagine a **response** $y$ is produced based on $p$ **predictors** $x_j$ plus noise $\varepsilon$ ("epsilon"):
+A **response** $y$ is produced based on $p$ **predictors** $x_j$ plus noise $\varepsilon$ ("epsilon"):
 
 $$ y = \beta_1 x_1 + \beta_2 x_2 + \dots + \beta_p x_p + \varepsilon $$
 
@@ -122,7 +160,7 @@ The noise is assumed to be normally distributed with standard deviation $\sigma$
 
 $$ \varepsilon \sim \mathcal{N}(0,\sigma^2) $$
 
-Typically but not always $x_1$ will always be 1, so $\beta_1$ is a constant term in the model. We still count it as one of the $p$ predictors. (This matches what R actually does, but may differ from other presentations!)
+Typically but not always $x_1$ will always be 1, so $\beta_1$ is a constant term in the model. We still count it as one of the $p$ predictors. (This matches what R does, but may differ from other presentations!)
 
 
 ## Linear model in R code
@@ -237,12 +275,233 @@ the_truth()
 
 ## 
 
-Do section: Fitting linear models
+Do section: Single numerical predictor
+
+Do section: Single factor predictor, two levels
+
+
+## Testing hypotheses
+
+<div style="float: right; width: 15em;">
+```{r}
+y <- c(3,5)
+fit1 <- lm(y ~ 1)
+fit0 <- lm(y ~ 0)
+```
+
+Two model formulas representing two hypotheses H0 and H1.
+
+H0 must *nest* within H1.
+
+$\varepsilon_0$ can't be shorter than $\varepsilon_1$
+
+Is it *surprisingly longer*? Then we reject H0.
+</div>
+
+```{r echo=F}
+begin()
+to_test()
+```
+
+## Testing hypotheses
+
+<div style="float: right; width: 15em;">
+```{r}
+y <- c(3,5)
+fit1 <- lm(y ~ 1)
+fit0 <- lm(y ~ 0)
+
+anova(fit0, fit1)
+```
+
+Here we can not reject the null hypothesis (F(1,1)=16, p=0.156).
+</div>
+
+```{r echo=F}
+begin()
+to_test()
+```
+
+## Testing hypotheses -- the gory details
+
+<div style="float: right; width: 15em">
+```{r}
+df0 <- df.residual(fit0)       # n-p0
+RSS0 <- sum(residuals(fit0)^2)
+
+df1 <- df.residual(fit1)       # n-p1
+RSS1 <- sum(residuals(fit1)^2)
+
+F <- (RSS0-RSS1)/(df0-df1) / (RSS1/df1) 
+F
+pf(F, df0-df1, df1, lower.tail=FALSE)
+```
+</div>
+$$
+RSS_0 = \hat\varepsilon_0^\top \hat\varepsilon_0 \\
+RSS_1 = \hat\varepsilon_1^\top \hat\varepsilon_1
+$$
+
+<br>
+
+$$
+F = {{RSS_0-RSS_1 \over p_1-p_0} \over {RSS_1 \over n-p_1} }
+$$
+
+RSS = Residual Sum of Squares
+
+Is the increase in RSS in H0 merely proportionate 
+<br>to the extra degree(s) of freedom?
+
+<div style="font-size: 150%">`anova(fit0, fit1)`<br>handles all this for us.</div>
+
+
+
+## Contrasts
+
+##
+
+Do section: Multiple factors, many levels
+
+
+
+## Multiple testing
+
+Suppose some set of hypotheses are true. What chance do we run of rejecting one or more of them?
+
+### Hypotheses are mutually exclusive
+
+> * No problem!
+
+Example: reject all values outside a confidence interval
+
+### Family-Wise Error Rate (FWER) control
+
+"*Any* false rejection will ruin my argument."
+
+> * Tukey's Honestly Significanct Differences
+> * Bonferroni correction (etc)
+
+### False Discovery Rate (FDR) control
+
+"I can tolerate a certain *rate* of false rejections."
+
+> * Benjamini and Hochberg correction (etc)
 
 
 ## Formulas
 
-Formula syntax 
+"Wilikins-Rogers notation"
+
+Formulas with `~` specify how to construct the model matrix $X$.
+
+Merely a convenience, if you already have a model matrix `X` can always just use `~0+X`.
+
+Let's discuss this in more detail.
+
+## Data types
+
+`numeric` vector is represented as itself.
+
+`logical` vector is converted to 0s and 1s.
+
+`factor` is represented as $n_\text{levels}-1$ predictors, "one-hot" representation.*
+
+`matrix` is represented as multiple columns.
+
+<br>
+
+<div style="font-size: 50%">\* Encoding can be adjusted using `C( )` function. Default differs between S and R languages!</div>
+
+
+## Function calls
+
+Can calculate with function calls, or enclose maths in `I( )`.
+
+Handy functions such as `poly` and `splines::ns` produce matrices for fitting curves.
+
+```{r}
+x <- 1:6
+```
+
+<div style="float: left; width: 15em;">
+```{r}
+model.matrix(~ x + I(x^2) + log2(x))
+```
+</div>
+
+<div style="float: left; width: 15em;">
+```{r}
+model.matrix(~ poly(x,3))
+```
+</div>
+
+
+## Intercept
+
+Intercept term `1` is implicit.
+
+Omit with `-1` or `0`.
+
+R tries to be clever about factor encoding if intercept omitted.
+
+```{r}
+f <- factor(c("a","a","b","b","c","c"))
+```
+
+<div style="float: left; width: 15em;">
+```{r}
+model.matrix(~ f)
+```
+</div>
+
+<div style="float: left; width: 15em;">
+```{r}
+model.matrix(~ 0 + f)
+```
+</div>
+
+
+## Interactions
+
+`a:b` specifies an interaction between `a` and `b`. 
+
+All pairings of predictors from the two terms are multiplied together.
+
+For logical and factor vectors, this produces the logical "and" of each pairing.
+<br>&nbsp;
+
+<br>
+
+```{r}
+model.matrix(~ f + x + f:x)
+```
+
+## Interactions
+
+`a*b` is shorthand to also include main effects `a + b + a:b`.
+
+(More obscurely `a/b` is shorthand for `a + a:b`, if `b` only makes sense in the context of each specific `a`.)
+
+<span style="display: inline-block; width: 6em">`(a+b+c)^2`</span> is shorthand for `a + b + c + a:b + a:c + b:c`.
+<br>
+<span style="display: inline-block; width: 6em">`a*b*c`</span> is shorthand for `a + b + c + a:b + a:c + b:c + a:b:c`.
+
+<br>
+
+```{r}
+model.matrix(~ f*x)
+```
+
+
+##
+
+Do section: Gene expression example
+
+
+
+
+
 
 
 
@@ -311,12 +570,6 @@ Suppose treatmeant A was applied in batch 1 and treatment B was applied only in 
 
 Assumption of uniform residual variance is more of a problem in unbalanced designs.
 
-
-
-## Hypothesis testing
-
-
-## Geometry of a hypothesis test
 
 
 ## Rejecting a single hypothesis is severely lacking in ambition
