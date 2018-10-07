@@ -46,6 +46,12 @@ More on this at the end.
 
 ## Linear models in R
 
+<div style="float: right">
+```{r echo=F,out.width="50%",fig.align="left"}
+knitr::include_graphics("../figures/chambers_and_hastie.jpg")
+```
+</div>
+
 S language (predecessor to R) was revamped in
 
 ...
@@ -285,8 +291,8 @@ Do section: Single factor predictor, two levels
 <div style="float: right; width: 15em;">
 ```{r}
 y <- c(3,5)
-fit1 <- lm(y ~ 1)
 fit0 <- lm(y ~ 0)
+fit1 <- lm(y ~ 1)
 ```
 
 Two model formulas representing two hypotheses H0 and H1.
@@ -308,8 +314,8 @@ to_test()
 <div style="float: right; width: 15em;">
 ```{r}
 y <- c(3,5)
-fit1 <- lm(y ~ 1)
 fit0 <- lm(y ~ 0)
+fit1 <- lm(y ~ 1)
 
 anova(fit0, fit1)
 ```
@@ -500,83 +506,55 @@ Do section: Gene expression example
 
 
 
+## Summary
+
+Should now be able to
+
+* fit linear models
+* understand the importance of different parts of the model
+    * coefficients
+    * residual standard deviation
+    * residual degrees of freedom
+* predict using a model
+* test hypothesis using two nested linear models
+* test hypotheses and calculate CIs using contrasts
+* test many hypotheses using limma
+* understand multiple testing correction
+
+
+## Summary - problems with linear models
+
+Incorrect transformation of y can introduce spurious interactions.
+
+Highly correlated predictors, or completely confounded experimental design.
+
+Problems with residual noise:
+
+>* Non-uniform noise level between conditions
+>* Remaining structure
+>* Non-normal distribution (can survive some violation of this, however large outliers are bad)
+
+> Various more advanced methods exist if these are present, such as robust model fitting and "sandwich" estimation of the accuracy of coefficients and contrasts.
 
 
 
+## Further reading
 
+<div style="float: right">
+```{r echo=F,out.width="50%",fig.align="left"}
+knitr::include_graphics("../figures/chambers_and_hastie.jpg")
+```
+</div>
 
+Primary reference is:
 
+[Chambers](http://statweb.stanford.edu/~jmc4/) and [Hastie](http://web.stanford.edu/~hastie/) (1991) "Statistical Models in S"
 
-## Units of observation
+<br>
+Also good:
 
-"individual" "biological sample"
+[Faraway](http://www.maths.bath.ac.uk/~jjf23/) (2014) "Linear Models with R"
 
-
-## Predictors
-
-"predictor" "independent variable" "explanatory variable"
-
-Predictors can be:
-
-* a constant (usually 1)
-* something we can measure about each unit
-* some varying treatment we made to each unit
-* any mathematical manipulation or combination of the above that we care to dream up
-
-
-## Response variable
-
-Independent
-
-* No *percolation* through a network, eg epidemics
-
-* No non-random correlation, except as accounted for by predictors
-
-* No technical replicates
-
-Identical normal distribution of "residual" noise. Some potential problems:
-
-* Magnitude of residual noise correlated with predictors ("heteroscedastic")
-
-* Large outliers
-
-* Just a few discrete values
-
-(We can survive some lack of normality with sufficient observations. The normality of the coefficient estimates is what matters, and the Central Limit Theorem lends a hand here.)
-
-
-
-
-## Noise assumptions to check
-
-Can survive some deviation from Gaussian distribution. Central Limit Theorem means errors in estimated coefficients tend to Gaussian.
-
-Data consisting of only a few discrete values can be a problem.
-
-Noise should be uniform, eg across different groups, "homoscedastic".
-
-Noise should not contain large outliers.
-
-* The variance or even the mean might not even exist to be estimated, and then the Central Limit Theorem will not apply.
-
-* Don't cause a Global Financial Crisis! See [Nassim Taleb](http://www.fooledbyrandomness.com/).
-
-Various possible solutions. The first thing to try is transformation, eg log(y).
-
-
-## Predictor problems
-
-Suppose treatmeant A was applied in batch 1 and treatment B was applied only in batch 2. Treatment and batch are confounded, and a linear model can not be fit.
-
-Assumption of uniform residual variance is more of a problem in unbalanced designs.
-
-
-
-## Rejecting a single hypothesis is severely lacking in ambition
-
-* If we show an effect size is non-zero, we still don't know if it is large enought to be important.
-
-* Scientific knowledge is hypotheses that could have been rejected but have not been (Popper). The failure of a vigorous attempt to reject a hypothesis corroborates it, but how much vigorousness have we achieved?
 
 
 

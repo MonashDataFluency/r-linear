@@ -4,6 +4,8 @@
 #////////////////////////
 # 1 Loading packages ----
 
+knitr::opts_chunk$set(fig.align="center", fig.width=5,fig.height=5)
+
 # To install needed packages:
 #   install.packages("tidyverse")
 #   install.packages("multcomp")
@@ -354,13 +356,41 @@ result
 summary(result)
 confint(result)
 
+# glht can test multiple contrasts at once. By default it applies a
+# multiple testing correction when doing so. This is a generalization of
+# Tukey's Honestly Significant Differences.
+
 K <- rbind(
     Bob_vs_Alice  = c(0,  1,0, 0,0,0,0,0,0,0),
-    Carl_vs_Alice = c(0,  1,0, 0,0,0,0,0,0,0),
+    Carl_vs_Alice = c(0,  0,1, 0,0,0,0,0,0,0),
     Carl_vs_Bob   = c(0, -1,1, 0,0,0,0,0,0,0))
 result <- glht(pvcfit1, K)
 summary(result)
 confint(result)
+
+# We can also turn off the multiple testing correction.
+
+summary(result, test=adjusted("none"))
+
+# A reasonable compromise between these extremes is Benjamini and
+# Hochberg's False Discovery Rate (FDR) correction.
+
+summary(result, test=adjusted("fdr"))
+
+# Finally, we can ask if *any* of the contrasts is non-zero, i.e.
+# whether the model with all three constraints applied can be rejected.
+# This is equivalent to the anova( ) tests we have done earlier. (Note
+# that while we have three constraints, the degrees of freedom reduction
+# is 2, as any 2 of the constraints are sufficient. This makes me
+# uneasy, it's reliant on numerical accuracy.)
+
+summary(result, test=Ftest())
+
+pvcfit0 <- lm(psize ~ resin, data=pvc)
+anova(pvcfit0, pvcfit1)
+
+# This demonstrates that the two methods of testing hypotheses--with the
+# ANOVA test and with contrasts--are equivalent.
 
 
 
@@ -376,16 +406,18 @@ confint(result)
 # million.
 #
 # (This data was extracted from ARCHS4. In the Gene Expression Omnibus
-# (GEO), it is entry GSE76316. The sample descriptions in GEO were out
-# of order. Reading the associated paper and the genes they talk about,
-# I *think* I have corrected the order of samples.)
+# (GEO), it is entry GSE76316. The sample descriptions in GEO seem to be
+# out of order, but reading the associated paper and the genes they talk
+# about I *think* I now have the correct order of samples.)
 
 teeth <- read_csv("r-linear-files/teeth.csv")
 
-# ((( A convenience to examine different model fits )))
+# It will be convenient to have a quick way to examine different genes
+# and different models with this data.
 
+# A convenience to examine different model fits
 more_data <- expand.grid(
-        day=seq(14.3,18.2,by=0.05),
+        day=seq(14.3,18.2,by=0.01),
         tooth=as_factor(c("lower","upper"))) %>%
     mutate(mouse=paste0("ind",round((day-14.5)*2+1)))
 
@@ -393,33 +425,161 @@ look <- function(y, fit=NULL) {
     p <- ggplot(teeth,aes(x=day,group=tooth))
     if (!is.null(fit)) {
         more_ci <- cbind(more_data, predict(fit, more_data, interval="confidence"))
-        p <- p + geom_ribbon(data=more_ci, aes(ymin=lwr,ymax=upr),alpha=0.25) + geom_line(data=more_ci,aes(y=fit,color=tooth))
+        p <- p +
+            geom_ribbon(data=more_ci, aes(ymin=lwr,ymax=upr),alpha=0.1) +
+            geom_line(data=more_ci,aes(y=fit,color=tooth))
     }
     p + geom_point(aes(y=y,color=tooth))
 }
 
-tfit <- lm(gene_ace ~ mouse + tooth, data=teeth)
+# Try it out
+look(teeth$gene_ace)
 
-look(teeth$gene_ace, tfit)
+# We could treat day as a categorical variable, as in the previous
+# section. However let us treat it as numerical, and see where that
+# leads.
 
-# 6.1 Paired t-test ----
+# 6.1 Transformation ----
 
-# 6.2 Transformation ----
+# 6.1.1 Ace gene ----
 
-# 6.3 Curve fitting ----
+acefit <- lm(gene_ace ~ tooth + day, data=teeth)
 
-# 6.4 Time is confounded with individual ----
+look(teeth$gene_ace, acefit)
+
+# Two problems:
+#
+# 1. The actual data appears to be curved, our straight lines are not a
+# good fit.
+# 2. The predictions fall below zero, a physical impossibility.
+#
+# In this case, log transformation of the data will solve both these
+# problems.
+
+log2_acefit <- lm( log2(gene_ace) ~ tooth + day, data=teeth)
+
+look(log2(teeth$gene_ace), log2_acefit)
+
+# Various transformations of y are possible. Log transformation is
+# commonly used in the context of gene expression. Square root
+# transformation can also be appropriate with nicely behaved count data
+# (technically, if the errors follow a Poisson distribution). This gene
+# expression data is ultimately count based, but is overdispersed
+# compared to the Poisson distribution so square root transformation
+# isn't appropriate in this case. The Box-Cox transformations provide a
+# spectrum of further options.
+
+# 6.1.2 Pou3f3 gene ----
+#
+# In the case of the Pou3f3 gene, the log transformation is even more
+# important. It looks like gene expression changes at different rates in
+# the upper and lower molars, that is there is a significant interaction
+# between tooth and day.
+
+pou3f3fit0 <- lm(gene_pou3f3 ~ tooth + day, data=teeth)
+pou3f3fit1 <- lm(gene_pou3f3 ~ tooth * day, data=teeth)
+
+anova(pou3f3fit0, pou3f3fit1)
+
+look(teeth$gene_pou3f3, pou3f3fit0)
+look(teeth$gene_pou3f3, pou3f3fit1)
+
+# Examining the residuals reveals a further problem.
+
+look(residuals(pou3f3fit1))
+plot(predict(pou3f3fit1), residuals(pou3f3fit1))
+qqnorm(residuals(pou3f3fit1))
+qqline(residuals(pou3f3fit1))
+
+# Larger expression values are associated with larger residuals.
+#
+# Log transformation both removes the interaction and makes the
+# residuals more uniform (except for one outlier).
+
+log2_pou3f3fit0 <- lm(log2(gene_pou3f3) ~ tooth + day, data=teeth)
+log2_pou3f3fit1 <- lm(log2(gene_pou3f3) ~ tooth * day, data=teeth)
+
+anova(log2_pou3f3fit0, log2_pou3f3fit1)
+
+look(log2(teeth$gene_pou3f3), log2_pou3f3fit0)
+
+qqnorm(residuals(log2_pou3f3fit0))
+qqline(residuals(log2_pou3f3fit0))
+
+# 6.2 Curve fitting ----
+
+# 6.2.1 Smoc1 gene ----
+
+log2_smoc1fit <- lm( log2(gene_smoc1) ~ tooth + day, data=teeth)
+
+look(log2(teeth$gene_smoc1), log2_smoc1fit)
+
+# In this case, log transformation does not remove the curve. If you
+# think this is a problem for *linear* models, you are mistaken! With a
+# little *feature engineering* we can fit a quadratic curve.
+# Calculations can be included in the formula if wrapped in I( ):
+
+curved_fit <- lm(log2(gene_smoc1) ~ tooth + day + I(day^2), data=teeth)
+look(log2(teeth$gene_smoc1), curved_fit)
+
+# Another way to do this would be to add the column to the data frame:
+
+teeth$day_squared <- teeth$day^2
+curved_fit2 <- lm(log2(gene_smoc1) ~ tooth + day + day_squared, data=teeth)
+
+# Finally, the poly( ) function can be used in a formula to fit
+# polynomials of arbitrary degree. poly will encode day slightly
+# differently, but produces an equivalent fit.
+
+curved_fit3 <- lm(log2(gene_smoc1) ~ tooth + poly(day,2), data=teeth)
+
+sigma(curved_fit)
+sigma(curved_fit2)
+sigma(curved_fit3)
+
+# poly can also be used to fit higher order polynomials, but these tend
+# to become very wobbly and extrapolate poorly. A better option may be
+# to use the ns( ) or bs( ) functions in the splines package, which can
+# be used to fit piecewise "B-splines". In particular ns( ) (natural
+# spline) is appealing because it extrapolates beyond the ends only with
+# straight lines.
+
+library(splines)
+spline_fit <- lm(log2(gene_smoc1) ~ tooth * ns(day,3), data=teeth)
+
+look(log2(teeth$gene_smoc1), spline_fit)
+
+# 6.3 Day is confounded with mouse ----
+#
+# There may be individual differences between mice. We would like to
+# take this into our account in a model. In general it is common to
+# include batch effect terms in a model in order to correctly model the
+# data (and increase the significance level of results), even if they
+# are not directly of interest.
+
+badfit <- lm(log2(gene_ace) ~ tooth + day + mouse, data=teeth)
+summary(badfit)
+
+# In this case this is not possible. As a different mouse produced data
+# for each different day, mouse is confounded with day. day can be
+# constructed as a linear combination of the intercept term and the
+# mouse terms.
 #
 # Another example of confounding would be an experiment in which each
 # treatment is done in a separate batch.
 #
 # Highly correlated predictors can also be problematic, even if not
 # perfectly confounded.
+#
+# A possible solution to this problem would be to use a "mixed model",
+# but this is beyond the scope of today's workshop.
 
 
 
-#//////////////////////////
-# 7 Testing many genes ----
+#/////////////////////////////////////
+# 7 Testing many genes with limma ----
+
+# 7.1 Load, normalize, log transform ----
 #
 # Actually in this gene expression dataset, the expression level of all
 # genes was measured!
@@ -454,10 +614,10 @@ dgelist$samples
 log2_cpms <- cpm(dgelist, log=TRUE, prior.count=0.25)
 
 # There is little chance of detecting differential expression in genes
-# with very few genes. Including these genes will require a larger False
-# Discovery Rate correction, and also confuses limma's hyper-parameter
-# estimation. Let's only retain genes with an average of 5 reads per
-# sample or more.
+# with very low read counts. Including these genes will require a larger
+# False Discovery Rate correction, and also confuses limma's Empirical
+# Bayes hyper-parameter estimation. Let's only retain genes with an
+# average of 5 reads per sample or more.
 
 keep <- rowMeans(log2_cpms) >= -3
 log2_cpms_filtered <- log2_cpms[keep,]
@@ -465,14 +625,22 @@ log2_cpms_filtered <- log2_cpms[keep,]
 nrow(log2_cpms)
 nrow(log2_cpms_filtered)
 
-# We will use limma to detect differentially expressed genes. limma
-# doesn't automatically convert a formula into a model matrix, so we
-# have to do this step manually.
+# 7.2 Fitting a model to and testing each gene ----
+#
+# We will use limma to fit a linear model to each gene. The same model
+# formula will be used in each case.
+#
+# limma doesn't automatically convert a formula into a model matrix, so
+# we have to do this step manually. Here I am using a model formula that
+# treats day/mouse as categorical, so this will be like our earlier pvc
+# example. The models treating day as a numeric variable are just as
+# applicable (this is left as an exercise).
 
 design <- model.matrix(~ tooth + mouse, data=teeth)
 
 fit <- lmFit(log2_cpms_filtered, design)
 
+class(fit)
 fit$coefficients[1:5,]
 
 # Significance testing in limma is by the use of contrasts. A difference
@@ -504,7 +672,21 @@ ggplot(all_results, aes(x=AveExpr, y=logFC)) +
     geom_point(size=0.1, color="grey") +
     geom_point(data=all_results[significant,], size=0.1)
 
-# 7.1 False Coverage Rate corrected CIs ----
+# 7.3 Relation to lm( ) and glht( ) ----
+#
+# Nkx2-3 stands out in terms log2 fold change.
+
+nkx23 <- log2_cpms["Nkx2-3",]
+nkx23_fit <- lm(nkx23 ~ tooth + mouse, data=teeth)
+look(nkx23, nkx23_fit)
+
+# We can use the same contrast with glht. The value of the contrast is
+# the same, but limma has gained some power by shrinking the variance
+# toward the trend line, so limma's p-value is smaller.
+
+summary( glht(nkx23_fit, K) )
+
+# 7.4 False Coverage Rate corrected CIs ----
 #
 # Confidence Intervals should also be of interest.
 
@@ -512,12 +694,15 @@ topTable(efit, confint=0.95)
 
 # However we should adjust for multiple testing. A False Coverage Rate
 # corrected CI can be constructed corresponding to a set of genes judged
-# significant. The smaller the selection of genes selected as a
-# proportion of the whole, the greater the correction required. To
-# ensure a false coverage rate of q, we use the confidence interval
+# significant. The smaller the selection of genes as a proportion of the
+# whole, the greater the correction required. To ensure a false coverage
+# rate of q, we use the confidence interval
 # (1-q*n_genes_selected/n_genes_total)*100%.
 
-fcr_confint <- 1-0.05*mean(significant)
+all_results <- topTable(efit, n=Inf)
+significant <- all_results$adj.P.Val <= 0.05
+prop_significant <- mean(significant)
+fcr_confint <- 1 - 0.05*prop_significant
 
 all_results <- topTable(efit, confint=fcr_confint, n=Inf)
 
@@ -529,7 +714,7 @@ ggplot(all_results, aes(x=AveExpr, y=logFC)) +
 # The FCR corrected CIs used here have the same q, 0.05, as we used as
 # the cutoff for adj.P.Val. This means they never pass through zero.
 
-# 7.2 ANOVA test ----
+# 7.5 ANOVA test ----
 #
 # limma can also test a constraint over several contrasts at once. We
 # illustrate this verbosely:
@@ -550,7 +735,7 @@ topTable(efit2)
 # A shortcut would be to use contrasts.fit(fit, coefficients=3:9) here
 # instead, or to specify a set of coefficients directly to topTable().
 
-# 7.3 Challenge - find genes that changed between specific mouse embryos ----
+# 7.6 Challenge - find genes that changed between specific mouse embryos ----
 #
 # Construct and use contrasts to find genes that changed between:
 #
@@ -558,12 +743,20 @@ topTable(efit2)
 #
 # 2. ind2 and ind3
 #
-# 7.4 Challenge - find smoothly changing genes ----
+# 7.7 Challenge - find smoothly changing genes ----
 #
-# Use limma to find genes where the hypothesis that they are changing
-# linearly or quadratically over time is significantly better than the
-# hypothesis that they are not changing over time.
+# Use limma to find genes where the hypothesis that expression is
+# changing linearly or quadratically over time is significantly better
+# than the hypothesis that they are not changing over time.
 #
 # Your model should allow that the upper and lower teeth may differ in
-# expression level by a constant amount. As an extension, also allow
-# that they they may follow different curves.
+# expression level by a constant amount.
+#
+# As an extension, also allow that they they may follow different
+# curves. Do any genes follow different curves in the upper and lower
+# teeth, other than differing by a constant amount? (This is something
+# we couldn't test for in the above analysis, which treated time as
+# categorical, as we would run out of residual degrees of freedom. By
+# assuming a smooth change over time we can recover some residual
+# degrees of freedom and test for this even without having replicates at
+# any of the time points!)
