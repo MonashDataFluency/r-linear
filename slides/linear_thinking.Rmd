@@ -41,8 +41,6 @@ Linear modelling encompasses much of statistics
 
 and is the starting point for most of the rest.
 
-More on this at the end.
-
 
 ## Linear models in R
 
@@ -71,7 +69,9 @@ Primary reference is "Statistical models in S".
 
 ## Notation
 
+<!--
 Will give everything today in English, in maths, and in R code.
+-->
 
 We will be using vectors and matrices.
 
@@ -138,15 +138,12 @@ Do section: Vectors and matrices
 
 ## Models
 
-A **model** can be used to predict a **response** variable based on a set of **predictor** variables.
+A **model** can be used to predict a **response** variable based on a set of **predictor** variables. <span class="tip">*<span class="tiptext">Alternative terms: depedent variable, independent variables.<br><br>We are using causal language, but really only measuring an association.</span></span>
+
 
 The prediction will usually be imperfect, due to random noise.
 
 <br>
-
-(Alternative terms: depedent variable, independent variables.)
-
-(Using causal language, but really only modelling an association.)
 
 
 
@@ -166,7 +163,7 @@ The noise is assumed to be normally distributed with standard deviation $\sigma$
 
 $$ \varepsilon \sim \mathcal{N}(0,\sigma^2) $$
 
-Typically but not always $x_1$ will always be 1, so $\beta_1$ is a constant term in the model. We still count it as one of the $p$ predictors. (This matches what R does, but may differ from other presentations!)
+Typically but not always $x_1$ will always be 1, so $\beta_1$ is a constant term in the model. We still count it as one of the $p$ predictors. <span class="tip">*<span class="tiptext">This matches what R does, but may differ from other presentations!</span></span>
 
 
 ## Linear model in R code
@@ -299,7 +296,7 @@ Two model formulas representing two hypotheses H0 and H1.
 
 H0 must *nest* within H1.
 
-$\varepsilon_0$ can't be shorter than $\varepsilon_1$
+$\hat\varepsilon_0$ can't be shorter than $\hat\varepsilon_1$
 
 Is it *surprisingly longer*? Then we reject H0.
 </div>
@@ -320,7 +317,7 @@ fit1 <- lm(y ~ 1)
 anova(fit0, fit1)
 ```
 
-Here we can not reject the null hypothesis (F(1,1)=16, p=0.156).
+Here we can not reject the null hypothesis (F(1,1)=16, p=0.156). <span class="tip">*<span class="tiptext">If H0 is true, we expect F to be close to 1. This value of F is much larger than 1. Why can't we reject H0? The problem is that we are very uncertain about $\sigma$ because our residual degrees of freedom is so low. Hence the F(1,1) distribution here has a very long fat tail.</span></span>
 </div>
 
 ```{r echo=F}
@@ -351,7 +348,7 @@ $$
 <br>
 
 $$
-F = {{RSS_0-RSS_1 \over p_1-p_0} \over {RSS_1 \over n-p_1} }
+F = { {RSS_0-RSS_1 \over p_1-p_0} \over {RSS_1 \over n-p_1} }
 $$
 
 RSS = Residual Sum of Squares
@@ -411,13 +408,10 @@ Let's discuss this in more detail.
 
 `logical` vector is converted to 0s and 1s.
 
-`factor` is represented as $n_\text{levels}-1$ predictors, "one-hot" representation.*
+`factor` is represented as $n_\text{levels}-1$ predictors, "one-hot" representation. <span class="tip">*<span class="tiptext">The encoding can be adjusted using the `C( )` function within a formula. The default differs between S and R languages!</span></span>
 
 `matrix` is represented as multiple columns.
 
-<br>
-
-<div style="font-size: 50%">\* Encoding can be adjusted using `C( )` function. Default differs between S and R languages!</div>
 
 
 ## Function calls
@@ -510,16 +504,16 @@ Do section: Gene expression example
 
 Should now be able to
 
-* fit linear models
-* understand the importance of different parts of the model
-    * coefficients
-    * residual standard deviation
-    * residual degrees of freedom
-* predict using a model
-* test hypothesis using two nested linear models
-* test hypotheses and calculate CIs using contrasts
-* test many hypotheses using limma
-* understand multiple testing correction
+>* fit linear models
+>* understand the importance of different parts of the model
+>    * coefficients
+>    * residual standard deviation
+>    * residual degrees of freedom
+>* predict using a model
+>* test hypothesis using two nested linear models
+>* test hypotheses and calculate CIs using contrasts
+>* test many hypotheses using limma
+>* understand multiple testing correction
 
 
 ## Summary - problems with linear models
@@ -532,9 +526,18 @@ Problems with residual noise:
 
 >* Non-uniform noise level between conditions
 >* Remaining structure
->* Non-normal distribution (can survive some violation of this, however large outliers are bad)
+>* Non-normal distribution <div class="tip">*<div class="tiptext">We can survive some violation of this, but large outliers are bad. This is as much about beliefs and past experience as observation -- if outliers are rare, a sample *without* outliers may give a misleading estimate. See: Global Financial Crisis, Nasim Taleb.</div></div>
 
 > Various more advanced methods exist if these are present, such as robust model fitting and "sandwich" estimation of the accuracy of coefficients and contrasts.
+
+
+## Where next?
+
+Generalized Linear Models
+
+Cox survival models
+
+Regularization
 
 
 

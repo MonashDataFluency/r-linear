@@ -542,7 +542,9 @@ sigma(curved_fit3)
 # to use the ns( ) or bs( ) functions in the splines package, which can
 # be used to fit piecewise "B-splines". In particular ns( ) (natural
 # spline) is appealing because it extrapolates beyond the ends only with
-# straight lines.
+# straight lines. If the data is cyclic (for example cell cycle or
+# circadian time series), sine and cosine terms can be used to fit some
+# number of harmonics from a Fourier series.
 
 library(splines)
 spline_fit <- lm(log2(gene_smoc1) ~ tooth * ns(day,3), data=teeth)

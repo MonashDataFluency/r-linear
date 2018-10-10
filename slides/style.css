@@ -6,3 +6,30 @@ slides > slide.title-slide {
 h1,h2,h3 {
     color: #048;
 }
+
+.tip {
+    position: relative;
+    display: inline-block;
+    color: #00f;
+    border-bottom: 1px dotted black;
+}
+
+.tip .tiptext {
+    display: block;
+    color: black;
+    background: white;
+    visibility: hidden;
+    width: 20em;
+    padding: 1em;
+    border: 2px solid black;
+    border-radius: 6px;
+ 
+    position: fixed;
+    right: 3em;
+    bottom: 3em;
+    z-index: 1;
+}
+
+.tip:hover .tiptext {
+    visibility: visible;
+}
