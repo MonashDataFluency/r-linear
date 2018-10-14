@@ -643,7 +643,7 @@ fit2 <- lm(log2(gene_smoc1) ~ tooth * day, data=teeth)
 # model significantly better?
 #
 # 3. Why would it *not* be appropriate to compare fit2 and your new
-# model with anova( )?
+# model using anova( )?
 #
 # 4. What more complicated model *could* we compare to fit2 with anova(
 # )?
@@ -779,10 +779,10 @@ summary( glht(rnf144b_fit, K) )
 topTable(efit, confint=0.95)
 
 # However we should adjust for multiple testing. A False Coverage Rate
-# corrected CI can be constructed corresponding to a set of genes judged
-# significant. The smaller the selection of genes as a proportion of the
-# whole, the greater the correction required. To ensure a false coverage
-# rate of q, we use the confidence interval
+# (FCR) corrected CI can be constructed corresponding to a set of genes
+# judged significant. The smaller the selection of genes as a proportion
+# of the whole, the greater the correction required. To ensure a False
+# Coverage Rate of q, we use the confidence interval
 # (1-q*n_genes_selected/n_genes_total)*100%.
 
 all_results <- topTable(efit, n=Inf)

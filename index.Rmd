@@ -39,7 +39,7 @@ This course is developed by the [Monash Bioinformatics Platform](https://www.mon
 
 ## Source code
 
-* [GitHub repository](https://github.com/MonashBioinformaticsPlatform/r-more)
+* [GitHub repository](https://github.com/MonashBioinformaticsPlatform/r-linear)
 
 <p style="margin-top: 5em; text-align: right">
 <a href="http://bioinformatics.erc.monash.edu"><img src="figures/MBP-banner.png" width="675"></a>
