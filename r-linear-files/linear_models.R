@@ -438,9 +438,9 @@ anova(pvcfit0, pvcfit1)
 # This demonstrates that the two methods of testing hypotheses--with the
 # ANOVA test and with contrasts--are equivalent.
 
-# 5.5 Challenge - construct some contrasts ----
+# 5.5 Challenge - construct contrasts ----
 #
-# Construct contrasts to see if the effect of:
+# Using the pvcfit1 model, construct contrasts to see if the effect of:
 #
 # 1. R8 is different to R4
 # 2. R2 is different to R1
@@ -453,15 +453,16 @@ anova(pvcfit0, pvcfit1)
 # Tooth growth in mouse embryos is studied using RNA-Seq. The RNA
 # expression levels of several genes are examined in the cells that form
 # the upper and lower first molars, in eight individual mouse embryos
-# that have been disected after different times of embryo development.
+# that have been dissected after different times of embryo development.
 # The measurements are in terms of "Reads Per Million", essentially the
 # fraction of RNA in each sample belonging to each gene, times 1
 # million.
 #
-# (This data was extracted from ARCHS4. In the Gene Expression Omnibus
-# (GEO) it is entry GSE76316. The sample descriptions in GEO seem to be
-# out of order, but reading the associated paper and the genes they talk
-# about I *think* I now have the correct order of samples.)
+# (This data was extracted from ARCHS4
+# (https://amp.pharm.mssm.edu/archs4/). In the Gene Expression Omnibus
+# it is entry GSE76316. The sample descriptions in GEO seem to be out of
+# order, but reading the associated paper and the genes they talk about
+# I *think* I have the correct order of samples!)
 
 teeth <- read_csv("r-linear-files/teeth.csv")
 
@@ -476,7 +477,9 @@ more_data <- expand.grid(
 look <- function(y, fit=NULL) {
     p <- ggplot(teeth,aes(x=day,group=tooth))
     if (!is.null(fit)) {
-        more_ci <- cbind(more_data, predict(fit, more_data, interval="confidence"))
+        more_ci <- cbind(
+            more_data,
+            predict(fit, more_data, interval="confidence"))
         p <- p +
             geom_ribbon(data=more_ci, aes(ymin=lwr,ymax=upr),alpha=0.1) +
             geom_line(data=more_ci,aes(y=fit,color=tooth))
@@ -589,10 +592,10 @@ sigma(curved_fit)
 sigma(curved_fit2)
 sigma(curved_fit3)
 
-# poly can also be used to fit higher order polynomials, but these tend
-# to become very wobbly and extrapolate poorly. A better option may be
-# to use the ns( ) or bs( ) functions in the splines package, which can
-# be used to fit piecewise "B-splines". In particular ns( ) (natural
+# poly( ) can also be used to fit higher order polynomials, but these
+# tend to become very wobbly and extrapolate poorly. A better option may
+# be to use the ns( ) or bs( ) functions in the splines package, which
+# can be used to fit piecewise "B-splines". In particular ns( ) (natural
 # spline) is appealing because it extrapolates beyond the ends only with
 # straight lines. If the data is cyclic (for example cell cycle or
 # circadian time series), sine and cosine terms can be used to fit some
@@ -672,7 +675,7 @@ teeth$sample
 
 # A usual first step in RNA-Seq analysis is to convert read counts to
 # Reads Per Million, and log2 transform the results. There are some
-# subtlties here which we breeze over lightly: We use "TMM"
+# subtleties here which we breeze over lightly: We use "TMM"
 # normalization as a small adjustment to the total number of reads in
 # each sample. A small constant is added to the counts to avoid
 # calculating log2(0). The edgeR and limma manuals describe these in
@@ -728,15 +731,13 @@ fit$coefficients[1:5,]
 # Upper slope: c(0,0,1,1)
 
 K <- rbind(avg_slope = c(0,0,1,0.5))
-cfit <- contrasts.fit(fit, t(K))         #limma expects contrasts in columns!
+cfit <- contrasts.fit(fit, t(K))         #contrasts in columns!
 
 # Empirical Bayes squeezing of the residual variance acts as though we
 # have some number of extra "prior" observations of the variance. These
 # are also counted as extra degrees of freedom in F tests. The "prior"
 # observations act to squeeze the estimated residual variance toward a
 # trend line that is a function of the average expression level.
-
-options(max.print=21)
 
 efit <- eBayes(cfit, trend=TRUE)
 efit$df.prior
@@ -745,9 +746,9 @@ efit$df.total
 plotSA(efit)
 points(efit$Amean, efit$s2.post^0.25, col="red", cex=0.3)
 
-options(max.print=1000)
-
 topTable(efit)
+
+# The column adj.P.Val contains FDR adjusted p-values.
 
 all_results <- topTable(efit, n=Inf)
 
@@ -799,6 +800,9 @@ ggplot(all_results, aes(x=AveExpr, y=logFC)) +
 
 # The FCR corrected CIs used here have the same q, 0.05, as we used as
 # the cutoff for adj.P.Val. This means they never pass through zero.
+#
+# I have some further thoughts on this topic, see the package
+# topconfects (http://logarithmic.net/topconfects/).
 
 # 7.5 ANOVA test ----
 #
