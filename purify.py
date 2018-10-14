@@ -12,6 +12,9 @@ last_comment = False
 counts = [ ]
 for line in sys.stdin:
     line = line.rstrip()
+
+    if line.startswith("knitr::"): continue
+
     if line.startswith("```"):
         #print()
         in_code = not in_code

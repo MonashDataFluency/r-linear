@@ -21,19 +21,11 @@ output:
 [Answers to challenges.](topics/answers.html) No peeking during class!
 -->
 
-## Further reading
-
-* [PH525x - Biomedical Data Science](http://genomicsclass.github.io/book/), see especially chapter 5. These are the course notes for [edX HarvardX PH525x](https://courses.edx.org/courses/HarvardX/PH525x/1T2014/course/)
-
-* Books "Linear Models with R" and "Extending the Linear Model with R" by Julian J. Faraway.
-
+<br><br><br>
 
 ## Authors
 
-This course is developed by the [Monash Bioinformatics Platform](https://www.monash.edu/researchinfrastructure/bioinformatics):
-
-* Paul Harrison
-* Kirill Tsyganov
+This course has been developed for the [Monash Bioinformatics Platform](https://www.monash.edu/researchinfrastructure/bioinformatics) and [Monash Data Fluency](https://www.monash.edu/data-fluency) by Paul Harrison.
 
 <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="figures/CC-BY.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
 

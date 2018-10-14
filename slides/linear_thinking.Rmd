@@ -26,7 +26,7 @@ Learn to predict a response variable as
 <br/>
 
 * test which variables and interactions the data supports as predictors
-* test what confidence interval to give on their strength as predictors
+* give a confidence interval on any estimates
 
 
 ## Linear models in context
@@ -35,34 +35,36 @@ Learn to predict a response variable as
 
 Linear modelling encompasses much of statistics
 
->* t test
->* correlation test
->* ANOVA
+>* calculation of averages and correlations
+>* t test, correlation test
+>* ANOVA, ANCOVA
 
 and is the starting point for most of the rest.
 
 
 ## Linear models in R
 
-<div style="float: right">
-```{r echo=F,out.width="50%",fig.align="left"}
+<div style="float: right; width: 25%; padding 2em;">
+```{r echo=F,out.width="100%",fig.align="left"}
 knitr::include_graphics("../figures/chambers_and_hastie.jpg")
 ```
 </div>
 
-S language (predecessor to R) was revamped in
+Much of the design of the S language (predecessor to R) exists to support linear models and their generalizations:
 
-...
+<br>
 
-substantially to support linear models:
+>* `data.frame` type introduced to hold data for modelling.
 
-* `data.frame` type introduced to hold data for modelling.
+>* `factor` type introduced to hold categorical data.
 
-* `factor` type introduced to hold categorical data.
+>* `~` formula syntax specify terms in models.
 
-* `~` formulas specify terms in models.
+>* Manipulation of "S3" objects holding fitted models.
 
-* Manipulation of "S3" objects holding fitted models.
+>* Rich set of diagnostic visualization functions.
+
+<br>
 
 Primary reference is "Statistical models in S".
 
@@ -73,7 +75,7 @@ Primary reference is "Statistical models in S".
 Will give everything today in English, in maths, and in R code.
 -->
 
-We will be using vectors and matrices.
+We will be using vectors and matrices extensively today.
 
 In maths, we usually treat a vector as a matrix with a single column. In R, they are two different types. A matrix can be created using `matrix`, or `cbind` or `rbind`.
 
@@ -106,10 +108,8 @@ Taking the product of a matrix $X$ and a vector $a$, $Xa$, the result is a vecto
 In R:
 
 ```{r eval=F}
-as.vector( X %*% a )
+X %*% a
 ```
-
-Without the `as.vector` the result would be a single column matrix.
 
 (It's also possible to multiply two matrices with `%*%` but we won't need this today.)
 
@@ -297,13 +297,13 @@ the_truth()
 
 ## Model fitting in R with `lm( )`
 
-Our starting point for modelling is always a data frame, but the process of getting $y$ and $X$ from the data frame has some complications, and a special "formula" syntax.
+Our starting point for modelling is usually a data frame, but the process of getting $y$ and $X$ from the data frame has some complications, and a special "formula" syntax. 
 
 ```
         data frame
 
             ||
-            || Magic involving "~" syntax happens
+            || Magic involving "~" formula syntax happens
             \/
 
            y, X
@@ -409,18 +409,16 @@ Is the increase in RSS in H0 merely proportionate
 A linear combination of coefficients, for example:
 
 >* difference of response between two levels in a factor
->* predicted response for a certain individual
+>* predicted response for an individual
 >* difference in predicted response between two individuals
 
-Constraining a contrast to be zero is another way to specify H0.
+Constraining a contrast to be zero is another way to specify a null hypothesis.
 
->* especially useful to say "there is no difference between these two levels"
+We might want:
 
-Can obtain:
-
->* estimated value with dot product
+>* estimated value of the contrast (calculated with dot product)
 >* Confidence Interval (CI)
->* hypothesis test
+>* hypothesis test p-value
 
 Use `multcomp` package.
 
@@ -459,9 +457,9 @@ Example: reject all values outside a confidence interval
 
 "Wilikins-Rogers notation"
 
-Formulas with `~` specify how to construct the model matrix $X$.
+Formulas with `~` specify response $y$ and the construction of the model matrix $X$.
 
-Merely a convenience, if you already have a model matrix `X` can always just use `~0+X`.
+Merely a convenience, if you already have model matrix `X` can just use `y ~ 0 + X`.
 
 Let's discuss this in more detail.
 
@@ -478,7 +476,7 @@ Let's discuss this in more detail.
 
 ## Factors
 
-$n_\text{levels}-1$ columns, "one-hot" encoding. <span class="tip">*<span class="tiptext">The encoding can be adjusted using the `C( )` function within a formula. The default differs between S and R languages!</span></span>
+$n_\text{levels}-1$ columns of "indicator variables", aka "one-hot" encoding. <span class="tip">*<span class="tiptext">The encoding can be adjusted using the `C( )` function within a formula. The default differs between S and R languages!</span></span>
 
 ```{r}
 f <- factor(c("a","a","b","b","c","c"))
@@ -512,7 +510,7 @@ model.matrix(~ 0 + f)
 </div>
 
 
-## Function calls
+## Calculations and function calls
 
 Can calculate with function calls, or enclose maths in `I( )`.
 
@@ -611,8 +609,8 @@ Various more advanced methods exist if these are present, such as robust model f
 ### $p > n$
 
 >* regularization with ridge regression and/or LASSO: `glmnet::glmnet( )`
->* Partial Least Squares (PLS) <br>(naive best directions first)
->* Principal Component Regression (PCR)<br>(largest variation in X first)
+>* Partial Least Squares (PLS) <br>(pick best direction to start moving in and take best leap along it, repeat)
+>* Principal Component Regression (PCR)<br>(direction of largest variation in X first)
 
 ### Noise not normal (eg binary or count data)
 
@@ -621,8 +619,8 @@ Various more advanced methods exist if these are present, such as robust model f
 
 ### Modelling populations, repeated measurements on individuals
 
->* Mixed models
->* Generalized Estimating Equation methods
+>* Generalized Least Squares<br>(account for covariance in noise)
+>* Mixed models<br>(some coefficients are drawn from a random distribution)
 
 
 ## Extensions to linear models

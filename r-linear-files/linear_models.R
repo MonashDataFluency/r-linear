@@ -4,8 +4,6 @@
 #////////////////////////
 # 1 Loading packages ----
 
-knitr::opts_chunk$set(fig.align="center", fig.width=5,fig.height=5)
-
 # To install needed packages:
 #   install.packages("tidyverse")
 #   install.packages("multcomp")
@@ -13,24 +11,15 @@ knitr::opts_chunk$set(fig.align="center", fig.width=5,fig.height=5)
 library(MASS)       # ginv   (coefficient estimation)
 library(splines)    # ns, bs (spline curves)
 library(multcomp)   # glht   (contrasts)
-library(tidyverse)
+library(tidyverse)  #        (working with data frames)
 
-# Much of what we will be using is built in to R without loading any
+# Much of what we will be using is built into R without loading any
 # packages.
 #
-# From the [Tidyverse](https://www.tidyverse.org/) we will be using:
-#
-# * readr::read_csv as a convenient way to specify a data frame.
-# * dplyr for data frame manipulations.
-# * ggplot2 for graphing.
-#
-# See [here](https://monashbioinformaticsplatform.github.io/r-more/topic
-# s/tidyverse.html) for our introduction to the Tidyverse.
-#
-# We will also be using:
-#
-# * multcomp::glht to calculate contrast p-values and confidence
-# intervals.
+# We will be using several [Tidyverse](https://www.tidyverse.org/)
+# packages for loading, manipulating, and plotting data frames. See http
+# s://monashbioinformaticsplatform.github.io/r-more/topics/tidyverse.htm
+# l for our introduction to the Tidyverse.
 
 
 
@@ -412,6 +401,7 @@ K <- rbind(
 result <- glht(pvcfit1, K)
 summary(result)
 confint(result)
+plot(result)
 
 # We can also turn off the multiple testing correction.
 
@@ -539,15 +529,14 @@ anova(pou3f3fit0, pou3f3fit1)
 look(teeth$gene_pou3f3, pou3f3fit0)
 look(teeth$gene_pou3f3, pou3f3fit1)
 
-# Examining the residuals reveals a further problem.
+# Examining the residuals reveals a further problem: larger expression
+# values are associated with larger residuals.
 
 look(residuals(pou3f3fit1))
 plot(predict(pou3f3fit1), residuals(pou3f3fit1))
 qqnorm(residuals(pou3f3fit1))
 qqline(residuals(pou3f3fit1))
 
-# Larger expression values are associated with larger residuals.
-#
 # Log transformation both removes the interaction and makes the
 # residuals more uniform (except for one outlier).
 
@@ -625,8 +614,9 @@ summary(badfit)
 # Another example of confounding would be an experiment in which each
 # treatment is done in a separate batch.
 #
-# Highly correlated predictors can also be problematic, even if not
-# perfectly confounded.
+# Highly correlated predictors are a problem even if they are not
+# perfectly confounded. It becomes impossible to estimate either of the
+# predictor coefficients accurately.
 #
 # A possible solution to this problem would be to use a "mixed model",
 # but this is beyond the scope of today's workshop.
