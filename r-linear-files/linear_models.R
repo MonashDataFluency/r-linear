@@ -10,8 +10,10 @@ knitr::opts_chunk$set(fig.align="center", fig.width=5,fig.height=5)
 #   install.packages("tidyverse")
 #   install.packages("multcomp")
 
+library(MASS)       # ginv   (coefficient estimation)
+library(splines)    # ns, bs (spline curves)
+library(multcomp)   # glht   (contrasts)
 library(tidyverse)
-library(multcomp)
 
 # Much of what we will be using is built in to R without loading any
 # packages.
@@ -50,11 +52,11 @@ a * b
 # We will be using the dot product a lot. This is:
 
 sum(a*b)
+t(a) %*% b
 
 # The *geometric* length of a vector is (by Pythagorus):
 
 sqrt(sum(a*a))
-sqrt(sum(a^2))
 
 # 2.2 Matrix operations ----
 #
@@ -146,8 +148,13 @@ predict(fit, interval="confidence")
 
 # We can also calculate predictions manually.
 
-X <- model.matrix(fit)
+# Prediction for a 15-year old
+x <- c(1, 15)
 beta <- coef(fit)
+sum(x * beta)
+
+# Prediction for all original data
+X <- model.matrix(fit)
 as.vector( X %*% beta )
 
 # predict can be used with new data.
@@ -226,39 +233,52 @@ sigma(outfit)
 
 model.matrix(outfit)
 
-# 4.1 Challenge - the meanings of coefficients ----
+# 4.1 How coefficients are estimated ----
 #
-# Examine the model matrix. What are the meanings of the two
-# coefficients that have been fitted?
+# Coefficients are estimated from responses by multiplying by the
+# "Moore-Penrose generalized inverse" of X. It can be useful to examine
+# this to work out exactly what a model is doing. Each row shows how the
+# corresponding coefficient is estimated.
+
+X <- model.matrix(outfit)
+y <- outcomes$outcome
+ginv(X) %>% round(3)
+ginv(X) %*% y
+
+# 4.2 Challenge - the meanings of coefficients ----
+#
+# Examine the model matrix and the generalized inverse matrix. What are
+# the meanings of the two coefficients that have been fitted?
 #
 # Suppose instead we fit:
 
 outfit2 <- lm(outcome ~ 0 + group, data=outcomes)
 
-# What do the coefficients in this new model represent? Does it fit the
-# data better or worse than the original model?
+# What do the coefficients in this new model represent?
 #
-# 4.2 Testing a hypothesis ----
+# Does it fit the data better or worse than the original model?
+#
+# 4.3 Testing a hypothesis ----
 #
 # Besides data with categorical predictors, the term ANOVA is used to
 # refer to the use of the F test. Significance is judged based on
 # comparing the Residual Sums of Squares of two models. We fit a model
 # representing a null hypothesis. This model formula must nest within
-# our original model formula: any prediction it can make can also be
-# made by the original model formula. We compare the models using the
-# anova function.
+# our original model formula: any prediction it can make must also be
+# possible to be made by the original model formula. We compare the
+# models using the anova function.
 
 outfit0 <- lm(outcome ~ 1, data=outcomes)
 
 anova(outfit0, outfit)
 
 # **Warning:** This is not the only way to use the anova( ) function,
-# but I think this is the safest way. Once we start using multiple
+# but I think it is the safest way. Once we start using multiple
 # predictors, the meaning of the output from anova with a single model
-# is likely to be not quite what you want. Read the documentation
+# is likely to be not quite what you want, read the documentation
 # carefully. The aov( ) function also has traps for the unwary. Use lm(
 # ), and anova( ) with two nested models as in this document and the
-# meaning should be as you would expect.
+# meaning should be as you expect.
 #
 # summary( ) also outputs p-values. Too many p-values, summary( )
 # doesn't respect the hierarchy of terms in the model. The p-value for
@@ -278,7 +298,7 @@ confint(outfit)
 
 t.test(outcome ~ group, data=outcomes, var.equal=TRUE)
 
-# 4.3 Challenge - does height change with age? ----
+# 4.4 Challenge - does height change with age? ----
 #
 # Return to the people dataset. Can we reject the hypothesis that height
 # is unrelated to age?
@@ -311,6 +331,17 @@ pvcfit1 <- lm(psize ~ operator + resin, data=pvc)
 summary(pvcfit1)
 confint(pvcfit1)
 
+# This model assumes the influence of the two factors is additive, the
+# model only contains the "main effects". The meanings of the
+# coefficients are:
+#
+# * "(Intercept)" is particle size for Alice and R1
+# * "operatorBob" is particle size for Bob relative to Alice
+# * "operatorCarl" is particle size for Carl relative to Alice
+# * "resinR2" is particle size for R2 relative to R1
+# * "resinR3" is particle size for R3 relative to R1
+# * (etc)
+
 # 5.2 Heteroscedasticity ----
 
 ggplot(pvc, aes(x=resin, y=residuals(pvcfit1))) +
@@ -327,6 +358,19 @@ pvcfit2 <- lm(psize ~ operator + resin + operator:resin, data=pvc)
 # or
 pvcfit2 <- lm(psize ~ operator*resin, data=pvc)
 
+# This model allows for interactions between the two factors. There are
+# enough predictors in the model matrix that each combination of levels
+# can take on a distinct value. So we now have
+#
+# * "(Intercept)" is particle size for Alice and R1
+# * "operatorBob" is particle size for Bob relative to Alice, for R1
+# * "operatorCarl" is particle size for Carl relative to Alice, for R1
+# * "resinR2" is particle size for R2 relative to R1, for Alice
+# * (etc)
+# * "operatorBob:resinR2" is particle size for Bob relative to Alice, R2
+# relative to R1
+# * (etc)
+
 anova(pvcfit1, pvcfit2)
 
 # 5.4 Contrasts and confidence intervals ----
@@ -334,11 +378,12 @@ anova(pvcfit1, pvcfit2)
 # anova lets us test if a particular factor interaction is needed at
 # all, and summary allows us to see if any levels of a factor differ
 # from the first level. However we may wish to compare an arbitrary pair
-# of levels in a factor, or even some more complicated combination of
-# levels. This can be done using contrasts.
+# of levels in a factor, or some more complicated combination of
+# coefficients such as a difference between two hypothetical
+# individuals. This can be done using contrasts.
 #
 # Say we want to compare Bob and Carl's particle sizes. We will use the
-# pvcfit model as a starting point.
+# pvcfit1 model.
 
 coef(pvcfit1)
 K <- rbind(Carl_vs_Bob = c(0, -1,1, 0,0,0,0,0,0,0))
@@ -381,8 +426,9 @@ summary(result, test=adjusted("fdr"))
 # whether the model with all three constraints applied can be rejected.
 # This is equivalent to the anova( ) tests we have done earlier. (Note
 # that while we have three constraints, the degrees of freedom reduction
-# is 2, as any 2 of the constraints are sufficient. This makes me
-# uneasy, it's reliant on numerical accuracy.)
+# is 2, as any 2 of the constraints are sufficient. This makes me uneasy
+# as it is reliant on numerical accuracy, better to just use any two of
+# the constraints.)
 
 summary(result, test=Ftest())
 
@@ -392,6 +438,13 @@ anova(pvcfit0, pvcfit1)
 # This demonstrates that the two methods of testing hypotheses--with the
 # ANOVA test and with contrasts--are equivalent.
 
+# 5.5 Challenge - construct some contrasts ----
+#
+# Construct contrasts to see if the effect of:
+#
+# 1. R8 is different to R4
+# 2. R2 is different to R1
+#
 
 
 #///////////////////////////////
@@ -406,7 +459,7 @@ anova(pvcfit0, pvcfit1)
 # million.
 #
 # (This data was extracted from ARCHS4. In the Gene Expression Omnibus
-# (GEO), it is entry GSE76316. The sample descriptions in GEO seem to be
+# (GEO) it is entry GSE76316. The sample descriptions in GEO seem to be
 # out of order, but reading the associated paper and the genes they talk
 # about I *think* I now have the correct order of samples.)
 
@@ -417,9 +470,8 @@ teeth <- read_csv("r-linear-files/teeth.csv")
 
 # A convenience to examine different model fits
 more_data <- expand.grid(
-        day=seq(14.3,18.2,by=0.01),
-        tooth=as_factor(c("lower","upper"))) %>%
-    mutate(mouse=paste0("ind",round((day-14.5)*2+1)))
+    day=seq(14.3,18.2,by=0.01),
+    tooth=as_factor(c("lower","upper")))
 
 look <- function(y, fit=NULL) {
     p <- ggplot(teeth,aes(x=day,group=tooth))
@@ -562,10 +614,10 @@ look(log2(teeth$gene_smoc1), spline_fit)
 badfit <- lm(log2(gene_ace) ~ tooth + day + mouse, data=teeth)
 summary(badfit)
 
-# In this case this is not possible. As a different mouse produced data
-# for each different day, mouse is confounded with day. day can be
-# constructed as a linear combination of the intercept term and the
-# mouse terms.
+# In this case this is not possible, and R has arbirarily dropped a
+# predictor from the model. As a different mouse produced data for each
+# different day, mouse is confounded with day. day can be constructed as
+# a linear combination of the intercept term and the mouse terms.
 #
 # Another example of confounding would be an experiment in which each
 # treatment is done in a separate batch.
@@ -576,6 +628,26 @@ summary(badfit)
 # A possible solution to this problem would be to use a "mixed model",
 # but this is beyond the scope of today's workshop.
 
+# 6.4 Challenge - two-way ANOVA model vs straight lines ----
+#
+# Consider:
+
+fit1 <- lm(log2(gene_smoc1) ~ tooth + day, data=teeth)
+fit2 <- lm(log2(gene_smoc1) ~ tooth * day, data=teeth)
+
+# 1. Fit a model to log2(gene_smoc1) which instead uses tooth and mouse
+# as predictors.
+#
+# 2. fit1 above nests within this model, since day can be computed from
+# mouse and your new model can fit any function of mouse. Is the new
+# model significantly better?
+#
+# 3. Why would it *not* be appropriate to compare fit2 and your new
+# model with anova( )?
+#
+# 4. What more complicated model *could* we compare to fit2 with anova(
+# )?
+#
 
 
 #/////////////////////////////////////
@@ -634,11 +706,11 @@ nrow(log2_cpms_filtered)
 #
 # limma doesn't automatically convert a formula into a model matrix, so
 # we have to do this step manually. Here I am using a model formula that
-# treats day/mouse as categorical, so this will be like our earlier pvc
-# example. The models treating day as a numeric variable are just as
-# applicable (this is left as an exercise).
+# treats the upper and lower teeth as following a linear trend over
+# time.
 
-design <- model.matrix(~ tooth + mouse, data=teeth)
+design <- model.matrix(~ tooth * day, data=teeth)
+design
 
 fit <- lmFit(log2_cpms_filtered, design)
 
@@ -648,9 +720,15 @@ fit$coefficients[1:5,]
 # Significance testing in limma is by the use of contrasts. A difference
 # between glht and limma's contrasts.fit is that limma uses columns as
 # contrasts, rather than rows.
+#
+# We will first look for genes where the slope over time is not flat,
+# *averaging* the lower and upper teeth.
 
-K <- rbind(upper = c(0, 1, 0,0,0,0,0,0,0))
-cfit <- contrasts.fit(fit, t(K))
+# Lower slope: c(0,0,1,0)
+# Upper slope: c(0,0,1,1)
+
+K <- rbind(avg_slope = c(0,0,1,0.5))
+cfit <- contrasts.fit(fit, t(K))         #limma expects contrasts in columns!
 
 # Empirical Bayes squeezing of the residual variance acts as though we
 # have some number of extra "prior" observations of the variance. These
@@ -658,10 +736,16 @@ cfit <- contrasts.fit(fit, t(K))
 # observations act to squeeze the estimated residual variance toward a
 # trend line that is a function of the average expression level.
 
+options(max.print=21)
+
 efit <- eBayes(cfit, trend=TRUE)
 efit$df.prior
+efit$df.residual
+efit$df.total
 plotSA(efit)
 points(efit$Amean, efit$s2.post^0.25, col="red", cex=0.3)
+
+options(max.print=1000)
 
 topTable(efit)
 
@@ -676,17 +760,17 @@ ggplot(all_results, aes(x=AveExpr, y=logFC)) +
 
 # 7.3 Relation to lm( ) and glht( ) ----
 #
-# Nkx2-3 stands out in terms log2 fold change.
+# Let's look at a specific gene.
 
-nkx23 <- log2_cpms["Nkx2-3",]
-nkx23_fit <- lm(nkx23 ~ tooth + mouse, data=teeth)
-look(nkx23, nkx23_fit)
+rnf144b <- log2_cpms["Rnf144b",]
+rnf144b_fit <- lm(rnf144b ~ tooth * day, data=teeth)
+look(rnf144b, rnf144b_fit)
 
 # We can use the same contrast with glht. The value of the contrast is
 # the same, but limma has gained some power by shrinking the variance
 # toward the trend line, so limma's p-value is smaller.
 
-summary( glht(nkx23_fit, K) )
+summary( glht(rnf144b_fit, K) )
 
 # 7.4 False Coverage Rate corrected CIs ----
 #
@@ -718,47 +802,29 @@ ggplot(all_results, aes(x=AveExpr, y=logFC)) +
 
 # 7.5 ANOVA test ----
 #
-# limma can also test a constraint over several contrasts at once. We
-# illustrate this verbosely:
+# limma can also test a constraint over several contrasts at once.
+# Suppose we want to find *any* deviation from a constant expression
+# level. We can check for this with:
 
 K2 <- rbind(
-    ind2_vs_ind1 = c(0, 0, 1,0,0,0,0,0,0),
-    ind3_vs_ind1 = c(0, 0, 0,1,0,0,0,0,0),
-    ind4_vs_ind1 = c(0, 0, 0,0,1,0,0,0,0),
-    ind5_vs_ind1 = c(0, 0, 0,0,0,1,0,0,0),
-    ind6_vs_ind1 = c(0, 0, 0,0,0,0,1,0,0),
-    ind7_vs_ind1 = c(0, 0, 0,0,0,0,0,1,0),
-    ind8_vs_ind1 = c(0, 0, 0,0,0,0,0,0,1))
+    c(0,1,0,0),
+    c(0,0,1,0),
+    c(0,0,0,1))
 
 cfit2 <- contrasts.fit(fit, t(K2))
 efit2 <- eBayes(cfit2, trend=TRUE)
 topTable(efit2)
 
-# A shortcut would be to use contrasts.fit(fit, coefficients=3:9) here
-# instead, or to specify a set of coefficients directly to topTable().
+# A shortcut would be to use contrasts.fit(fit, coefficients=2:4) here
+# instead, or to specify a set of coefficients directly to topTable( ).
 
-# 7.6 Challenge - find genes that changed between specific mouse embryos ----
+# 7.6 Challenge - construct some contrasts ----
 #
-# Construct and use contrasts to find genes that changed between:
+# Construct and use contrasts to find genes that:
 #
-# 1. ind1 and ind8
+# 1. Differ in slope between lower and upper molars.
 #
-# 2. ind2 and ind3
+# 2. Differ in expression on day 16 between the lower and upper molars.
 #
-# 7.7 Challenge - find smoothly changing genes ----
-#
-# Use limma to find genes where the hypothesis that expression is
-# changing linearly or quadratically over time is significantly better
-# than the hypothesis that they are not changing over time.
-#
-# Your model should allow that the upper and lower teeth may differ in
-# expression level by a constant amount.
-#
-# As an extension, also allow that they they may follow different
-# curves. Do any genes follow different curves in the upper and lower
-# teeth, other than differing by a constant amount? (This is something
-# we couldn't test for in the above analysis, which treated time as
-# categorical, as we would run out of residual degrees of freedom. By
-# assuming a smooth change over time we can recover some residual
-# degrees of freedom and test for this even without having replicates at
-# any of the time points!)
+# Hint: Contrast 2 can be viewed as the difference in predictions
+# between two individual samples.

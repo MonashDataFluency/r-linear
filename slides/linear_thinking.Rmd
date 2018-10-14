@@ -99,6 +99,8 @@ In R:
 sum(a*b)
 ```
 
+## Notation
+
 Taking the product of a matrix $X$ and a vector $a$, $Xa$, the result is a vector containing the dot product of each row of the matrix $X$ with the vector $a$.
 
 In R:
@@ -114,19 +116,36 @@ Without the `as.vector` the result would be a single column matrix.
 
 ## Geometry
 
-### Distances
+<div style="float: left; width: 25%; padding: 2em">
+The dot product is our ruler and set-square.
 
-A vector can be thought of as a point in space. The dot product of a vector with itself $a^\top a$ is the square of its distance from the origin. Remember Pythagorus!
+```{r echo=F,out.width="100%",fig.align="left"}
+knitr::include_graphics("../figures/Triangle-Ruler.png")
+```
+</div>
 
-### Subspaces
+### Lengths
 
-Think of all the vectors that could result from multiplying a matrix $X$ with some arbitrary vector. Suppose the matrix $X$ has $n$ rows and $p$ columns. We obtain an (at most) $p$-dimensional **subspace** within an $n$-dimensional space.
+A vector can be thought of as an arrow in a space.
 
-Familiar examples of subspaces:
+The dot product of a vector with itself $a^\top a$ is the square of its length. Pythagorus!
+
+### Right angles
+
+Two vectors at right angles have a dot product of zero. They are **orthogonal**.
+
+
+## Geometry - subspaces
 
 > * A line in two or more dimensions, passing through the origin.
 > * A plane in three or more dimensions, passing through the origin.
 > * A point at the origin.
+
+These are all examples of **subspaces**.
+
+Think of all the vectors that could result from multiplying a matrix $X$ with some arbitrary vector. 
+
+If the matrix $X$ has $n$ rows and $p$ columns, we obtain an (at most) $p$-dimensional **subspace** within an $n$-dimensional space.
 
 In each case there is also an **orthogonal subspace** with $n-p$ dimensions.
 
@@ -138,7 +157,7 @@ Do section: Vectors and matrices
 
 ## Models
 
-A **model** can be used to predict a **response** variable based on a set of **predictor** variables. <span class="tip">*<span class="tiptext">Alternative terms: depedent variable, independent variables.<br><br>We are using causal language, but really only measuring an association.</span></span>
+A **model** can be used to predict a **response** variable based on a set of **predictor** variables. <span class="tip">*<span class="tiptext">Alternative terms: depedent variable, independent variables.<br><br>We are using causal language, but really only describing an association.</span></span>
 
 
 The prediction will usually be imperfect, due to random noise.
@@ -159,7 +178,7 @@ This can also be written as a dot product:
 
 $$ y = \beta^\top x + \varepsilon $$
 
-The noise is assumed to be normally distributed with standard deviation $\sigma$ (ie variance $\sigma^2$):
+The noise is assumed to be normally distributed with standard deviation $\sigma$ (variance $\sigma^2$):
 
 $$ \varepsilon \sim \mathcal{N}(0,\sigma^2) $$
 
@@ -276,6 +295,31 @@ the_truth()
 ```
 
 
+## Model fitting in R with `lm( )`
+
+Our starting point for modelling is always a data frame, but the process of getting $y$ and $X$ from the data frame has some complications, and a special "formula" syntax.
+
+```
+        data frame
+
+            ||
+            || Magic involving "~" syntax happens
+            \/
+
+           y, X
+
+            ||
+            || Model fitting happens
+            \/
+
+        coef, sigma
+```
+
+First look at examples then discuss process in detail.
+
+
+
+
 ## 
 
 Do section: Single numerical predictor
@@ -362,6 +406,25 @@ Is the increase in RSS in H0 merely proportionate
 
 ## Contrasts
 
+A linear combination of coefficients, for example:
+
+>* difference of response between two levels in a factor
+>* predicted response for a certain individual
+>* difference in predicted response between two individuals
+
+Constraining a contrast to be zero is another way to specify H0.
+
+>* especially useful to say "there is no difference between these two levels"
+
+Can obtain:
+
+>* estimated value with dot product
+>* Confidence Interval (CI)
+>* hypothesis test
+
+Use `multcomp` package.
+
+
 ##
 
 Do section: Multiple factors, many levels
@@ -382,7 +445,7 @@ Example: reject all values outside a confidence interval
 
 "*Any* false rejection will ruin my argument."
 
-> * Tukey's Honestly Significanct Differences
+> * Tukey's Honestly Significant Differences
 > * Bonferroni correction (etc)
 
 ### False Discovery Rate (FDR) control
@@ -408,33 +471,20 @@ Let's discuss this in more detail.
 
 `logical` vector is converted to 0s and 1s.
 
-`factor` is represented as $n_\text{levels}-1$ predictors, "one-hot" representation. <span class="tip">*<span class="tiptext">The encoding can be adjusted using the `C( )` function within a formula. The default differs between S and R languages!</span></span>
+`factor` is represented as $n_\text{levels}-1$ columns containing 1s and 0s. 
 
 `matrix` is represented as multiple columns.
 
 
+## Factors
 
-## Function calls
-
-Can calculate with function calls, or enclose maths in `I( )`.
-
-Handy functions such as `poly` and `splines::ns` produce matrices for fitting curves.
+$n_\text{levels}-1$ columns, "one-hot" encoding. <span class="tip">*<span class="tiptext">The encoding can be adjusted using the `C( )` function within a formula. The default differs between S and R languages!</span></span>
 
 ```{r}
-x <- 1:6
-```
+f <- factor(c("a","a","b","b","c","c"))
 
-<div style="float: left; width: 15em;">
-```{r}
-model.matrix(~ x + I(x^2) + log2(x))
+model.matrix(~ f)
 ```
-</div>
-
-<div style="float: left; width: 15em;">
-```{r}
-model.matrix(~ poly(x,3))
-```
-</div>
 
 
 ## Intercept
@@ -458,6 +508,29 @@ model.matrix(~ f)
 <div style="float: left; width: 15em;">
 ```{r}
 model.matrix(~ 0 + f)
+```
+</div>
+
+
+## Function calls
+
+Can calculate with function calls, or enclose maths in `I( )`.
+
+Handy functions such as `poly` and `splines::ns` produce matrices for fitting curves.
+
+```{r}
+x <- 1:6
+```
+
+<div style="float: left; width: 15em;">
+```{r}
+model.matrix(~ x + I(x^2) + log2(x))
+```
+</div>
+
+<div style="float: left; width: 15em;">
+```{r}
+model.matrix(~ poly(x,3))
 ```
 </div>
 
@@ -505,10 +578,12 @@ Do section: Gene expression example
 Should now be able to
 
 >* fit linear models
->* understand the importance of different parts of the model
->    * coefficients
->    * residual standard deviation
->    * residual degrees of freedom
+>* understand the importance of different parts of the fitted model
+><ul>
+>    <li> coefficients
+>    <li> residual standard deviation
+>    <li> residual degrees of freedom
+></ul>
 >* predict using a model
 >* test hypothesis using two nested linear models
 >* test hypotheses and calculate CIs using contrasts
@@ -526,25 +601,52 @@ Problems with residual noise:
 
 >* Non-uniform noise level between conditions
 >* Remaining structure
->* Non-normal distribution <div class="tip">*<div class="tiptext">We can survive some violation of this, but large outliers are bad. This is as much about beliefs and past experience as observation -- if outliers are rare, a sample *without* outliers may give a misleading estimate. See: Global Financial Crisis, Nasim Taleb.</div></div>
+>* Non-normal distribution <div class="tip">*<div class="tiptext">Least squares estimation still has good properties when the noise is not normally distributed, as a way to predict averages, if averages are truly what we want ("BLUE"). However outliers can lead to mis-estimating the accuracy of the model. This is as much about beliefs and past experience as observation -- if outliers are rare, a sample *without* outliers may give a misleading estimate. In the worst case the outliers may be so large the variance doesn't exist, and least squares does completely break down.<br><br>For example it would be important to include outliers like the Global Financial Crisis in an average yearly return on investment, see Nasim Taleb.</div></div>
 
-> Various more advanced methods exist if these are present, such as robust model fitting and "sandwich" estimation of the accuracy of coefficients and contrasts.
+Various more advanced methods exist if these are present, such as robust model fitting and "sandwich" estimation of the accuracy of coefficients and contrasts.
 
 
-## Where next?
+## Extensions to linear models
 
-Generalized Linear Models
+### $p > n$
 
-Cox survival models
+>* regularization with ridge regression and/or LASSO: `glmnet::glmnet( )`
+>* Partial Least Squares (PLS) <br>(naive best directions first)
+>* Principal Component Regression (PCR)<br>(largest variation in X first)
 
-Regularization
+### Noise not normal (eg binary or count data)
 
+>* First use Generalized Linear Models: `glm( )`<br>(logistic regression, binomial, Poisson, negative binomial, gamma, etc)
+>* Realize data is over-dispersed and switch to Quasi-Likelihood
+
+### Modelling populations, repeated measurements on individuals
+
+>* Mixed models
+>* Generalized Estimating Equation methods
+
+
+## Extensions to linear models
+
+### Survival time data, individuals drop out of study or haven't died yet
+
+>* Cox survival model: `survival::coxph( )`
+
+### Prior knowledge is important, or need a flexible hierarchical model
+
+>* Bayesian model
+
+### Response is non-linear in predictors
+
+>* Feature engineering: `poly( )`, `splines::ns( )`
+>* Generalized Additive Models (GAM)
+>* Neural network<br>(plug together many logistic regression models)
+>* Tree methods, such as gradient boosted trees
 
 
 ## Further reading
 
-<div style="float: right">
-```{r echo=F,out.width="50%",fig.align="left"}
+<div style="float: right; width: 25%; padding 2em;">
+```{r echo=F,out.width="100%",fig.align="left"}
 knitr::include_graphics("../figures/chambers_and_hastie.jpg")
 ```
 </div>
