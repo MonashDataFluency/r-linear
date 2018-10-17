@@ -312,7 +312,7 @@ anova(outfit0, outfit)
 
 **Warning:** This is not the only way to use the `anova( )` function, but I think it is the safest way. Once we start using multiple predictors, the meaning of the output from `anova` with a single model is likely to be not quite what you want, read the documentation carefully. The `aov( )` function also has traps for the unwary. Use `lm( )`, and `anova( )` with two nested models as in this document and the meaning should be as you expect.
 
-`summary( )` also outputs p-values. Too many p-values, `summary( )` doesn't respect the hierarchy of terms in the model. The p-value for dropping the intercept is nonsense.
+`summary( )` also outputs p-values. Too many p-values, `summary( )` doesn't respect the hierarchy of terms in the model. The p-value for dropping the intercept is nonsense. The p-values are based on a t statistic, where F=t^2.
 
 ```{r}
 summary(outfit)
@@ -675,10 +675,8 @@ Actually in this gene expression dataset, the expression level of all genes was 
 
 ```{r warning=F, message=F}
 counts_df <- read_csv("r-linear-files/teeth-read-counts.csv")
-
-counts <- counts_df %>% 
-    column_to_rownames("gene") %>% 
-    as.matrix()
+counts <- as.matrix( select(counts_df, -gene) )
+rownames(counts) <- counts_df$gene
 
 counts[1:5,]
 ```
@@ -816,7 +814,7 @@ The FCR corrected CIs used here have the same q, 0.05, as we used as the cutoff 
 I have some further thoughts on this topic, see the package `topconfects` (http://logarithmic.net/topconfects/).
 
 
-## ANOVA test
+## F test
 
 limma can also test a constraint over several contrasts at once. Suppose we want to find *any* deviation from a constant expression level. We can check for this with:
 

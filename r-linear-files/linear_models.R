@@ -280,7 +280,8 @@ anova(outfit0, outfit)
 #
 # summary( ) also outputs p-values. Too many p-values, summary( )
 # doesn't respect the hierarchy of terms in the model. The p-value for
-# dropping the intercept is nonsense.
+# dropping the intercept is nonsense. The p-values are based on a t
+# statistic, where F=t^2.
 
 summary(outfit)
 
@@ -670,10 +671,8 @@ fit2 <- lm(log2(gene_smoc1) ~ tooth * day, data=teeth)
 # genes was measured!
 
 counts_df <- read_csv("r-linear-files/teeth-read-counts.csv")
-
-counts <- counts_df %>%
-    column_to_rownames("gene") %>%
-    as.matrix()
+counts <- as.matrix( select(counts_df, -gene) )
+rownames(counts) <- counts_df$gene
 
 counts[1:5,]
 
@@ -812,7 +811,7 @@ ggplot(all_results, aes(x=AveExpr, y=logFC)) +
 # I have some further thoughts on this topic, see the package
 # topconfects (http://logarithmic.net/topconfects/).
 
-# 7.5 ANOVA test ----
+# 7.5 F test ----
 #
 # limma can also test a constraint over several contrasts at once.
 # Suppose we want to find *any* deviation from a constant expression
