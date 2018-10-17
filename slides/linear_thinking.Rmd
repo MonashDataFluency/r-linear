@@ -178,7 +178,7 @@ $$ \varepsilon \sim \mathcal{N}(0,\sigma^2) $$
 
 <br>
 
-Typically but not always $x_1$ will always be 1, so $\beta_1$ is a constant term in the model. We still count it as one of the $p$ predictors. <span class="tip">*<span class="tiptext">This matches what R does, but may differ from other presentations!</span></span>
+Typically $x_1$ will always be 1, so $\beta_1$ is a constant term in the model. We still count it as one of the $p$ predictors. <span class="tip">*<span class="tiptext">This matches what R does, but may differ from other presentations!</span></span>
 
 
 ## Linear model in R code
@@ -340,7 +340,7 @@ fit0 <- lm(y ~ 0)
 fit1 <- lm(y ~ 1)
 ```
 
-Two model formulas representing two hypotheses H0 and H1.
+Two model formulas representing null hypotheses H0 and alternative hypothesis H1.
 
 H0 must *nest* within H1.
 
@@ -433,6 +433,23 @@ Use `multcomp` package.
 Do section: Multiple factors, many levels
 
 
+## What is a p-value anyway?
+
+A p-value lets us choose our probability of falsely rejecting a true hypothesis.
+
+A p-value is a uniformly random number between 0 and 1, if the null hypothesis is true.
+
+<br>
+
+If we decide to reject hypotheses with $p \leq 0.05$, we are guaranteed a probability of 0.05 of rejecting a hypothesis if it is actually true.
+
+However suppose we perform 20 such tests. There is a high chance we will falsely reject at least one of them.
+
+<br>
+
+Need to adjust p-values for this problem (see `p.adjust( )`).
+
+
 
 ## Multiple testing
 
@@ -442,7 +459,7 @@ Suppose some set of hypotheses are true. What chance do we run of rejecting one 
 
 > * No problem!
 
-Example: reject all values outside a confidence interval
+Example: reject all values outside a confidence interval.
 
 ### Family-Wise Error Rate (FWER) control
 

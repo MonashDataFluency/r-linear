@@ -131,8 +131,8 @@ model.matrix(fit)
 
 model.matrix(~ age, data=people)
 
-# 10 observations minus 2 columns in the model matrix leaves 8 residual
-# degrees of freedom:
+# n=10 observations minus p=2 columns in the model matrix leaves 8
+# residual degrees of freedom:
 
 df.residual(fit)
 
@@ -243,16 +243,18 @@ y <- outcomes$outcome
 ginv(X) %>% round(3)
 ginv(X) %*% y
 
+# Here we can see the first coefficient is the average of the
+# "untreated" samples, and the second is the average of the "treated"
+# samples minus that average of the "untreated" samples.
+
 # 4.2 Challenge - the meanings of coefficients ----
-#
-# Examine the model matrix and the generalized inverse matrix. What are
-# the meanings of the two coefficients that have been fitted?
 #
 # Suppose instead we fit:
 
 outfit2 <- lm(outcome ~ 0 + group, data=outcomes)
 
-# What do the coefficients in this new model represent?
+# Examine the model matrix and the generalized inverse matrix. What do
+# the coefficients in this new model represent?
 #
 # Does it fit the data better or worse than the original model?
 #
@@ -295,7 +297,7 @@ confint(outfit)
 
 # These results exactly match those of a t-test.
 
-t.test(outcome ~ group, data=outcomes, var.equal=TRUE)
+t.test(outcomes$outcome[5:7], outcomes$outcome[1:4], var.equal=TRUE)
 
 # 4.4 Challenge - does height change with age? ----
 #
@@ -340,18 +342,20 @@ confint(pvcfit1)
 # * "resinR2" is particle size for R2 relative to R1
 # * "resinR3" is particle size for R3 relative to R1
 # * (etc)
+#
+# We can use anova( ) to test if there is evidence either of these main
+# effects is important. For example, to test if there is evidence that
+# the operator is important to the outcome we can test pvcfit1 against a
+# model in which operator is dropped:
 
-# 5.2 Heteroscedasticity ----
+pvcfit0 <- lm(psize ~ resin, data=pvc)
+anova(pvcfit0, pvcfit1)
 
-ggplot(pvc, aes(x=resin, y=residuals(pvcfit1))) +
-    geom_point() + geom_hline(yintercept=0) + facet_grid(~operator)
-
-# Our assumption that the residual noise is uniformly normally
-# distributed may not hold. Carl's data seems to have greater standard
-# deviation than Alice or Bob's. When comparing Alice and Bob's results,
-# including Carl's data in the model may alter the outcome.
-
-# 5.3 Interactions ----
+# 5.2 Interactions ----
+#
+# We can ask if there is any interaction between the two factors. For
+# example Carl might produce particularly small particles with R5. An
+# additive model doesn't allow for this.
 
 pvcfit2 <- lm(psize ~ operator + resin + operator:resin, data=pvc)
 # or
@@ -372,10 +376,10 @@ pvcfit2 <- lm(psize ~ operator*resin, data=pvc)
 
 anova(pvcfit1, pvcfit2)
 
-# 5.4 Contrasts and confidence intervals ----
+# 5.3 Contrasts and confidence intervals ----
 #
-# anova lets us test if a particular factor interaction is needed at
-# all, and summary allows us to see if any levels of a factor differ
+# anova( ) lets us test if a particular factor interaction is needed at
+# all, and summary( ) allows us to see if any levels of a factor differ
 # from the first level. However we may wish to compare an arbitrary pair
 # of levels in a factor, or some more complicated combination of
 # coefficients such as a difference between two hypothetical
@@ -394,6 +398,8 @@ K %*% coef(pvcfit1)
 # GLHT stands for General Linear Hypothesis Test, "general" meaning it
 # can be used with various other types of models besides plain linear
 # models.
+
+library(multcomp)
 
 result <- glht(pvcfit1, K)
 result
@@ -438,6 +444,16 @@ anova(pvcfit0, pvcfit1)
 # This demonstrates that the two methods of testing hypotheses--with the
 # ANOVA test and with contrasts--are equivalent.
 
+# 5.4 Heteroscedasticity ----
+
+ggplot(pvc, aes(x=resin, y=residuals(pvcfit1))) +
+    geom_point() + geom_hline(yintercept=0) + facet_grid(~operator)
+
+# Our assumption that the residual noise is uniformly normally
+# distributed may not hold. Carl's data seems to have greater standard
+# deviation than Alice or Bob's. When comparing Alice and Bob's results,
+# including Carl's data in the model may alter the outcome.
+
 # 5.5 Challenge - construct contrasts ----
 #
 # Using the pvcfit1 model, construct contrasts to see if the effect of:
@@ -466,6 +482,9 @@ anova(pvcfit0, pvcfit1)
 
 teeth <- read_csv("r-linear-files/teeth.csv")
 
+teeth$tooth <- factor(teeth$tooth, c("lower","upper"))
+teeth$mouse <- factor(teeth$mouse)
+
 # It will be convenient to have a quick way to examine different genes
 # and different models with this data.
 
@@ -484,7 +503,8 @@ look <- function(y, fit=NULL) {
             geom_ribbon(data=more_ci, aes(ymin=lwr,ymax=upr),alpha=0.1) +
             geom_line(data=more_ci,aes(y=fit,color=tooth))
     }
-    p + geom_point(aes(y=y,color=tooth))
+    p + geom_point(aes(y=y,color=tooth)) +
+        labs(y=deparse(substitute(y)))
 }
 
 # Try it out
@@ -532,12 +552,12 @@ look(log2(teeth$gene_ace), log2_acefit)
 # between tooth and day.
 
 pou3f3fit0 <- lm(gene_pou3f3 ~ tooth + day, data=teeth)
+look(teeth$gene_pou3f3, pou3f3fit0)
+
 pou3f3fit1 <- lm(gene_pou3f3 ~ tooth * day, data=teeth)
+look(teeth$gene_pou3f3, pou3f3fit1)
 
 anova(pou3f3fit0, pou3f3fit1)
-
-look(teeth$gene_pou3f3, pou3f3fit0)
-look(teeth$gene_pou3f3, pou3f3fit1)
 
 # Examining the residuals reveals a further problem: larger expression
 # values are associated with larger residuals.
@@ -564,7 +584,7 @@ qqline(residuals(log2_pou3f3fit0))
 
 # 6.2.1 Smoc1 gene ----
 
-log2_smoc1fit <- lm( log2(gene_smoc1) ~ tooth + day, data=teeth)
+log2_smoc1fit <- lm(log2(gene_smoc1) ~ tooth + day, data=teeth)
 
 look(log2(teeth$gene_smoc1), log2_smoc1fit)
 
@@ -592,9 +612,9 @@ sigma(curved_fit2)
 sigma(curved_fit3)
 
 # poly( ) can also be used to fit higher order polynomials, but these
-# tend to become very wobbly and extrapolate poorly. A better option may
-# be to use the ns( ) or bs( ) functions in the splines package, which
-# can be used to fit piecewise "B-splines". In particular ns( ) (natural
+# tend to become wobbly and extrapolate poorly. A better option may be
+# to use the ns( ) or bs( ) functions in the splines package, which can
+# be used to fit piecewise "B-splines". In particular ns( ) (natural
 # spline) is appealing because it extrapolates beyond the ends only with
 # straight lines. If the data is cyclic (for example cell cycle or
 # circadian time series), sine and cosine terms can be used to fit some
@@ -619,23 +639,16 @@ summary(badfit)
 # In this case this is not possible, and R has arbirarily dropped a
 # predictor from the model. As a different mouse produced data for each
 # different day, mouse is confounded with day. day can be constructed as
-# a linear combination of the intercept term and the mouse terms.
+# a linear combination of the intercept term and the mouse terms. The
+# model suffers from multicollinearity.
 #
 # Another example of confounding would be an experiment in which each
 # treatment is done in a separate batch.
 #
-# Highly correlated predictors are a problem even if they are not
-# perfectly confounded. It becomes impossible to estimate any of these
-# predictor coefficients accurately. While it's a bit deeper into linear
-# maths than we are aiming for today, the "singular values" of X are a
-# way to check for this in general:
-
-s <- svd( model.matrix(badfit) )$d
-1/s
-
-# A small change in y could be amplified by up to the largest of these
-# numbers when estimating the coefficients. Here the only reason the
-# largest value isn't infinity is numerical inaccuracy.
+# Even if predictors are not perfectly multicollinear, correlation
+# between predictors can make their estimates inaccurate. The "Variance
+# Inflation Factor" of each predictor can be used as a diagnostic for
+# this.
 #
 # A possible solution to this problem would be to use a "mixed model",
 # but this is beyond the scope of today's workshop.
@@ -647,8 +660,8 @@ s <- svd( model.matrix(badfit) )$d
 fit1 <- lm(log2(gene_smoc1) ~ tooth + day, data=teeth)
 fit2 <- lm(log2(gene_smoc1) ~ tooth * day, data=teeth)
 
-# 1. Fit a model to log2(gene_smoc1) which instead uses tooth and mouse
-# as predictors.
+# 1. Fit a model fit3 to log2(gene_smoc1) which instead uses tooth and
+# mouse as predictors.
 #
 # 2. fit1 above nests within this model, since day can be computed from
 # mouse and your new model can fit any function of mouse. Is the new
@@ -674,6 +687,7 @@ counts_df <- read_csv("r-linear-files/teeth-read-counts.csv")
 counts <- as.matrix( select(counts_df, -gene) )
 rownames(counts) <- counts_df$gene
 
+dim(counts)
 counts[1:5,]
 
 # The column names match our teeth data frame.
@@ -719,10 +733,10 @@ nrow(log2_cpms_filtered)
 # treats the upper and lower teeth as following a linear trend over
 # time.
 
-design <- model.matrix(~ tooth * day, data=teeth)
-design
+X <- model.matrix(~ tooth * day, data=teeth)
+X
 
-fit <- lmFit(log2_cpms_filtered, design)
+fit <- lmFit(log2_cpms_filtered, X)
 
 class(fit)
 fit$coefficients[1:5,]
@@ -739,19 +753,11 @@ fit$coefficients[1:5,]
 
 K <- rbind(avg_slope = c(0,0,1,0.5))
 cfit <- contrasts.fit(fit, t(K))         #contrasts in columns!
-
-# Empirical Bayes squeezing of the residual variance acts as though we
-# have some number of extra "prior" observations of the variance. These
-# are also counted as extra degrees of freedom in F tests. The "prior"
-# observations act to squeeze the estimated residual variance toward a
-# trend line that is a function of the average expression level.
-
 efit <- eBayes(cfit, trend=TRUE)
-efit$df.prior
-efit$df.residual
-efit$df.total
-plotSA(efit)
-points(efit$Amean, efit$s2.post^0.25, col="red", cex=0.3)
+
+# The call to eBayes does Emprical Bayes squeezing of the residual
+# variance for each gene (see appendix). This is a bit of magic that
+# allows limma to work well with small numbers of samples.
 
 topTable(efit)
 
@@ -780,36 +786,12 @@ look(rnf144b, rnf144b_fit)
 
 summary( glht(rnf144b_fit, K) )
 
-# 7.4 False Coverage Rate corrected CIs ----
+# 7.4 Confidence intervals ----
 #
-# Confidence Intervals should also be of interest.
+# Confidence Intervals should also be of interest. However note that
+# these are not adjusted for multiple testing (see appendix).
 
 topTable(efit, confint=0.95)
-
-# However we should adjust for multiple testing. A False Coverage Rate
-# (FCR) corrected CI can be constructed corresponding to a set of genes
-# judged significant. The smaller the selection of genes as a proportion
-# of the whole, the greater the correction required. To ensure a False
-# Coverage Rate of q, we use the confidence interval
-# (1-q*n_genes_selected/n_genes_total)*100%.
-
-all_results <- topTable(efit, n=Inf)
-significant <- all_results$adj.P.Val <= 0.05
-prop_significant <- mean(significant)
-fcr_confint <- 1 - 0.05*prop_significant
-
-all_results <- topTable(efit, confint=fcr_confint, n=Inf)
-
-ggplot(all_results, aes(x=AveExpr, y=logFC)) +
-    geom_point(size=0.1, color="grey") +
-    geom_errorbar(data=all_results[significant,], aes(ymin=CI.L, ymax=CI.R), color="red") +
-    geom_point(data=all_results[significant,], size=0.1)
-
-# The FCR corrected CIs used here have the same q, 0.05, as we used as
-# the cutoff for adj.P.Val. This means they never pass through zero.
-#
-# I have some further thoughts on this topic, see the package
-# topconfects (http://logarithmic.net/topconfects/).
 
 # 7.5 F test ----
 #
@@ -839,3 +821,55 @@ topTable(efit2)
 #
 # Hint: Contrast 2 can be viewed as the difference in predictions
 # between two individual samples.
+#
+
+
+#////////////////
+# 8 Appendix ----
+
+# 8.1 Empirical Bayes variance squeezing ----
+#
+# In limma, Empirical Bayes squeezing of the residual variance acts as
+# though we have some number of extra "prior" observations of the
+# variance. These are also counted as extra degrees of freedom in F
+# tests. The "prior" observations act to squeeze the estimated residual
+# variance toward a trend line that is a function of the average
+# expression level.
+
+efit <- eBayes(cfit, trend=TRUE)
+
+efit$df.prior
+efit$df.residual
+efit$df.total
+plotSA(efit)
+points(efit$Amean, efit$s2.post^0.25, col="red", cex=0.3)
+
+# It's worthwhile checking df.prior, as a low value may indicate a
+# problem with a data-set.
+
+# 8.2 False Coverage Rate corrected CIs ----
+#
+# We noted the CIs produced by limma were not adjusted for multiple
+# testing. A False Coverage Rate (FCR) corrected CI can be constructed
+# corresponding to a set of genes judged significant. The smaller the
+# selection of genes as a proportion of the whole, the greater the
+# correction required. To ensure a False Coverage Rate of q, we use the
+# confidence interval (1-q*n_genes_selected/n_genes_total)*100%.
+
+all_results <- topTable(efit, n=Inf)
+significant <- all_results$adj.P.Val <= 0.05
+prop_significant <- mean(significant)
+fcr_confint <- 1 - 0.05*prop_significant
+
+all_results <- topTable(efit, confint=fcr_confint, n=Inf)
+
+ggplot(all_results, aes(x=AveExpr, y=logFC)) +
+    geom_point(size=0.1, color="grey") +
+    geom_errorbar(data=all_results[significant,], aes(ymin=CI.L, ymax=CI.R), color="red") +
+    geom_point(data=all_results[significant,], size=0.1)
+
+# The FCR corrected CIs used here have the same q, 0.05, as we used as
+# the cutoff for adj.P.Val. This means they never pass through zero.
+#
+# I have some further thoughts on this topic, see the package
+# topconfects (http://logarithmic.net/topconfects/).
