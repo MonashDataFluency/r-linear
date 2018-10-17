@@ -4,14 +4,23 @@
 #////////////////////////
 # 1 Loading packages ----
 
-# To install needed packages:
-#   install.packages("tidyverse")
-#   install.packages("multcomp")
+## To install needed CRAN packages:
+#
+# install.packages("tidyverse")
+# install.packages("multcomp")
+#
+## To install needed Bioconductor packages:
+#
+# source("https://bioconductor.org/biocLite.R")
+# biocLite(c("limma", "edgeR"))
+#
 
-library(MASS)       # ginv   (coefficient estimation)
-library(splines)    # ns, bs (spline curves)
-library(multcomp)   # glht   (contrasts)
-library(tidyverse)  #        (working with data frames)
+library(MASS)       # ginv -- coefficient estimation
+library(splines)    # ns, bs -- spline curves
+library(multcomp)   # glht -- contrasts
+library(edgeR)      # cpm, etc -- RNA-Seq normalization
+library(limma)      # lmFit, etc -- fitting many models
+library(tidyverse)  # working with data frames, plotting
 
 # Much of what we will be using is built into R without loading any
 # packages.
@@ -615,8 +624,17 @@ summary(badfit)
 # treatment is done in a separate batch.
 #
 # Highly correlated predictors are a problem even if they are not
-# perfectly confounded. It becomes impossible to estimate either of the
-# predictor coefficients accurately.
+# perfectly confounded. It becomes impossible to estimate any of these
+# predictor coefficients accurately. While it's a bit deeper into linear
+# maths than we are aiming for today, the "singular values" of X are a
+# way to check for this in general:
+
+s <- svd( model.matrix(badfit) )$d
+1/s
+
+# A small change in y could be amplified by up to the largest of these
+# numbers when estimating the coefficients. Here the only reason the
+# largest value isn't infinity is numerical inaccuracy.
 #
 # A possible solution to this problem would be to use a "mixed model",
 # but this is beyond the scope of today's workshop.

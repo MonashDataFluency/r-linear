@@ -21,9 +21,29 @@ output:
 [Answers to challenges.](topics/answers.html) No peeking during class!
 -->
 
+## Key functions to remember
+
+Built-in to R: 
+
+    lm, anova, model.matrix, coef, sigma, df.residual, predict, confint, summary
+    I, poly
+
+`splines` -- curve fitting:
+
+    ns, bs
+
+`multcomp` -- contrasts and multiple comparisons: 
+
+    glht, confint, summary
+
+`limma` and `edgeR` -- fitting many models to gene expression data: 
+
+    DGEList, calcNormFactors, cpm
+    lmFit, contrasts.fit, eBayes, plotSA, topTable
+
 <br><br><br>
 
-## Authors
+## Author
 
 This course has been developed for the [Monash Bioinformatics Platform](https://www.monash.edu/researchinfrastructure/bioinformatics) and [Monash Data Fluency](https://www.monash.edu/data-fluency) by Paul Harrison.
 
