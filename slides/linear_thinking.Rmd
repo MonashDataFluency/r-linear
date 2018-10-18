@@ -632,7 +632,7 @@ Various more advanced methods exist if these are present, such as robust model f
 
 ## Extensions to linear models
 
-### $p > n$
+### Insufficient data or $p > n$
 
 >* regularization with ridge regression and/or LASSO: `glmnet::glmnet( )`
 >* Partial Least Squares (PLS) <br>(pick best direction to start moving in and take best leap along it, repeat)
@@ -641,9 +641,9 @@ Various more advanced methods exist if these are present, such as robust model f
 ### Noise not normal (eg binary or count data)
 
 >* Generalized Linear Models: `glm( )`<br>(logistic regression, binomial, Poisson, negative binomial, gamma, etc)
->* Then realize data is always over-dispersed,<br>switch to safer Quasi-Likelihood F-test
+>* Quasi-Likelihood F-test in case of over-dispersion
 
-### Survival time data, individuals drop out of study or haven't died yet
+### Survival time, with censoring
 
 >* Cox survival model: `survival::coxph( )`
 
@@ -657,17 +657,14 @@ Individuals tracked over time, repeated measurements, blocks/batches/plots, etc.
 >* Generalized Least Squares (accounts for covariance in noise)
 >* Mixed Model (some coefficients are drawn from a random distribution)
 
-### Prior knowledge is important, or need a flexible hierarchical model
-
->* Bayesian model
-
 ### Response is non-linear in predictors
 
 >* Feature engineering: `poly( )`, `splines::ns( )`
 >* Local regression (LOESS): `loess( )`
 >* Generalized Additive Models (GAM): `mgcv::gam( )`<br>(splines with regularization)
 >* Neural network (plug together many logistic regression models)
->* Tree methods, such as gradient boosted trees
+
+Also consider tree methods, such as gradient boosted trees.
 
 
 ## Further reading
