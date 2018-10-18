@@ -443,9 +443,9 @@ A p-value is a uniformly random number between 0 and 1, if the null hypothesis i
 
 If we decide to reject hypotheses with $p \leq 0.05$, we are guaranteed a probability of 0.05 of rejecting a hypothesis if it is actually true.
 
-However suppose we perform 20 such tests. There is a high chance we will falsely reject at least one of them.
-
 <br>
+
+However suppose we perform 20 such tests. There is a high chance we will falsely reject at least one of them.
 
 Need to adjust p-values for this problem (see `p.adjust( )`).
 
@@ -470,7 +470,7 @@ Example: reject all values outside a confidence interval.
 
 ### False Discovery Rate (FDR) control
 
-"I can tolerate a certain *rate* of false rejections."
+"I can tolerate a certain *rate* of false rejections amongst rejected hypotheses."
 
 > * Benjamini and Hochberg correction (etc)
 

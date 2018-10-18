@@ -646,32 +646,22 @@ summary(badfit)
 # treatment is done in a separate batch.
 #
 # Even if predictors are not perfectly multicollinear, correlation
-# between predictors can make their estimates inaccurate. The "Variance
-# Inflation Factor" of each predictor can be used as a diagnostic for
-# this.
+# between predictors can make their estimates inaccurate. One way to
+# check for this is to attempt to predict each of the predictors with a
+# linear model that uses the remaining predictors (see "Variance
+# Inflation Factor").
 #
 # A possible solution to this problem would be to use a "mixed model",
 # but this is beyond the scope of today's workshop.
 
-# 6.4 Challenge - two-way ANOVA model vs straight lines ----
+# 6.4 Challenge - Wnt2 gene ----
 #
-# Consider:
-
-fit1 <- lm(log2(gene_smoc1) ~ tooth + day, data=teeth)
-fit2 <- lm(log2(gene_smoc1) ~ tooth * day, data=teeth)
-
-# 1. Fit a model fit3 to log2(gene_smoc1) which instead uses tooth and
-# mouse as predictors.
+# Look at the expression of gene Wnt2 in column gene_wnt2.
 #
-# 2. fit1 above nests within this model, since day can be computed from
-# mouse and your new model can fit any function of mouse. Is the new
-# model significantly better?
+# 1. Try some different model formulas.
 #
-# 3. Why would it *not* be appropriate to compare fit2 and your new
-# model using anova( )?
-#
-# 4. What more complicated model *could* we compare to fit2 with anova(
-# )?
+# 2. Justify a particular model by rejecting simpler alternatives using
+# anova( ).
 #
 
 
