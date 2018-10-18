@@ -812,6 +812,10 @@ topTable(efit2)
 # Hint: Contrast 2 can be viewed as the difference in predictions
 # between two individual samples.
 #
+# 3. Construct a pair of contrasts that when used together in an F test
+# find genes with non-zero slope in either or both the lower or upper
+# molars.
+#
 
 
 #////////////////
@@ -834,8 +838,13 @@ efit$df.total
 plotSA(efit)
 points(efit$Amean, efit$s2.post^0.25, col="red", cex=0.3)
 
-# It's worthwhile checking df.prior, as a low value may indicate a
-# problem with a data-set.
+# The total effective degrees of freedom is the "prior" degrees of
+# freedom plus the normal residual degrees of freedom. As can be seen in
+# the plot, this produces a posterior residual variance (efit$s2.post)
+# that is squeezed toward the trend line.
+#
+# It's worthwhile checking df.prior when using limma, as a low value may
+# indicate a problem with a data-set.
 
 # 8.2 False Coverage Rate corrected CIs ----
 #
