@@ -95,7 +95,11 @@ sum(a*b)
 
 ## Linear maths and R
 
-Taking the product of a matrix $X$ and a vector $a$, $Xa$, the result is a vector containing the dot product of each row of the matrix $X$ with the vector $a$.
+Taking the product of a matrix $X$ and a vector $a$ with length matching the number of columns, the result is a vector containing the dot product of each row of the matrix $X$ with the vector $a$.
+
+$$
+Xa
+$$
 
 In R:
 
@@ -408,22 +412,22 @@ Is the increase in RSS in H0 merely proportionate
 
 
 
-## A different way to test hypotheses: contrasts
+## A different way to test: linear hypotheses
 
-A **contrast** is a linear combination of coefficients.
+A **linear hypothesis** test tests an H0 in which some linear combination of coefficients in H1 is constrained to be zero.
 
-Constraining a contrast to be zero is another way to specify a null hypothesis.
+Specified differently but equivalent to an `anova( )` test.
 
-Contrasts offer great flexibility, for example:
+From a linear hypothesis we obtain:
 
->* difference of response between any two levels in a factor
->* difference of response between two imagined individuals
-
-From a contrast we obtain:
-
->* estimated value (calculate with dot product)
+>* estimated value (calculated with dot product)
 >* Confidence Interval (CI)
 >* hypothesis test p-value
+
+Examples:
+
+>* a **contrast** compares specific levels of an experimental factor<span class="tip">*<span class="tiptext">Terminology is a little tricky here. The limma package we are using later refers to linear hypotheses in general as contrasts.</span></span>
+>* the difference of response between two imagined individuals
 
 Use `multcomp` package.
 
@@ -610,7 +614,7 @@ Should now be able to
 ></ul>
 >* predict using a model
 >* test a hypothesis using two nested linear models
->* test a hypothesis and calculate a CI using a contrast
+>* test a hypothesis and calculate a CI on a linear combination of coefficients
 >* test a hypothesis against many sets of responses using limma
 >* understand multiple testing correction
 

@@ -17,7 +17,7 @@
 
 library(MASS)       # ginv -- coefficient estimation
 library(splines)    # ns, bs -- spline curves
-library(multcomp)   # glht -- contrasts
+library(multcomp)   # glht -- linear hypotheses
 library(edgeR)      # cpm, etc -- RNA-Seq normalization
 library(limma)      # lmFit, etc -- fitting many models
 library(tidyverse)  # working with data frames, plotting
@@ -79,10 +79,11 @@ t(X)
 
 # Matrix multiplication is performed with %*%. The dot product of each
 # row of the left hand side matrix and each column of the right hand
-# side matrix is calculated. %*% treats a vector as a single column
-# matrix. Actually all we need today is to multiply a matrix by a
-# vector, in which case we get the dot product of each row of the matrix
-# with the vector.
+# side matrix is calculated. %*% treats a vector as either a single
+# column or single row matrix as will make sense for matrix
+# multiplication. Actually all we need today is to multiply a matrix by
+# a vector, in which case we get the dot product of each row of the
+# matrix with the vector.
 
 X %*% a
 as.vector(X %*% a)
@@ -376,14 +377,15 @@ pvcfit2 <- lm(psize ~ operator*resin, data=pvc)
 
 anova(pvcfit1, pvcfit2)
 
-# 5.3 Contrasts and confidence intervals ----
+# 5.3 Linear hypotheses and confidence intervals ----
 #
 # anova( ) lets us test if a particular factor interaction is needed at
 # all, and summary( ) allows us to see if any levels of a factor differ
 # from the first level. However we may wish to compare an arbitrary pair
-# of levels in a factor, or some more complicated combination of
-# coefficients such as a difference between two hypothetical
-# individuals. This can be done using contrasts.
+# of levels in a factor -- this is called a "contrast". We might also
+# want to test some more complicated combination of coefficients such as
+# a difference between two hypothetical individuals. In general this is
+# called a "linear hypotheses" or a "general linear hypothesis".
 #
 # Say we want to compare Bob and Carl's particle sizes. We will use the
 # pvcfit1 model.
@@ -395,9 +397,7 @@ K %*% coef(pvcfit1)
 
 # This is the estimated difference in particle size between Carl and
 # Bob, but can we trust it? The glht function from multcomp can tell us.
-# GLHT stands for General Linear Hypothesis Test, "general" meaning it
-# can be used with various other types of models besides plain linear
-# models.
+# GLHT stands for General Linear Hypothesis Test.
 
 library(multcomp)
 
@@ -406,7 +406,7 @@ result
 summary(result)
 confint(result)
 
-# glht can test multiple contrasts at once. By default it applies a
+# glht can test multiple hypotheses at once. By default it applies a
 # multiple testing correction when doing so. This is a generalization of
 # Tukey's Honestly Significant Differences.
 
@@ -428,13 +428,13 @@ summary(result, test=adjusted("none"))
 
 summary(result, test=adjusted("fdr"))
 
-# Finally, we can ask if *any* of the contrasts is non-zero, i.e.
-# whether the model with all three constraints applied can be rejected.
-# This is equivalent to the anova( ) tests we have done earlier. (Note
-# that while we have three constraints, the degrees of freedom reduction
-# is 2, as any 2 of the constraints are sufficient. This makes me uneasy
-# as it is reliant on numerical accuracy, better to just use any two of
-# the constraints.)
+# Finally, we can ask if *any* of the linear combinations is non-zero,
+# i.e. whether the model with all three constraints applied can be
+# rejected. This is equivalent to the anova( ) tests we have done
+# earlier. (Note that while we have three constraints, the degrees of
+# freedom reduction is 2, as any 2 of the constraints are sufficient.
+# This makes me uneasy as it is reliant on numerical accuracy, better to
+# just use any two of the constraints.)
 
 summary(result, test=Ftest())
 
@@ -442,7 +442,7 @@ pvcfit0 <- lm(psize ~ resin, data=pvc)
 anova(pvcfit0, pvcfit1)
 
 # This demonstrates that the two methods of testing hypotheses--with the
-# ANOVA test and with contrasts--are equivalent.
+# ANOVA test and with linear hypotheses--are equivalent.
 
 # 5.4 Heteroscedasticity ----
 
@@ -454,9 +454,10 @@ ggplot(pvc, aes(x=resin, y=residuals(pvcfit1))) +
 # deviation than Alice or Bob's. When comparing Alice and Bob's results,
 # including Carl's data in the model may alter the outcome.
 
-# 5.5 Challenge - construct contrasts ----
+# 5.5 Challenge - examine contrasts ----
 #
-# Using the pvcfit1 model, construct contrasts to see if the effect of:
+# Using the pvcfit1 model, construct linear hypotheses to see if the
+# effect of:
 #
 # 1. R8 is different to R4
 # 2. R2 is different to R1
@@ -731,9 +732,9 @@ fit <- lmFit(log2_cpms_filtered, X)
 class(fit)
 fit$coefficients[1:5,]
 
-# Significance testing in limma is by the use of contrasts. A difference
-# between glht and limma's contrasts.fit is that limma uses columns as
-# contrasts, rather than rows.
+# Significance testing in limma is by the use of linear hypotheses
+# (which limma refers to as contrasts). A difference between glht and
+# limma's contrasts.fit is that limma uses columns rather than rows.
 #
 # We will first look for genes where the slope over time is not flat,
 # *averaging* the lower and upper teeth.
@@ -742,7 +743,7 @@ fit$coefficients[1:5,]
 # Upper slope: c(0,0,1,1)
 
 K <- rbind(avg_slope = c(0,0,1,0.5))
-cfit <- contrasts.fit(fit, t(K))         #contrasts in columns!
+cfit <- contrasts.fit(fit, t(K))       #linear hypotheses in columns!
 efit <- eBayes(cfit, trend=TRUE)
 
 # The call to eBayes does Emprical Bayes squeezing of the residual
@@ -770,9 +771,9 @@ rnf144b <- log2_cpms["Rnf144b",]
 rnf144b_fit <- lm(rnf144b ~ tooth * day, data=teeth)
 look(rnf144b, rnf144b_fit)
 
-# We can use the same contrast with glht. The value of the contrast is
-# the same, but limma has gained some power by shrinking the variance
-# toward the trend line, so limma's p-value is smaller.
+# We can use the same linear hypothesis with glht. The estimate is the
+# same, but limma has gained some power by shrinking the variance toward
+# the trend line, so limma's p-value is smaller.
 
 summary( glht(rnf144b_fit, K) )
 
@@ -785,9 +786,9 @@ topTable(efit, confint=0.95)
 
 # 7.5 F test ----
 #
-# limma can also test a constraint over several contrasts at once.
-# Suppose we want to find *any* deviation from a constant expression
-# level. We can check for this with:
+# limma can also test several simultaneous constraints on linear
+# combinations of coefficients. Suppose we want to find *any* deviation
+# from a constant expression level. We can check for this with:
 
 K2 <- rbind(
     c(0,1,0,0),
@@ -801,20 +802,20 @@ topTable(efit2)
 # A shortcut would be to use contrasts.fit(fit, coefficients=2:4) here
 # instead, or to specify a set of coefficients directly to topTable( ).
 
-# 7.6 Challenge - construct some contrasts ----
+# 7.6 Challenge - construct some linear hypotheses ----
 #
-# Construct and use contrasts to find genes that:
+# Construct and use linear combinations to find genes that:
 #
 # 1. Differ in slope between lower and upper molars.
 #
 # 2. Differ in expression on day 16 between the lower and upper molars.
 #
-# Hint: Contrast 2 can be viewed as the difference in predictions
+# Hint: hypothesis 2 can be viewed as the difference in predictions
 # between two individual samples.
 #
-# 3. Construct a pair of contrasts that when used together in an F test
-# find genes with non-zero slope in either or both the lower or upper
-# molars.
+# 3. Construct a pair of linear combinations that when used together in
+# an F test find genes with non-zero slope in either or both the lower
+# or upper molars.
 #
 
 
