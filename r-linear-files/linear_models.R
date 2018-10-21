@@ -379,13 +379,14 @@ anova(pvcfit1, pvcfit2)
 
 # 5.3 Linear hypotheses and confidence intervals ----
 #
-# anova( ) lets us test if a particular factor interaction is needed at
-# all, and summary( ) allows us to see if any levels of a factor differ
-# from the first level. However we may wish to compare an arbitrary pair
-# of levels in a factor -- this is called a "contrast". We might also
-# want to test some more complicated combination of coefficients such as
-# a difference between two hypothetical individuals. In general this is
-# called a "linear hypotheses" or a "general linear hypothesis".
+# anova( ) lets us test if a particular factor or interaction is needed
+# at all, and summary( ) allows us to see if any levels of a factor
+# differ from the first level. However we may wish to perform different
+# comparisons of the levels of a factor -- this is called a "contrast".
+# We might also want to test some more complicated combination of
+# coefficients such as a difference between two hypothetical
+# individuals. In general this is called a "linear hypotheses" or a
+# "general linear hypothesis".
 #
 # Say we want to compare Bob and Carl's particle sizes. We will use the
 # pvcfit1 model.
