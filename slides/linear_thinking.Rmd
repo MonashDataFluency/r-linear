@@ -416,19 +416,20 @@ Is the increase in RSS in H0 merely proportionate
 
 A **linear hypothesis** test tests an H0 in which some linear combination of coefficients in H1 is constrained to be zero.
 
-Specified differently but equivalent to an `anova( )` test.
-
-From a linear hypothesis we obtain:
+<br>
+From a linear combination of coefficients we obtain:
 
 >* estimated value (calculated with dot product)
 >* Confidence Interval (CI)
 >* hypothesis test p-value
 
+<br>
 Examples:
 
->* a **contrast** compares specific levels of an experimental factor<span class="tip">*<span class="tiptext">Terminology is a little tricky here. The limma package we are using later refers to linear hypotheses in general as contrasts.</span></span>
+>* a **contrast** compares specific levels of an experimental factor<span class="tip">*<span class="tiptext">Terminology is a little tricky here. The limma package we are using later refers to linear combinations in general as contrasts.</span></span>
 >* the difference of response between two imagined individuals
 
+<br>
 Use `multcomp` package.
 
 
@@ -631,7 +632,7 @@ Problems with residual noise:
 >* Remaining structure
 >* Non-normal distribution <div class="tip">*<div class="tiptext">Least squares estimation still has good properties when the noise is not normally distributed, as a way to predict averages, if averages are truly what we want ("BLUE"). However outliers can lead to mis-estimating the accuracy of the model. This is as much about beliefs and past experience as observation -- if outliers are rare, a sample *without* outliers may give a misleading estimate. In the worst case the outliers may be so large the variance doesn't exist, and least squares does completely break down.<br><br>For example it would be important to include outliers like the Global Financial Crisis in an average yearly return on investment, see Nasim Taleb.</div></div>
 
-Various more advanced methods exist if these are present, such as robust model fitting and "sandwich" estimation of the accuracy of coefficients and contrasts.
+Various more advanced methods exist if these are present, such as quantile regression and "sandwich" estimation of the accuracy of coefficients and contrasts.
 
 
 ## Extensions to linear models
