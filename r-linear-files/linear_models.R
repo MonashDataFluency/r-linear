@@ -669,11 +669,17 @@ summary(badfit)
 
 #/////////////////////////////////////
 # 7 Testing many genes with limma ----
+#
+# In this section we look at fitting the same matrix of predictors X to
+# many different sets of responses y. We will use the package limma from
+# Bioconductor. This is a very brief demonstration, and there is much
+# more to this package. See the excellent usersguide.pdf at
+# https://bioconductor.org/packages/release/bioc/html/limma.html
 
 # 7.1 Load, normalize, log transform ----
 #
-# Actually in this gene expression dataset, the expression level of all
-# genes was measured!
+# Actually in the teeth dataset, the expression level of all genes was
+# measured!
 
 counts_df <- read_csv("r-linear-files/teeth-read-counts.csv")
 counts <- as.matrix( select(counts_df, -gene) )
@@ -688,11 +694,11 @@ teeth$sample
 
 # A usual first step in RNA-Seq analysis is to convert read counts to
 # Reads Per Million, and log2 transform the results. There are some
-# subtleties here which we breeze over lightly: We use "TMM"
-# normalization as a small adjustment to the total number of reads in
-# each sample. A small constant is added to the counts to avoid
-# calculating log2(0). The edgeR and limma manuals describe these in
-# more detail.
+# subtleties here which we breeze over lightly: "TMM" normalization is
+# used as a small adjustment to the total number of reads in each
+# sample. A small constant is added to the counts to avoid calculating
+# log2(0). The edgeR and limma manuals describe these steps in more
+# detail.
 
 library(edgeR)
 library(limma)
@@ -706,8 +712,8 @@ log2_cpms <- cpm(dgelist, log=TRUE, prior.count=0.25)
 # There is little chance of detecting differential expression in genes
 # with very low read counts. Including these genes will require a larger
 # False Discovery Rate correction, and also confuses limma's Empirical
-# Bayes hyper-parameter estimation. Let's only retain genes with an
-# average of 5 reads per sample or more.
+# Bayes parameter estimation. Let's only retain genes with an average of
+# 5 reads per sample or more.
 
 keep <- rowMeans(log2_cpms) >= -3
 log2_cpms_filtered <- log2_cpms[keep,]
@@ -717,13 +723,11 @@ nrow(log2_cpms_filtered)
 
 # 7.2 Fitting a model to and testing each gene ----
 #
-# We will use limma to fit a linear model to each gene. The same model
-# formula will be used in each case.
-#
-# limma doesn't automatically convert a formula into a model matrix, so
-# we have to do this step manually. Here I am using a model formula that
-# treats the upper and lower teeth as following a linear trend over
-# time.
+# We use limma to fit a linear model to each gene. The same model
+# formula will be used in each case. limma doesn't automatically convert
+# a formula into a model matrix, so we have to do this step manually.
+# Here I am using a model formula that treats the upper and lower teeth
+# as following a different linear trend over time.
 
 X <- model.matrix(~ tooth * day, data=teeth)
 X
@@ -734,7 +738,7 @@ class(fit)
 fit$coefficients[1:5,]
 
 # Significance testing in limma is by the use of linear hypotheses
-# (which limma refers to as contrasts). A difference between glht and
+# (which limma refers to as "contrasts"). A difference between glht and
 # limma's contrasts.fit is that limma uses columns rather than rows.
 #
 # We will first look for genes where the slope over time is not flat,
@@ -743,7 +747,7 @@ fit$coefficients[1:5,]
 # Lower slope: c(0,0,1,0)
 # Upper slope: c(0,0,1,1)
 
-K <- rbind(avg_slope = c(0,0,1,0.5))
+K <- rbind(c(0,0,1,0.5))
 cfit <- contrasts.fit(fit, t(K))       #linear hypotheses in columns!
 efit <- eBayes(cfit, trend=TRUE)
 

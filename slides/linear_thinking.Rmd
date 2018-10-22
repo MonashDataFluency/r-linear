@@ -414,7 +414,10 @@ Is the increase in RSS in H0 merely proportionate
 
 ## A different way to test: linear hypotheses
 
-A **linear hypothesis** test tests an H0 in which some linear combination of coefficients in H1 is constrained to be zero.
+"linear hypothesis" "general linear hypothesis" "linear restriction" "contrast"
+
+<br>
+A **linear hypothesis** test tests an H0 in which some linear combination of coefficients in H1 is restricted to be zero.
 
 <br>
 From a linear combination of coefficients we obtain:
@@ -442,7 +445,9 @@ Do section: Multiple factors, many levels
 
 A p-value lets us choose our probability of falsely rejecting a true hypothesis.
 
-A p-value is a uniformly random number between 0 and 1, if the null hypothesis is true.
+If H1 is true, tends towards zero.
+
+If H0 is true, it is a uniformly random number between 0 and 1.
 
 <br>
 
@@ -450,7 +455,7 @@ If we decide to reject hypotheses with $p \leq 0.05$, we are guaranteed a probab
 
 <br>
 
-However suppose we perform 20 such tests. There is a high chance we will falsely reject at least one of them.
+Suppose we perform 20 such tests. There is a high chance of falsely rejecting at least one of them.
 
 Need to adjust p-values for this problem (see `p.adjust( )`).
 
