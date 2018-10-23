@@ -41,7 +41,16 @@ Built-in to R:
     DGEList, calcNormFactors, cpm
     lmFit, contrasts.fit, eBayes, plotSA, topTable
 
-<br><br><br>
+## Links
+
+* [More workshop materials from Monash Data Fluency](https://monashdatafluency.github.io/resources/)
+* [Monash Data Fluency](https://www.monash.edu/data-fluency)
+* [Monash Bioinformatics Platform](https://www.monash.edu/researchinfrastructure/bioinformatics)
+
+<br>
+
+* [James, Witten, Hastie and Tibshirani (2013) "An Introduction to Statistical Learning"](https://www-bcf.usc.edu/~gareth/ISL/)
+
 
 ## Author
 

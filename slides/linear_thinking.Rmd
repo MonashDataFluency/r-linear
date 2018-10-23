@@ -429,7 +429,7 @@ From a linear combination of coefficients we obtain:
 <br>
 Examples:
 
->* a **contrast** compares specific levels of an experimental factor<span class="tip">*<span class="tiptext">Terminology is a little tricky here. The limma package we are using later refers to linear combinations in general as contrasts.</span></span>
+>* a **contrast** compares specific levels of an experimental factor<span class="tip">*<span class="tiptext">Terminology is a little tricky here. The limma package refers to linear combinations in general as contrasts.</span></span>
 >* the difference of response between two imagined individuals
 
 <br>
@@ -499,7 +499,7 @@ Merely a convenience, if you already have model matrix `X` can just use `y ~ 0 +
 
 Let's discuss this in more detail.
 
-## Data types
+## Formulas - data types
 
 `numeric` vector is represented as itself.
 
@@ -510,7 +510,7 @@ Let's discuss this in more detail.
 `matrix` is represented as multiple columns.
 
 
-## Factors
+## Formulas - factors
 
 $n_\text{levels}-1$ columns of "indicator variables", aka "one-hot" encoding. <span class="tip">*<span class="tiptext">The encoding can be adjusted using the `C( )` function within a formula. The default differs between S and R languages!</span></span>
 
@@ -521,7 +521,7 @@ model.matrix(~ f)
 ```
 
 
-## Intercept
+## Formulas - intercept
 
 Intercept term `1` is implicit.
 
@@ -546,7 +546,7 @@ model.matrix(~ 0 + f)
 </div>
 
 
-## Calculations and function calls
+## Formulas - calculations and function calls
 
 Can calculate with function calls, or enclose maths in `I( )`.
 
@@ -569,7 +569,7 @@ model.matrix(~ poly(x,3))
 </div>
 
 
-## Interactions
+## Formulas - interactions
 
 `a:b` specifies an interaction between `a` and `b`. 
 
@@ -584,7 +584,7 @@ For logical and factor vectors, this produces the logical "and" of each pairing.
 model.matrix(~ f + x + f:x)
 ```
 
-## Interactions
+## Formulas - interactions
 
 `a*b` is shorthand to also include main effects `a + b + a:b`.
 
@@ -685,15 +685,16 @@ knitr::include_graphics("../figures/chambers_and_hastie.jpg")
 ```
 </div>
 
-Primary reference is:
+**Primary reference is:**
 
-[Chambers](http://statweb.stanford.edu/~jmc4/) and [Hastie](http://web.stanford.edu/~hastie/) (1991) "Statistical Models in S"
+Chambers and Hastie (1991) "Statistical Models in S"
 
 <br>
-Also good:
+**Also good:**
 
-[Faraway](http://www.maths.bath.ac.uk/~jjf23/) (2014) "Linear Models with R"
+Faraway (2014) "Linear Models with R"
 
+James, Witten, Hastie and Tibshirani (2013) "An Introduction to Statistical Learning"
 
 
 
