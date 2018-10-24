@@ -24,11 +24,6 @@ library(tidyverse)  # working with data frames, plotting
 
 # Much of what we will be using is built into R without loading any
 # packages.
-#
-# We will be using several [Tidyverse](https://www.tidyverse.org/)
-# packages for loading, manipulating, and plotting data frames. See http
-# s://monashbioinformaticsplatform.github.io/r-more/topics/tidyverse.htm
-# l for our introduction to the Tidyverse.
 
 
 
@@ -362,6 +357,8 @@ pvcfit2 <- lm(psize ~ operator + resin + operator:resin, data=pvc)
 # or
 pvcfit2 <- lm(psize ~ operator*resin, data=pvc)
 
+pvcfit2
+
 # This model allows for interactions between the two factors. There are
 # enough predictors in the model matrix that each combination of levels
 # can take on a distinct value. So we now have
@@ -371,8 +368,8 @@ pvcfit2 <- lm(psize ~ operator*resin, data=pvc)
 # * "operatorCarl" is particle size for Carl relative to Alice, for R1
 # * "resinR2" is particle size for R2 relative to R1, for Alice
 # * (etc)
-# * "operatorBob:resinR2" is particle size for Bob relative to Alice, R2
-# relative to R1
+# * "operatorBob:resinR2" is particle size for Bob and R2, relative to
+# Alice and R1
 # * (etc)
 
 anova(pvcfit1, pvcfit2)
@@ -842,12 +839,13 @@ efit$df.prior
 efit$df.residual
 efit$df.total
 plotSA(efit)
-points(efit$Amean, efit$s2.post^0.25, col="red", cex=0.3)
+points(efit$Amean, efit$s2.post^0.25, col="red", cex=0.2)
 
 # The total effective degrees of freedom is the "prior" degrees of
 # freedom plus the normal residual degrees of freedom. As can be seen in
-# the plot, this produces a posterior residual variance (efit$s2.post)
-# that is squeezed toward the trend line.
+# the plot, compared to the residual variance (black dots), this
+# produces a posterior residual variance (efit$s2.post, red dots) that
+# is squeezed toward the trend line.
 #
 # It's worthwhile checking df.prior when using limma, as a low value may
 # indicate a problem with a data-set.
