@@ -369,7 +369,7 @@ pvcfit2
 # * "resinR2" is particle size for R2 relative to R1, for Alice
 # * (etc)
 # * "operatorBob:resinR2" is particle size for Bob and R2, relative to
-# Alice and R1
+# (Intercept)+operatorBob+resinR2.
 # * (etc)
 
 anova(pvcfit1, pvcfit2)

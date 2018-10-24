@@ -399,7 +399,7 @@ This model allows for interactions between the two factors. There are enough pre
 * "operatorCarl" is particle size for Carl relative to Alice, for R1
 * "resinR2" is particle size for R2 relative to R1, for Alice
 * (etc)
-* "operatorBob:resinR2" is particle size for Bob and R2, relative to Alice and R1
+* "operatorBob:resinR2" is particle size for Bob and R2, relative to `(Intercept)+operatorBob+resinR2`.
 * (etc)
 
 
