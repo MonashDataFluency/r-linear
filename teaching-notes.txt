@@ -11,3 +11,24 @@ Move some discussion of formula syntax earlier.
 
 Maybe go up to four hours to allow time for limma. Still had energy at the end of the workshop.
 
+Here are some introductory talking points:
+
+    View this workshop as "vocational training".
+    Theory and practice will re-enforce each other.
+
+    Exploration remains important, but not covered in detail today.
+
+    Trying to provide a "complete" toolbox, up to a certain point.
+    Trying to provide generic rather than specialized methods, skipping useful shortcuts.
+    Statistics and R have a lot of history.
+    I'm skipping over a lot -- people view the same underlying mathematics in different ways.
+    Particularly ANOVA is a separate but often equivalent line of development.
+
+    Presentation is generic, but somewhat shaded by needs in bioinformatics.
+
+    Not covering GLMs or mixed models, however you will have a good foundation to learn about them.
+    Many of the same functions apply.
+
+    Now introduce yourself to your neighbours and introduce yourself on the etherpad.
+
+
