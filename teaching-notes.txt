@@ -1,0 +1,13 @@
+
+2018-10-25 10am-1pm (3 hours, 15 minute break at 11:30)
+
+Skipped limma section. Rushed in teeth section. Skipped multiple testing. Pace was otherwise good.
+
+Formulas were a significant source of confusion:
+- dropping the intercept and the factor getting an extra column was very confusing
+- ~0 and ~1 models in slideshow were a bit confusing.
+
+Move some discussion of formula syntax earlier.
+
+Maybe go up to four hours to allow time for limma. Still had energy at the end of the workshop.
+
