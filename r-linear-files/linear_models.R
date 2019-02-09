@@ -254,6 +254,10 @@ outfit2 <- lm(outcome ~ 0 + group, data=outcomes)
 #
 # Does it fit the data better or worse than the original model?
 #
+# **Warning:** If you've been reading ahead, don't use the summary
+# function's R^2 values to compare the two models! If you use ~0+group,
+# summary's R^2 and F are based on comparing the model to ~0, not ~1.
+#
 # 4.3 Testing a hypothesis ----
 #
 # Besides data with categorical predictors, the term ANOVA is used to
@@ -876,3 +880,7 @@ ggplot(all_results, aes(x=AveExpr, y=logFC)) +
 #
 # I have some further thoughts on this topic, see the package
 # topconfects (http://logarithmic.net/topconfects/).
+#
+# ---
+
+sessionInfo()

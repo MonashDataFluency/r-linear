@@ -1,5 +1,0 @@
----
-title: "Answers to challenge questions"
-output: html_document
----
-

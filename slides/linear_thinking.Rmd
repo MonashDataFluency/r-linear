@@ -39,7 +39,7 @@ knitr::include_graphics("../figures/chambers_and_hastie.jpg")
 ```
 </div>
 
-Many features of the S language (predecessor to R) were created to support working with linear models and its generalizations:
+Many features of the S language (predecessor to R) were created to support working with linear models and their generalizations:
 
 <br>
 
@@ -47,7 +47,7 @@ Many features of the S language (predecessor to R) were created to support worki
 
 >* `factor` type introduced to hold categorical data.
 
->* `~` formula syntax specify terms in models.
+>* `y ~ x1+x2+x3` formula syntax specify terms in models.
 
 >* Manipulation of "S3" objects holding fitted models.
 
@@ -97,8 +97,24 @@ sum(a*b)
 
 Taking the product of a matrix $X$ and a vector $a$ with length matching the number of columns, the result is a vector containing the dot product of each row of the matrix $X$ with the vector $a$.
 
+Can also think of this as a weighted sum of the columns of $X$.
+
 $$
-Xa
+Xa = 
+a_1
+\begin{bmatrix}
+x_{1,1} \\
+x_{2,1} \\
+\vdots
+\end{bmatrix}
++ a_2
+\begin{bmatrix}
+x_{1,2} \\
+x_{2,2} \\
+\vdots
+\end{bmatrix}
++
+\dots
 $$
 
 In R:
@@ -107,6 +123,7 @@ In R:
 X %*% a
 ```
 
+<br>
 (It's also possible to multiply two matrices with `%*%` but we won't need this today.)
 
 
@@ -238,6 +255,118 @@ Distance is the square root of the sum of squared differences in each dimension,
 $$ \hat \varepsilon = y - X \hat \beta $$
 
 
+## Model fitting in R with `lm( )`
+
+Our starting point for modelling is usually a data frame, but the process of getting $y$ and $X$ from the data frame has some complications, and a special "formula" syntax. 
+
+```
+        data frame
+
+            ||
+            || Weirdness involving "~" formula syntax happens
+            \/
+
+           y, X
+
+            ||
+            || Actual magic of model fitting happens
+            \/
+
+        coef, sigma
+```
+
+First look at examples then discuss process in detail.
+
+##
+
+Do section: Single numerical predictor
+
+
+## Formula syntax introduction
+
+We've just seen the formula
+
+```
+height ~ age
+```
+
+> * Left hand side specifies response $y$.
+> * Right hand side specifies model matrix $X$.
+
+Terms refer to columns of a data frame or variables in the environment.
+
+There are some rules to learn about the construction of $X$.
+
+
+## Formula syntax -- intercept term
+
+From the formula `height ~ age`, X had *two* columns. What gives? 
+
+Intercept term `1` is implicit (predictor consisting of all 1s). 
+
+> * `height ~ 1 + age` to be explicit.
+
+Omit with `-1` or `0`. 
+
+> * `height ~ 0 + age` to force a model where newborns are 0cm tall.
+
+
+## Formulas - factors
+
+Factors in R represent categorical data, such as treatment groups or batches in an experiment.
+
+R converts a factor into $n_\text{levels}-1$ columns of "indicator variables", aka "one-hot" encoding. <span class="tip">\*<span class="tiptext">The encoding can be adjusted using the `C( )` function within a formula. The default differs between S and R languages!</span></span>
+
+```{r}
+f <- factor(c("a","a","b","b","c","c"))
+
+model.matrix(~ f)
+```
+
+## Formulas - factors
+
+Need to be careful interpreting the meaning of coefficients for factors.
+
+> * `(Intercept)` is the mean for "a".
+> * `fb` is the *difference* between "b" and "a".
+> * `fc` is the *difference* between "c" and "a".
+
+```{r}
+f <- factor(c("a","a","b","b","c","c"))
+
+model.matrix(~ f)
+```
+
+## Formulas - factors without the intercept term
+
+R tries to be clever about factor encoding if the intercept is omitted.
+
+Without an intercept, each coefficient is simply the mean for that level. 
+
+Can't do this with multiple factors.<span class="tip">*<span class="tiptext">Without the intercept term, R will only do this for the first factor. Further factors are encoded as before, omitting the first level. If R didn't do this, there would be multiple choices of coefficients able to make the exact same prediction (the predictors would not be linearly independent).</span></span>
+
+```{r}
+f <- factor(c("a","a","b","b","c","c"))
+```
+
+<div style="float: left; width: 15em;">
+```{r}
+model.matrix(~ f)
+```
+</div>
+
+<div style="float: left; width: 15em;">
+```{r}
+model.matrix(~ 0 + f)
+```
+</div>
+
+
+## 
+
+Do section: Single factor predictor, two levels
+
+
 ## Model fitting -- estimating $\beta$ with geometry
 
 <div style="float: right; width: 15em;">
@@ -283,12 +412,16 @@ to_predict()
 
 ## Model fitting -- estimating $\sigma$
 
+```{asis}
 <div style="float: right; width: 15em;">
 The coefficient is wrong, but is our best estimate. It is an unbiassed estimate.
 
 The residuals vector must be orthogonal to the subspace of possible predictions so it is too short, but we can correct for this to get an unbiassed estimate of the variance.
+<span class="tip">*<span class="tiptext">In R, this is done using QR decomposition. X is decomposed into $X=QR$ with $Q$ orthonormal (i.e. a rotation matrix). $Q^{\top}y$ rotates $y$ so that the first $p$ elements contain all the information relevant to fitting the model, and the remaining $n-p$ elements are purely noise.<br><br>The first $p$ elements of $Q^{\top}\hat{\varepsilon}$ will be zero due to fitting the model, but the remaining $n-p$ elements are unaffected by this and as this is a rotation of a spherically symmetric noise distribution they have the same variance as the original elements of $\varepsilon$.</span></span>
+
 
 $$ \hat \sigma^2 = { \hat\varepsilon^\top \hat\varepsilon \over n-p } $$
+```
 
 ```{r}
 df.residual(fit)  # n-p
@@ -303,37 +436,6 @@ the_truth()
 ```
 
 
-## Model fitting in R with `lm( )`
-
-Our starting point for modelling is usually a data frame, but the process of getting $y$ and $X$ from the data frame has some complications, and a special "formula" syntax. 
-
-```
-        data frame
-
-            ||
-            || Magic involving "~" formula syntax happens
-            \/
-
-           y, X
-
-            ||
-            || Model fitting happens
-            \/
-
-        coef, sigma
-```
-
-First look at examples then discuss process in detail.
-
-
-
-
-## 
-
-Do section: Single numerical predictor
-
-Do section: Single factor predictor, two levels
-
 
 ## Testing hypotheses
 
@@ -344,7 +446,7 @@ fit0 <- lm(y ~ 0)
 fit1 <- lm(y ~ 1)
 ```
 
-Two model formulas representing null hypotheses H0 and alternative hypothesis H1.
+Two model formulas representing null hypothesis H0 and alternative hypothesis H1.
 
 H0 must *nest* within H1.
 
@@ -485,19 +587,19 @@ Example: reject all values outside a confidence interval.
 > * Benjamini and Hochberg correction (etc)
 
 
-## Formulas
+## More on formulas
 
 "Wilikins-Rogers notation"
 
-Formulas with `~` specify response $y$ and the construction of the model matrix $X$.
-
-Terms refer to columns of a data frame or variables in the environment.
-
 Merely a convenience, if you already have model matrix `X` can just use `y ~ 0 + X`.
 
-<br>
+We've seen:
 
-Let's discuss this in more detail.
+> * numerical predictors
+> * factor predictors
+> * intercept term
+
+Let's look at other things formula syntax can do.
 
 ## Formulas - data types
 
@@ -508,42 +610,6 @@ Let's discuss this in more detail.
 `factor` is represented as $n_\text{levels}-1$ columns containing 1s and 0s. 
 
 `matrix` is represented as multiple columns.
-
-
-## Formulas - factors
-
-$n_\text{levels}-1$ columns of "indicator variables", aka "one-hot" encoding. <span class="tip">*<span class="tiptext">The encoding can be adjusted using the `C( )` function within a formula. The default differs between S and R languages!</span></span>
-
-```{r}
-f <- factor(c("a","a","b","b","c","c"))
-
-model.matrix(~ f)
-```
-
-
-## Formulas - intercept
-
-Intercept term `1` is implicit.
-
-Omit with `-1` or `0`.
-
-R tries to be clever about factor encoding if intercept omitted.
-
-```{r}
-f <- factor(c("a","a","b","b","c","c"))
-```
-
-<div style="float: left; width: 15em;">
-```{r}
-model.matrix(~ f)
-```
-</div>
-
-<div style="float: left; width: 15em;">
-```{r}
-model.matrix(~ 0 + f)
-```
-</div>
 
 
 ## Formulas - calculations and function calls
@@ -665,7 +731,7 @@ Various more advanced methods exist if these are present, such as quantile regre
 Individuals tracked over time, repeated measurements, blocks/batches/plots, etc.
 
 >* Generalized Least Squares (accounts for covariance in noise)
->* Mixed Model (some coefficients are drawn from a random distribution)
+>* **Mixed Model** (some coefficients are drawn from a random distribution): `lme4`, `lmerTest`
 
 ### Response is non-linear in predictors
 

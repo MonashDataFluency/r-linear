@@ -297,6 +297,8 @@ Examine the model matrix and the generalized inverse matrix. What do the coeffic
 
 Does it fit the data better or worse than the original model?
 
+**Warning:** If you've been reading ahead, don't use the `summary` function's R^2 values to compare the two models! If you use `~0+group`, `summary`'s R^2 and F are based on comparing the model to `~0`, not `~1`.
+
 
 ## Testing a hypothesis
 
@@ -858,6 +860,13 @@ ggplot(all_results, aes(x=AveExpr, y=logFC)) +
 The FCR corrected CIs used here have the same q, 0.05, as we used as the cutoff for adj.P.Val. This means they never pass through zero.
 
 I have some further thoughts on this topic, see the package `topconfects` (http://logarithmic.net/topconfects/).
+
+---
+
+```{r}
+sessionInfo()
+```
+
 
 
 
