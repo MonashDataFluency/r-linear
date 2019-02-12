@@ -68,13 +68,13 @@ We will be using vectors and matrices extensively today.
 
 In mathematics, we usually treat a vector as a matrix with a single column. In R, they are two different types. <span class="tip">*<span class="tiptext">R also makes a distinction between `matrix` and `data.frame` types. There is a good chance you have used data frames but not matrices before now.<br><br>Matrices contain all the same type of value, typically numeric, whereas data frames can have different types in different columns.</span></span>
 
-A matrix can be created from a vector using `matrix`, or from multiple vectors with `cbind` (bind columns) or `rbind` (bind rows).
+A matrix can be created from a vector using `matrix`, or from multiple vectors with `cbind` (bind columns) or `rbind` (bind rows), or from a data frame with `as.matrix`.
 
-Matrix transpose exchanges rows and columns. In maths it is indicated with a small t, eg $a^\top$. In R use the `t` function, eg `t(a)`.
+Matrix transpose exchanges rows and columns. In maths it is indicated with a small t, eg $X^\top$. In R use the `t` function, eg `t(X)`.
 
 $$
-a = \begin{bmatrix} 1 & 4 \\ 2 & 5 \\ 3 & 6 \end{bmatrix} 
-\quad \quad a^\top = \begin{bmatrix} 1 & 2 & 3 \\ 4 & 5 & 6 \end{bmatrix} 
+X = \begin{bmatrix} 1 & 4 \\ 2 & 5 \\ 3 & 6 \end{bmatrix} 
+\quad \quad X^\top = \begin{bmatrix} 1 & 2 & 3 \\ 4 & 5 & 6 \end{bmatrix} 
 $$
 
 ## Linear maths and R
@@ -286,9 +286,7 @@ Do section: Single numerical predictor
 
 We've just seen the formula
 
-```
-height ~ age
-```
+`height ~ age`
 
 > * Left hand side specifies response $y$.
 > * Right hand side specifies model matrix $X$.
