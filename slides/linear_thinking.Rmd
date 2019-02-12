@@ -593,9 +593,10 @@ Merely a convenience, if you already have model matrix `X` can just use `y ~ 0 +
 
 We've seen:
 
+> * intercept term
 > * numerical predictors
 > * factor predictors
-> * intercept term
+> * interactions between factors
 
 Let's look at other things formula syntax can do.
 
