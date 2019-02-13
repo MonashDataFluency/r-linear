@@ -32,3 +32,13 @@ Here are some introductory talking points:
     Now introduce yourself to your neighbours and introduce yourself on the etherpad.
 
 
+
+2019-02-13 11am-4pm (5 hours total: 4 hours teaching, 1 hour break for lunch)
+
+Pretty much covered the material, but rushed at the end.
+- Didn't do the demonstration that limma exactly matches glht -- probably superfluous.
+
+Final slides summarizing things learned could be trimmed back.
+
+It would be nice to get to a challenge earlier, first challenge reached at 12:30pm.
+
