@@ -309,9 +309,7 @@ margin-top: 0;
 }
 </style>
 
-</head>
 
-<body>
 
 <style type="text/css">
 .main-container {
@@ -342,8 +340,6 @@ summary {
 </style>
 
 
-
-<div class="container-fluid main-container">
 
 <!-- tabsets -->
 
@@ -418,6 +414,15 @@ $(document).ready(function () {
 
 
 
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
 
 <div class="fluid-row" id="header">
 
@@ -428,23 +433,35 @@ $(document).ready(function () {
 </div>
 
 
-<div id="files" class="section level2">
-<h2>Files</h2>
-<ul>
-<li><a href="r-linear-files.zip" class="uri">r-linear-files.zip</a> - Files used in this workshop.</li>
-</ul>
-</div>
 <div id="workshop-notes" class="section level2">
 <h2>Workshop notes</h2>
 <ul>
 <li><a href="slides/linear_thinking.html">Slideshow</a></li>
 <li><a href="topics/linear_models.html">Linear models in R</a></li>
 </ul>
-<!--
-<br>
+</div>
+<div id="setup" class="section level2">
+<h2>Setup</h2>
+<p>This workshop is designed to work with <a href="https://rstudio.cloud/">RStudio Cloud</a>. Go to <a href="https://rstudio.cloud/" class="uri">https://rstudio.cloud/</a> (Monash users can log in with their Monash google account) and create a new project. The workshop can also be done using R locally on your laptop (if doing this, we also recommend you create a new project to contain the files).</p>
+<p>Running the R code below will download files and install packages used in this workshop.</p>
+<pre class="r"><code># Download data
+download.file(
+  &quot;https://monashdatafluency.github.io/r-linear/r-linear-files.zip&quot;,
+  destfile=&quot;r-linear-files.zip&quot;)
+unzip(&quot;r-linear-files.zip&quot;)
 
-[Answers to challenges.](topics/answers.html) No peeking during class!
--->
+# Install some CRAN packages:
+install.packages(c(&quot;tidyverse&quot;, &quot;multcomp&quot;, &quot;BiocManager&quot;))
+
+# Install some Bioconductor packages:
+BiocManager::install(c(&quot;limma&quot;,&quot;edgeR&quot;))</code></pre>
+<p>Now load the file <code>linear_models.R</code> in the <code>r-linear-files</code> folder.</p>
+</div>
+<div id="files" class="section level2">
+<h2>Files</h2>
+<ul>
+<li><a href="r-linear-files.zip">r-linear-files.zip</a> - Files used in this workshop.</li>
+</ul>
 </div>
 <div id="key-functions-to-remember" class="section level2">
 <h2>Key functions to remember</h2>
@@ -453,10 +470,10 @@ $(document).ready(function () {
 I, poly</code></pre>
 <p><code>splines</code> – curve fitting:</p>
 <pre><code>ns, bs</code></pre>
-<p><code>multcomp</code> – contrasts and multiple comparisons:</p>
+<p><code>multcomp</code> – linear hypothesis tests and multiple comparisons:</p>
 <pre><code>glht, confint, summary</code></pre>
 <p><code>limma</code> and <code>edgeR</code> – fitting many models to gene expression data:</p>
-<pre><code>DGEList, calcNormFactors, cpm
+<pre><code>DGEList, calcNormFactors, cpm,
 lmFit, contrasts.fit, eBayes, plotSA, topTable</code></pre>
 </div>
 <div id="links" class="section level2">

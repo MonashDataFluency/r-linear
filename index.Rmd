@@ -6,20 +6,36 @@ output:
         css: style.css
 ---
 
-## Files
-
-* [r-linear-files.zip](r-linear-files.zip) - Files used in this workshop.
-
 ## Workshop notes
 
 * [Slideshow](slides/linear_thinking.html)
 * [Linear models in R](topics/linear_models.html)
 
-<!--
-<br>
+## Setup
 
-[Answers to challenges.](topics/answers.html) No peeking during class!
--->
+This workshop is designed to work with [RStudio Cloud](https://rstudio.cloud/). Go to https://rstudio.cloud/ (Monash users can log in with their Monash google account) and create a new project. The workshop can also be done using R locally on your laptop (if doing this, we also recommend you create a new project to contain the files).
+
+Running the R code below will download files and install packages used in this workshop.
+
+```{r eval=FALSE}
+# Download data
+download.file(
+  "https://monashdatafluency.github.io/r-linear/r-linear-files.zip",
+  destfile="r-linear-files.zip")
+unzip("r-linear-files.zip")
+
+# Install some CRAN packages:
+install.packages(c("tidyverse", "multcomp", "BiocManager"))
+
+# Install some Bioconductor packages:
+BiocManager::install(c("limma","edgeR"))
+```
+
+Now load the file `linear_models.R` in the `r-linear-files` folder.
+
+## Files
+
+* [r-linear-files.zip](r-linear-files.zip) - Files used in this workshop.
 
 ## Key functions to remember
 
@@ -32,13 +48,13 @@ Built-in to R:
 
     ns, bs
 
-`multcomp` -- contrasts and multiple comparisons: 
+`multcomp` -- linear hypothesis tests and multiple comparisons: 
 
     glht, confint, summary
 
 `limma` and `edgeR` -- fitting many models to gene expression data: 
 
-    DGEList, calcNormFactors, cpm
+    DGEList, calcNormFactors, cpm,
     lmFit, contrasts.fit, eBayes, plotSA, topTable
 
 ## Links

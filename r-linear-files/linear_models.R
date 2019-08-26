@@ -1,19 +1,8 @@
 
 
 
-#////////////////////////
-# 1 Loading packages ----
-
-## To install needed CRAN packages:
-#
-# install.packages("tidyverse")
-# install.packages("multcomp")
-#
-## To install needed Bioconductor packages:
-#
-# source("https://bioconductor.org/biocLite.R")
-# biocLite(c("limma", "edgeR"))
-#
+#/////////////////////
+# 1 Load packages ----
 
 library(MASS)       # ginv -- coefficient estimation
 library(splines)    # ns, bs -- spline curves
@@ -83,6 +72,20 @@ t(X)
 X %*% a
 as.vector(X %*% a)
 
+# 2.3 Challenge - use a dot product to calculate ----
+#
+# The following dot product is an elaborate way to retrieve x[1]:
+
+x <- c(10,20,30,40)
+weights <- c(1,0,0,0)       # <-- modify this line
+sum(weights*x)
+
+# Modify weights in the above to calculate different quantities:
+#
+# A. x[3]-x[2]
+#
+# B. The mean of all four values.
+#
 
 
 #//////////////////////////////////
@@ -153,7 +156,7 @@ as.vector( X %*% beta )
 
 # predict can be used with new data.
 
-new_people <- data_frame(age=5:25)
+new_people <- tibble(age=5:25)
 predict(fit, new_people)
 
 new_predictions <- cbind(
@@ -301,8 +304,9 @@ t.test(outcomes$outcome[5:7], outcomes$outcome[1:4], var.equal=TRUE)
 
 # 4.4 Challenge - does height change with age? ----
 #
-# Return to the people dataset. Can we reject the hypothesis that height
-# is unrelated to age?
+# Return to the people dataset. What is the 95% confidence interval on
+# the slope, in cm per year? Can we reject the hypothesis that height is
+# unrelated to age?
 #
 # Compare the result to the outcome of a correlation test using
 # cor.test( ).
@@ -562,6 +566,11 @@ look(teeth$gene_pou3f3, pou3f3fit1)
 
 anova(pou3f3fit0, pou3f3fit1)
 
+confint(pou3f3fit1)["toothupper:day",]
+
+# The slopes of the lines confidently differ by at least 23.5 RPM per
+# day.
+#
 # Examining the residuals reveals a further problem: larger expression
 # values are associated with larger residuals.
 
@@ -577,6 +586,11 @@ log2_pou3f3fit0 <- lm(log2(gene_pou3f3) ~ tooth + day, data=teeth)
 log2_pou3f3fit1 <- lm(log2(gene_pou3f3) ~ tooth * day, data=teeth)
 
 anova(log2_pou3f3fit0, log2_pou3f3fit1)
+
+confint(log2_pou3f3fit1)["toothupper:day",]
+
+# The ratio of fold changes per day between the upper and lower molars
+# is confidently within 2^-0.22 to 2^0.19 (0.86 to 1.14).
 
 look(log2(teeth$gene_pou3f3), log2_pou3f3fit0)
 
