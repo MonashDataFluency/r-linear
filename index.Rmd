@@ -20,7 +20,7 @@ Running the R code below will download files and install packages used in this w
 ```{r eval=FALSE}
 # Download data
 download.file(
-  "https://monashdatafluency.github.io/r-linear/r-linear-files.zip",
+  "https://monashbioinformaticsplatform.github.io/r-linear/r-linear-files.zip",
   destfile="r-linear-files.zip")
 unzip("r-linear-files.zip")
 

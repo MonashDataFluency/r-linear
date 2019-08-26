@@ -74,10 +74,10 @@ as.vector(X %*% a)
 
 # 2.3 Challenge - use a dot product to calculate ----
 #
-# The following dot product is an elaborate way to retrieve x[1]:
+# The following dot product is an elaborate way to retrieve x[2]:
 
 x <- c(10,20,30,40)
-weights <- c(1,0,0,0)       # <-- modify this line
+weights <- c(0,1,0,0)       # <-- modify this line
 sum(weights*x)
 
 # Modify weights in the above to calculate different quantities:
@@ -239,12 +239,18 @@ model.matrix(outfit)
 
 X <- model.matrix(outfit)
 y <- outcomes$outcome
-ginv(X) %>% round(3)
+round(ginv(X), 3)
 ginv(X) %*% y
 
 # Here we can see the first coefficient is the average of the
 # "untreated" samples, and the second is the average of the "treated"
 # samples minus that average of the "untreated" samples.
+#
+# ( y contains noise, assumed to be identically normally distributed for
+# each observation. Transformation of this noise by ginv(X) tells us the
+# distribution of errors in the coefficients (see vcov()). This can be
+# further propagated to give the distribution of errors in predictions,
+# and in other linear combinations of coefficients. )
 
 # 4.2 Challenge - the meanings of coefficients ----
 #
@@ -304,12 +310,13 @@ t.test(outcomes$outcome[5:7], outcomes$outcome[1:4], var.equal=TRUE)
 
 # 4.4 Challenge - does height change with age? ----
 #
-# Return to the people dataset. What is the 95% confidence interval on
-# the slope, in cm per year? Can we reject the hypothesis that height is
-# unrelated to age?
+# Return to the people dataset. Can we reject the hypothesis that height
+# is unrelated to age?
 #
 # Compare the result to the outcome of a correlation test using
 # cor.test( ).
+#
+# What is the 95% confidence interval on the slope, in cm per year?
 #
 
 
@@ -382,7 +389,7 @@ pvcfit2
 
 anova(pvcfit1, pvcfit2)
 
-# 5.3 Linear hypotheses and confidence intervals ----
+# 5.3 Contrasts and confidence intervals ----
 #
 # anova( ) lets us test if a particular factor or interaction is needed
 # at all, and summary( ) allows us to see if any levels of a factor

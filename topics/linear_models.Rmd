@@ -86,11 +86,11 @@ as.vector(X %*% a)
 
 ## Challenge - use a dot product to calculate {.challenge}
 
-The following dot product is an elaborate way to retrieve `x[1]`:
+The following dot product is an elaborate way to retrieve `x[2]`:
 
 ```{r eval=F}
 x <- c(10,20,30,40)
-weights <- c(1,0,0,0)       # <-- modify this line
+weights <- c(0,1,0,0)       # <-- modify this line
 sum(weights*x)
 ```
 
@@ -281,11 +281,13 @@ Coefficients are estimated from responses by multiplying by the "Moore-Penrose g
 ```{r}
 X <- model.matrix(outfit)
 y <- outcomes$outcome
-ginv(X) %>% round(3)
+round(ginv(X), 3)
 ginv(X) %*% y
 ```
 
 Here we can see the first coefficient is the average of the "untreated" samples, and the second is the average of the "treated" samples minus that average of the "untreated" samples.
+
+( `y` contains noise, assumed to be identically normally distributed for each observation. Transformation of this noise by `ginv(X)` tells us the distribution of errors in the coefficients (see `vcov()`). This can be further propagated to give the distribution of errors in predictions, and in other linear combinations of coefficients. )
 
 
 ## Challenge - the meanings of coefficients {.challenge}
@@ -336,10 +338,11 @@ t.test(outcomes$outcome[5:7], outcomes$outcome[1:4], var.equal=TRUE)
 
 ## Challenge - does height change with age? {.challenge}
 
-Return to the `people` dataset. What is the 95% confidence interval on the slope, in cm per year? Can we reject the hypothesis that height is unrelated to age?
+Return to the `people` dataset. Can we reject the hypothesis that height is unrelated to age? 
 
 Compare the result to the outcome of a correlation test using `cor.test( )`.
 
+What is the 95% confidence interval on the slope, in cm per year?
 
 
 # Multiple factors, many levels
@@ -413,7 +416,7 @@ anova(pvcfit1, pvcfit2)
 ```
 
 
-## Linear hypotheses and confidence intervals
+## Contrasts and confidence intervals
 
 `anova( )` lets us test if a particular factor or interaction is needed at all, and `summary( )` allows us to see if any levels of a factor differ from the first level. However we may wish to perform different comparisons of the levels of a factor -- this is called a "contrast". We might also want to test some more complicated combination of coefficients such as a difference between two hypothetical individuals. In general this is called a "linear hypotheses" or a "general linear hypothesis".
 
