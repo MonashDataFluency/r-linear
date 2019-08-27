@@ -596,8 +596,8 @@ anova(log2_pou3f3fit0, log2_pou3f3fit1)
 
 confint(log2_pou3f3fit1)["toothupper:day",]
 
-# The ratio of fold changes per day between the upper and lower molars
-# is confidently within 2^-0.22 to 2^0.19 (0.86 to 1.14).
+# The ratio of fold-change-per-day between the upper and lower molars is
+# confidently within 2^-0.22 to 2^0.19 (0.86 to 1.14).
 
 look(log2(teeth$gene_pou3f3), log2_pou3f3fit0)
 
@@ -735,9 +735,10 @@ log2_cpms <- cpm(dgelist, log=TRUE, prior.count=0.25)
 # with very low read counts. Including these genes will require a larger
 # False Discovery Rate correction, and also confuses limma's Empirical
 # Bayes parameter estimation. Let's only retain genes with an average of
-# 5 reads per sample or more.
+# 1 read per sample or more (with the typical library size here being 40
+# million).
 
-keep <- rowMeans(log2_cpms) >= -3
+keep <- rowMeans(log2_cpms) >= log2(1/40)
 log2_cpms_filtered <- log2_cpms[keep,]
 
 nrow(log2_cpms)
@@ -787,8 +788,8 @@ significant <- all_results$adj.P.Val <= 0.05
 table(significant)
 
 ggplot(all_results, aes(x=AveExpr, y=logFC)) +
-    geom_point(size=0.1, color="grey") +
-    geom_point(data=all_results[significant,], size=0.1)
+    geom_point(size=0.1) +
+    geom_point(data=all_results[significant,], size=0.1, color="red")
 
 # 7.3 Relation to lm( ) and glht( ) ----
 #
@@ -899,8 +900,9 @@ ggplot(all_results, aes(x=AveExpr, y=logFC)) +
 # The FCR corrected CIs used here have the same q, 0.05, as we used as
 # the cutoff for adj.P.Val. This means they never pass through zero.
 #
-# I have some further thoughts on this topic, see the package
-# topconfects (http://logarithmic.net/topconfects/).
+# I have some further thoughts on this topic, see the Bioconductor
+# package topconfects (https://bioconductor.org/packages/release/bioc/ht
+# ml/topconfects.html).
 #
 # ---
 
