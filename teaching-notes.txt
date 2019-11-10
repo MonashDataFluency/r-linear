@@ -42,3 +42,21 @@ Final slides summarizing things learned could be trimmed back.
 
 It would be nice to get to a challenge earlier, first challenge reached at 12:30pm.
 
+
+
+2019-08-28 10:30am-4pm (5.5 hours total: 4.5 hours teaching, 1 hour lunch)
+
+Had multiple new people teaching. Very rushed at end.
+
+The ~0+group is very hard, you need to follow three tricks.
+- 0+ means no intercept
+- but group encoding adapts to this
+- and solution process a;so adapts
+... maybe a different challenge or add a challenge earlier
+
+log(1/40) is poorly thought out
+
+
+
+
+

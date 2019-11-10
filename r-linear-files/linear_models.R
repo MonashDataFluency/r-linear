@@ -207,7 +207,7 @@ plot(fit)
 #
 # Consider a simple experiment where some outcome is measured for an
 # untreated and a treated group. This can be viewed as a one-way
-# ANalysis Of Variance (ANOVA) experiment. (This is one of two senses in
+# ANalysis Of VAriance (ANOVA) experiment. (This is one of two senses in
 # which the term ANOVA will be used today.)
 
 outcomes <- read_csv(
@@ -234,7 +234,7 @@ model.matrix(outfit)
 #
 # Coefficients are estimated from responses by multiplying by the
 # "Moore-Penrose generalized inverse" of X. It can be useful to examine
-# this to work out exactly what a model is doing. Each row shows how the
+# this to work out exactly what a fit is doing. Each row shows how the
 # corresponding coefficient is estimated.
 
 X <- model.matrix(outfit)
@@ -254,18 +254,27 @@ ginv(X) %*% y
 
 # 4.2 Challenge - the meanings of coefficients ----
 #
-# Suppose instead we fit:
+# We now consider the formula outcome ~ 0 + group.
+#
+# Examine the model matrix that will be used:
+
+model.matrix(outcome ~ 0 + group, data=outcomes)
+
+# 1. What column has been removed because 0 + was used?
+#
+# 2. R has responded to this by being a bit clever when representing the
+# factor. What column has been added?
+#
+# 3. The mean of the untreated group is 5.2, the mean of the treated
+# group is 9.7, and the difference between them is 4.5. Without using
+# lm, what values should the coefficients have to best fit the data?
+#
+# Now perform the actual linear model fit:
 
 outfit2 <- lm(outcome ~ 0 + group, data=outcomes)
 
-# Examine the model matrix and the generalized inverse matrix. What do
-# the coefficients in this new model represent?
-#
-# Does it fit the data better or worse than the original model?
-#
-# **Warning:** If you've been reading ahead, don't use the summary
-# function's R^2 values to compare the two models! If you use ~0+group,
-# summary's R^2 and F are based on comparing the model to ~0, not ~1.
+# 4. Using sigma, does the new model fit the data better or worse than
+# the original?
 #
 # 4.3 Testing a hypothesis ----
 #
@@ -310,13 +319,14 @@ t.test(outcomes$outcome[5:7], outcomes$outcome[1:4], var.equal=TRUE)
 
 # 4.4 Challenge - does height change with age? ----
 #
-# Return to the people dataset. Can we reject the hypothesis that height
-# is unrelated to age?
+# Return to the people dataset.
 #
-# Compare the result to the outcome of a correlation test using
+# 1. Can we reject the hypothesis that height is unrelated to age?
+#
+# 2. Compare the result to the outcome of a correlation test using
 # cor.test( ).
 #
-# What is the 95% confidence interval on the slope, in cm per year?
+# 3. What is the 95% confidence interval on the slope, in cm per year?
 #
 
 
@@ -718,9 +728,9 @@ teeth$sample
 # Reads Per Million, and log2 transform the results. There are some
 # subtleties here which we breeze over lightly: "TMM" normalization is
 # used as a small adjustment to the total number of reads in each
-# sample. A small constant is added to the counts to avoid calculating
-# log2(0). The edgeR and limma manuals describe these steps in more
-# detail.
+# sample. A small constant "prior count" is added to the counts to avoid
+# calculating log2(0). The edgeR and limma manuals describe these steps
+# in more detail.
 
 library(edgeR)
 library(limma)
@@ -729,16 +739,17 @@ dgelist <- calcNormFactors(DGEList(counts))
 
 dgelist$samples
 
-log2_cpms <- cpm(dgelist, log=TRUE, prior.count=0.25)
+log2_cpms <- cpm(dgelist, log=TRUE, prior.count=1)
 
 # There is little chance of detecting differential expression in genes
 # with very low read counts. Including these genes will require a larger
 # False Discovery Rate correction, and also confuses limma's Empirical
-# Bayes parameter estimation. Let's only retain genes with an average of
-# 1 read per sample or more (with the typical library size here being 40
-# million).
+# Bayes parameter estimation. The typical library size in this data set
+# is 40 million reads. Let's only retain genes with an average of 1 read
+# per sample or more. Remembering also the "prior count" of 1, this
+# gives a cutoff of log2(2/40).
 
-keep <- rowMeans(log2_cpms) >= log2(1/40)
+keep <- rowMeans(log2_cpms) >= log2(2/40)
 log2_cpms_filtered <- log2_cpms[keep,]
 
 nrow(log2_cpms)
