@@ -181,21 +181,24 @@ ggplot(people, aes(x=age, y=height)) + geom_smooth(method="lm") + geom_point()
 
 residuals(fit)
 
+# There should be no remaining relationship between predictions and the
+# residuals (or between any individual predictors and the residual).
+
 plot(predict(fit), residuals(fit))
 
-# Residuals should be close to normally distributed.
+# A Q-Q (quantile-quantile) plot sorts the residuals and compares them
+# to what would be expected from a normal distribution.
 
 qqnorm(residuals(fit))
 qqline(residuals(fit))
 
-# Ideally the points would lie on the line. Are they far enough away to
-# worry about? We can simulate some data to judge against.
-# Try this several times:
-
-sim <- rnorm(10, mean=0, sd=sigma(fit))
-qqnorm(sim)
-qqline(sim)
-
+# Ideally points would lie close to the line, but deviations are not a
+# disaster. Our coefficient estimates will tend toward normally
+# distributed errors even if the data does not, due to the Central Limit
+# Theorem. Wild outliers should be investigated, as they may have a
+# large effect on the model. We will see further examples of things to
+# look for in a Q-Q plot in section 6.
+#
 # plot(fit) produces a series of more sophisticated diagnostic plots.
 
 plot(fit)

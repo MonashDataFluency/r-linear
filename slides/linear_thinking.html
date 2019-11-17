@@ -3381,6 +3381,11 @@ y_n &amp;= \beta_1 x_{n,1} + \beta_2 x_{n,2} + \dots + \beta_p x_{n,p} + \vareps
 
 <p>\[ \hat \varepsilon = y - X \hat \beta \]</p>
 
+<br> <br>
+
+<div style="font-size: 60%;">
+(This is <em>one route</em> to least squares. Normally distributed noise is <a href='https://en.wikipedia.org/wiki/Gauss%E2%80%93Markov_theorem' title=''>not a strict requirement</a>, so long as there aren’t wild outliers.)</div>
+
 </article></slide><slide class=""><hgroup><h2>Model fitting in R with <code>lm( )</code></h2></hgroup><article  class="smaller " id="model-fitting-in-r-with-lm">
 
 <p>Our starting point for modelling is usually a data frame, but the process of getting \(y\) and \(X\) from the data frame has some complications, and a special &ldquo;formula&rdquo; syntax.</p>
@@ -3925,7 +3930,7 @@ Least squares estimation still has good properties when the noise is not normall
 <h3>Noise not normal (eg binary or count data)</h3>
 
 <ul>
-<li>Generalized Linear Models: <code>glm( )</code><br>(logistic regression, binomial, Poisson, negative binomial, gamma, etc)</li>
+<li><strong>Generalized Linear Models:</strong> <code>glm( )</code><br>(logistic regression, binomial, Poisson, negative binomial, gamma, etc)</li>
 <li>Quasi-Likelihood F-test in case of over-dispersion</li>
 </ul>
 
@@ -3955,7 +3960,7 @@ Least squares estimation still has good properties when the noise is not normall
 <li>Neural network (plug together many logistic regression models)</li>
 </ul>
 
-<p>Also consider tree methods, such as gradient boosted trees.</p>
+<p>Also consider tree methods such as gradient boosted trees.</p>
 
 </article></slide><slide class=""><hgroup><h2>Further reading</h2></hgroup><article  class="smaller " id="further-reading">
 

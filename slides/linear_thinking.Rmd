@@ -255,6 +255,11 @@ Distance is the square root of the sum of squared differences in each dimension,
 $$ \hat \varepsilon = y - X \hat \beta $$
 
 
+<br>
+<br>
+<div style="font-size: 60%;">
+(This is *one route* to least squares. Normally distributed noise is [not a strict requirement](https://en.wikipedia.org/wiki/Gauss%E2%80%93Markov_theorem), so long as there aren't wild outliers.)</div>
+
 ## Model fitting in R with `lm( )`
 
 Our starting point for modelling is usually a data frame, but the process of getting $y$ and $X$ from the data frame has some complications, and a special "formula" syntax. 
@@ -715,7 +720,7 @@ Various more advanced methods exist if these are present, such as quantile regre
 
 ### Noise not normal (eg binary or count data)
 
->* Generalized Linear Models: `glm( )`<br>(logistic regression, binomial, Poisson, negative binomial, gamma, etc)
+>* **Generalized Linear Models:** `glm( )`<br>(logistic regression, binomial, Poisson, negative binomial, gamma, etc)
 >* Quasi-Likelihood F-test in case of over-dispersion
 
 ### Survival time, with censoring
@@ -739,7 +744,7 @@ Individuals tracked over time, repeated measurements, blocks/batches/plots, etc.
 >* Generalized Additive Models (GAM): `mgcv::gam( )`<br>(splines with regularization)
 >* Neural network (plug together many logistic regression models)
 
-Also consider tree methods, such as gradient boosted trees.
+Also consider tree methods such as gradient boosted trees.
 
 
 ## Further reading
