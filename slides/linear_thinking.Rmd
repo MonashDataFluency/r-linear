@@ -221,7 +221,7 @@ But where do the coefficients $\beta$ come from?
 
 ## Model fitting -- estimating $\beta$
 
-Say we have a observed $n$ responses $y_i$ with corresponding vectors of predictors $x_i$: 
+Say we have observed $n$ responses $y_i$ with corresponding vectors of predictors $x_i$: 
 
 $$ 
 \begin{align}
