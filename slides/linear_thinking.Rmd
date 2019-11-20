@@ -550,17 +550,17 @@ Do section: Multiple factors, many levels
 
 A p-value lets us choose our probability of falsely rejecting a true hypothesis.
 
-If H1 is true, tends towards zero.
+If H1 is true, $p$ tends towards zero.
 
-If H0 is true, it is a uniformly random number between 0 and 1.
-
-<br>
-
-If we decide to reject hypotheses with $p \leq 0.05$, we are guaranteed a probability of 0.05 of rejecting a hypothesis if it is actually true.
+If H0 is true, $p$ is a uniformly random number between 0 and 1.
 
 <br>
 
-Suppose we perform 20 such tests. There is a high chance of falsely rejecting at least one of them.
+If we decide to reject H0 when $p \leq 0.05$, we are guaranteed a probability of 0.05 of rejecting H0 if it is actually true.
+
+<br>
+
+Suppose we perform 20 such tests. There is a high chance of falsely rejecting at least one null hypothesis.
 
 Need to adjust p-values for this problem (see `p.adjust( )`).
 
