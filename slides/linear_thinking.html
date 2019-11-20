@@ -3915,7 +3915,7 @@ residual degrees of freedom
 Least squares estimation still has good properties when the noise is not normally distributed, as a way to predict averages, if averages are truly what we want (&ldquo;BLUE&rdquo;). However outliers can lead to mis-estimating the accuracy of the model. This is as much about beliefs and past experience as observation – if outliers are rare, a sample <em>without</em> outliers may give a misleading estimate. In the worst case the outliers may be so large the variance doesn’t exist, and least squares does completely break down.<br><br>For example it would be important to include outliers like the Global Financial Crisis in an average yearly return on investment, see Nasim Taleb.</div></div></li>
 </ul>
 
-<p>Various more advanced methods exist if these are present, such as quantile regression and &ldquo;sandwich&rdquo; estimation of the accuracy of coefficients and contrasts.</p>
+<p>Various more advanced methods exist for if these are present, such as robust quantile regression and &ldquo;sandwich&rdquo; or &ldquo;bootstrap&rdquo; estimation of the accuracy of coefficients and contrasts.</p>
 
 </article></slide><slide class=""><hgroup><h2>Extensions to linear models</h2></hgroup><article  class="smaller " id="extensions-to-linear-models">
 
@@ -3949,6 +3949,7 @@ Least squares estimation still has good properties when the noise is not normall
 <ul>
 <li>Generalized Least Squares (accounts for covariance in noise)</li>
 <li><strong>Mixed Model</strong> (some coefficients are drawn from a random distribution): <code>lme4</code>, <code>lmerTest</code></li>
+<li>Time series models</li>
 </ul>
 
 <h3>Response is non-linear in predictors</h3>

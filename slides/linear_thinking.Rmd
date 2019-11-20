@@ -707,7 +707,7 @@ Problems with residual noise:
 >* Remaining structure
 >* Non-normal distribution <div class="tip">*<div class="tiptext">Least squares estimation still has good properties when the noise is not normally distributed, as a way to predict averages, if averages are truly what we want ("BLUE"). However outliers can lead to mis-estimating the accuracy of the model. This is as much about beliefs and past experience as observation -- if outliers are rare, a sample *without* outliers may give a misleading estimate. In the worst case the outliers may be so large the variance doesn't exist, and least squares does completely break down.<br><br>For example it would be important to include outliers like the Global Financial Crisis in an average yearly return on investment, see Nasim Taleb.</div></div>
 
-Various more advanced methods exist if these are present, such as quantile regression and "sandwich" estimation of the accuracy of coefficients and contrasts.
+Various more advanced methods exist for if these are present, such as robust quantile regression and "sandwich" or "bootstrap" estimation of the accuracy of coefficients and contrasts.
 
 
 ## Extensions to linear models
@@ -736,6 +736,7 @@ Individuals tracked over time, repeated measurements, blocks/batches/plots, etc.
 
 >* Generalized Least Squares (accounts for covariance in noise)
 >* **Mixed Model** (some coefficients are drawn from a random distribution): `lme4`, `lmerTest`
+>* Time series models
 
 ### Response is non-linear in predictors
 
