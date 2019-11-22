@@ -51,10 +51,28 @@ Had multiple new people teaching. Very rushed at end.
 The ~0+group is very hard, you need to follow three tricks.
 - 0+ means no intercept
 - but group encoding adapts to this
-- and solution process a;so adapts
+- and solution process also adapts
 ... maybe a different challenge or add a challenge earlier
 
 log(1/40) is poorly thought out
+
+
+
+2019-11-21 10:30am-4pm + 30mins overtime (5.5+.5 hours total with 15min morning tea, 30min lunch, 15min afternoon tea)
+
+Had multiple people teaching, still rather rushed at end. Went 30min overtime talking very quickly about RNA-Seq -- this section really is too much at the end of a day and needs to be a separate workshop. Even without the RNA-Seq section, adding 30 minutes to bring this up to a 6 hour workshop would be ideal.
+
+Revised step-by-step challenge about ~0+group seemed to go well.
+
+Need to keep up a slightly faster pace in the introductory vector/matrix section.
+
+The morning and afternoon tea breaks are very much needed.
+
+
+
+
+
+
 
 
 

@@ -261,7 +261,7 @@ ginv(X) %*% y
 #
 # Examine the model matrix that will be used:
 
-model.matrix(outcome ~ 0 + group, data=outcomes)
+model.matrix(~ 0 + group, data=outcomes)
 
 # 1. What column has been removed because 0 + was used?
 #
