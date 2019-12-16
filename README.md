@@ -1,2 +1,4 @@
 # r-linear
-Course notes on linear models in R
+
+Workshop material on the use of linear models in R.
+

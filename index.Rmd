@@ -60,8 +60,8 @@ Built-in to R:
 ## Links
 
 * [Monash Data Fluency](https://www.monash.edu/data-fluency)
-* [More workshop materials from Monash Data Fluency](https://monashdatafluency.github.io/resources/)
 * [Monash Bioinformatics Platform](https://www.monash.edu/researchinfrastructure/bioinformatics)
+* [More workshop material from Monash Bioinformatics Platform](https://www.monash.edu/researchinfrastructure/bioinformatics/training)
 * [Course notes for PH525x](http://genomicsclass.github.io/book/) (initial chapters of this edX course cover similar material to this workshop)
 * [James, Witten, Hastie and Tibshirani (2013) "An Introduction to Statistical Learning"](https://www-bcf.usc.edu/~gareth/ISL/)
 * [Dance of the CIs](http://logarithmic.net/2017/dance/)
@@ -74,8 +74,8 @@ This course has been developed for the [Monash Bioinformatics Platform](https://
 
 ## Source code
 
-* [GitHub repository](https://github.com/MonashBioinformaticsPlatform/r-linear)
+* [GitHub repository](https://github.com/MonashDataFluency/r-linear)
 
 <p style="margin-top: 5em; text-align: right">
-<a href="http://bioinformatics.erc.monash.edu"><img src="figures/MBP-banner.png" width="675"></a>
+<a href="https://www.monash.edu/researchinfrastructure/bioinformatics"><img src="figures/MBP-banner.png" width="675"></a>
 </p>
