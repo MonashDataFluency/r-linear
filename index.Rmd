@@ -50,7 +50,7 @@ Built-in to R:
 
 `multcomp` -- linear hypothesis tests and multiple comparisons: 
 
-    glht, confint, summary
+    glht, mcp, confint, summary
 
 `limma` and `edgeR` -- fitting many models to gene expression data: 
 
@@ -64,6 +64,7 @@ Built-in to R:
 * [More workshop material from Monash Bioinformatics Platform](https://www.monash.edu/researchinfrastructure/bioinformatics/training)
 * [Course notes for PH525x](http://genomicsclass.github.io/book/) (initial chapters of this edX course cover similar material to this workshop)
 * [James, Witten, Hastie and Tibshirani (2013) "An Introduction to Statistical Learning"](https://www-bcf.usc.edu/~gareth/ISL/)
+* ["RNA-seq analysis is easy as 1-2-3 with limma, Glimma and edgeR", a Bioconductor workflow](https://bioconductor.org/packages/release/workflows/vignettes/RNAseq123/inst/doc/limmaWorkflow.html)
 * [Dance of the CIs](http://logarithmic.net/2017/dance/)
 
 ## Author

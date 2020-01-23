@@ -488,6 +488,24 @@ ggplot(pvc, aes(x=resin, y=residuals(pvcfit1))) +
 # 1. R8 is different to R4
 # 2. R2 is different to R1
 #
+# 5.6 An easier way to specify contrasts ----
+#
+# So far we have been manually constructing linear hypotheses. The
+# multcomp package automates this for some common situations. To compare
+# all pairs of levels within a factor, use the mcp function, giving the
+# factor to test as the name of an argument and specifying to test
+# "Tukey" contrasts:
+
+result <- glht(pvcfit1, mcp(resin="Tukey"))
+
+# To compare the first level of a factor to all other levels, specify to
+# test "Dunnett" contrasts:
+
+result <- glht(pvcfit1, mcp(resin="Dunnett"))
+
+# The linear hypotheses actually used can be inspected with
+# result$linfct.
+
 
 
 #///////////////////////////////
