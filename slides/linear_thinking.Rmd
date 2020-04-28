@@ -9,11 +9,11 @@ output:
         incremental: true
 ---
 
-```{r include=F}
+## Linear models
+
+```{r, include=F}
 knitr::opts_chunk$set(fig.width=5, fig.height=5)
 ```
-
-## Linear models
 
 "linear model" "general linear model" "linear predictor" "regression" "multiple regression" "multiple linear regression" "multiple linear regression model"
 
@@ -149,6 +149,21 @@ Two vectors at right angles have a dot product of zero. They are **orthogonal**.
 
 
 ## Geometry - subspaces
+<div style="float: right">
+*Example: a 3x2 matrix puts<br>2D vectors into a 2D subspace in 3D.*
+
+```{r echo=F, fig.width=2, fig.height=4}
+library(plot3D)
+x <- seq(-3,3,by=1)
+y <- seq(-3,3,by=1)
+m <- mesh(x,y)
+z <- m$x + m$y
+op <- par(mfrow=c(2,1), mar=c(1,1,1,1))
+plot(m$x, m$y, xlab="", ylab="", xaxt="n", yaxt="n")
+surf3D(m$x,m$y,z,border="black",col="#00aacc",colvar=NA,bty="f")
+par(op)
+```
+</div>
 
 > * A line in two or more dimensions, passing through the origin.
 > * A plane in three or more dimensions, passing through the origin.
@@ -318,7 +333,7 @@ Omit with `-1` or `0`.
 
 Factors in R represent categorical data, such as treatment groups or batches in an experiment.
 
-R converts a factor into $n_\text{levels}-1$ columns of "indicator variables", aka "one-hot" encoding. <span class="tip">\*<span class="tiptext">The encoding can be adjusted using the `C( )` function within a formula. The default differs between S and R languages!</span></span>
+R converts a factor into $n_\text{levels}-1$ columns of "indicator variables", aka "one-hot" encoding. <span class="tip">\*<span class="tiptext">The encoding can be adjusted using the `C()` function within a formula. The default differs between S and R languages!</span></span>
 
 ```{r}
 f <- factor(c("a","a","b","b","c","c"))
