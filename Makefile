@@ -34,4 +34,4 @@ r-linear-files.zip : r-linear-files/linear_models.R r-linear-files/*
 	zip -FSr r-linear-files.zip r-linear-files
 
 clean :
-	rm -f $(HTMLS)
+	rm -f $(HTMLS) r-linear-files/linear_models.R
