@@ -521,7 +521,7 @@ $$
 <br>
 
 $$
-F = { {RSS_0-RSS_1 \over p_1-p_0} \over {RSS_1 \over n-p_1} }
+F = { {(RSS_0-RSS_1) / (p_1-p_0)} \over {RSS_1 / (n-p_1)} }
 $$
 
 RSS = Residual Sum of Squares
@@ -529,7 +529,9 @@ RSS = Residual Sum of Squares
 Is the increase in RSS in H0 merely proportionate 
 <br>to the extra degree(s) of freedom?
 
-<div style="font-size: 150%">`anova(fit0, fit1)`<br>handles all this for us.</div>
+<br>
+
+<div style="font-size: 125%">`anova(fit0, fit1)`<br>handles all this for us.</div>
 
 
 
@@ -770,8 +772,8 @@ Typical example is RNA-Seq gene expression.
 
 Key features:
 
-> * Residual standard deviation is similar between genes. "Emprical Bayes" shrinkage of these standard deviations overcomes problems with small numbers of samples.
-> * A test is performed for each gene. Multiple testing adjustment is critical!
+> * Residual standard deviation is similar between genes. "Empirical Bayes" shrinking of these standard deviations overcomes problems with small numbers of samples.
+> * A test is performed for each gene. Multiple testing adjustment is crucial!
 
 <br>
 
@@ -789,7 +791,7 @@ Should now be able to
 
 >* Fit linear models.
 
->* Identify and correct problems with a model, or recognize the need for a more advanced method of modelling.
+>* Identify and correct problems with a model, or recognize the need for a more advanced method.
 
 >* Test a hypothesis using two nested linear models.
 >* Test a hypothesis and calculate a CI on a linear combination of coefficients.

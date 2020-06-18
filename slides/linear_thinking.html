@@ -3673,14 +3673,16 @@ RSS_1 = \hat\varepsilon_1^\top \hat\varepsilon_1
 <p><br></p>
 
 <p>\[
-F = { {RSS_0-RSS_1 \over p_1-p_0} \over {RSS_1 \over n-p_1} }
+F = { {(RSS_0-RSS_1) / (p_1-p_0)} \over {RSS_1 / (n-p_1)} }
 \]</p>
 
 <p>RSS = Residual Sum of Squares</p>
 
 <p>Is the increase in RSS in H0 merely proportionate <br>to the extra degree(s) of freedom?</p>
 
-<div style="font-size: 150%">
+<p><br></p>
+
+<div style="font-size: 125%">
 <code>anova(fit0, fit1)</code><br>handles all this for us.</div>
 
 </article></slide><slide class=""><hgroup><h2>A different way to test: linear hypotheses</h2></hgroup><article  class="smaller " id="a-different-way-to-test-linear-hypotheses">
@@ -3959,8 +3961,8 @@ Terminology is a little tricky here. The limma package refers to linear combinat
 <p>Key features:</p>
 
 <ul>
-<li>Residual standard deviation is similar between genes. &ldquo;Emprical Bayes&rdquo; shrinkage of these standard deviations overcomes problems with small numbers of samples.</li>
-<li>A test is performed for each gene. Multiple testing adjustment is critical!</li>
+<li>Residual standard deviation is similar between genes. &ldquo;Empirical Bayes&rdquo; shrinking of these standard deviations overcomes problems with small numbers of samples.</li>
+<li>A test is performed for each gene. Multiple testing adjustment is crucial!</li>
 </ul>
 
 <p><br></p>
@@ -3980,7 +3982,7 @@ Terminology is a little tricky here. The limma package refers to linear combinat
 </ul>
 
 <ul>
-<li>Identify and correct problems with a model, or recognize the need for a more advanced method of modelling.</li>
+<li>Identify and correct problems with a model, or recognize the need for a more advanced method.</li>
 </ul>
 
 <ul>
