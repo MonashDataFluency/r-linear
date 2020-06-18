@@ -698,7 +698,7 @@ Do section: Gene expression example
 
 ## Extensions to the idea of linear models
 
-Linear models are a building block or the basis for many more complex statistical models.
+Linear models are a building block or basis for many more complex statistical models.
 
 <br>
 
