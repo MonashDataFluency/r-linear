@@ -93,6 +93,27 @@ In R:
 sum(a*b)
 ```
 
+## Geometry
+
+<div style="float: left; width: 25%; padding: 2em">
+The dot product is our ruler and set-square.
+
+```{r echo=F,out.width="100%",fig.align="left"}
+knitr::include_graphics("../figures/Triangle-Ruler.png")
+```
+</div>
+
+### Lengths
+
+A vector can be thought of as an arrow in a space.
+
+The dot product of a vector with itself $a^\top a$ is the square of its length. Pythagorus!
+
+### Right angles
+
+Two vectors at right angles have a dot product of zero. They are **orthogonal**.
+
+
 ## Linear maths and R
 
 Taking the product of a matrix $X$ and a vector $a$ with length matching the number of columns, the result is a vector containing the dot product of each row of the matrix $X$ with the vector $a$.
@@ -126,26 +147,6 @@ X %*% a
 <br>
 (It's also possible to multiply two matrices with `%*%` but we won't need this today.)
 
-
-## Geometry
-
-<div style="float: left; width: 25%; padding: 2em">
-The dot product is our ruler and set-square.
-
-```{r echo=F,out.width="100%",fig.align="left"}
-knitr::include_graphics("../figures/Triangle-Ruler.png")
-```
-</div>
-
-### Lengths
-
-A vector can be thought of as an arrow in a space.
-
-The dot product of a vector with itself $a^\top a$ is the square of its length. Pythagorus!
-
-### Right angles
-
-Two vectors at right angles have a dot product of zero. They are **orthogonal**.
 
 
 ## Geometry - subspaces
@@ -587,7 +588,7 @@ Suppose some set of hypotheses are true. What chance do we run of rejecting one 
 
 ### Hypotheses are mutually exclusive
 
-> * No problem!
+> * Only one can be true, so no problem!
 
 Example: reject all values outside a confidence interval.
 
@@ -692,75 +693,109 @@ Do section: Gene expression example
 
 
 
+
+## Extensions to the idea of linear models
+
+Linear models are a building block or the basis for many more complex statistical models.
+
+<br>
+
+Of particular importance (in my opinion):
+
+> * Generalized Linear Models
+> * Linear Mixed Models
+> * Screening many different response variables
+
+
+## Generalized Linear Models (GLMs) 
+
+**(Not covered today.)**
+
+We are still trying to predict the mean value, but now the response has a distribution that changes based on its mean value.
+
+We want to specify the model on a transformed scale, but the data contains values that can't be transformed.
+
+Examples:
+
+> * Fit a model on a log scale to count data that includes zeros using a *Poisson* or *negative-binomial GLM*.
+> * Fit a model of the *log odds* of a binary outcome using *logistic regression*.
+
+Fit using the function `glm`.
+
+<br>
+
+Survival analysis using Cox regression has some similarities.
+
+
+## Linear Mixed Models
+
+**(Not covered today.)**
+
+The models we have fitted today contain only **fixed effects**.
+<br>A **mixed model** contains both **fixed effects** and **random effects**.
+
+>* A factor may represent individuals from a larger population.
+>* There may be a source of random variation affecting multiple responses, such as a batch effect.
+
+Using random effects:
+
+> * Lets us characterize a population.<br>How does an average individual behave, and what is the standard deviation?<br>The model is not about *particular individuals*, but about *the population as a whole*.
+> * Allows analysis of experiments with **nested** factors, such as repeated measurements (technical replicates).
+> * Gives slightly improved estimates of random effects, by "shrinking" estimates toward the mean.
+> * Gives slightly improved estimates of fixed effects, because modelling of random nuisance effects is better.
+
+Fit using a package such as `lme4`.
+
+
+## Screening many responses
+
+"High throughput" biological datasets we can view as containing many sets of responses.
+
+Typical example is RNA-Seq gene expression.
+
+<img src="../figures/igv.png" height="450">
+
+
+## Screening many responses
+
+"High throughput" biological datasets we can view as containing many sets of responses.
+
+Typical example is RNA-Seq gene expression.
+
+> * Perform RNA-Seq on a set of biological samples.
+> * Number of RNA molecules seen for each gene in each sample is counted.
+
+> * Linear model formula based on experiment design.
+> * Each gene can be viewed as a separate set of responses.
+
+Key features:
+
+> * Residual standard deviation is similar between genes. "Emprical Bayes" shrinkage of these standard deviations overcomes problems with small numbers of samples.
+> * A test is performed for each gene. Multiple testing adjustment is critical!
+
+<br>
+
+Use Bioconductor packages such as `limma` (fit many linear models) or `edgeR` (fit many GLMs).
+
+
+## 
+
+Do section: Testing many genes with limma
+
+
 ## Summary
 
 Should now be able to
 
->* fit linear models
->* understand the importance of different parts of the fitted model
-><ul>
->    <li> coefficients
->    <li> residual standard deviation
->    <li> residual degrees of freedom
-></ul>
->* predict using a model
->* test a hypothesis using two nested linear models
->* test a hypothesis and calculate a CI on a linear combination of coefficients
->* test a hypothesis against many sets of responses using limma
->* understand multiple testing correction
+>* Fit linear models.
 
+>* Identify and correct problems with a model, or recognize the need for a more advanced method of modelling.
 
-## Summary - problems with linear models
+>* Test a hypothesis using two nested linear models.
+>* Test a hypothesis and calculate a CI on a linear combination of coefficients.
 
-Incorrect transformation of y can introduce spurious interactions.
-
-Highly correlated predictors, or completely confounded experimental design.
-
-Problems with residual noise:
-
->* Non-uniform noise level between conditions
->* Remaining structure
->* Non-normal distribution <div class="tip">*<div class="tiptext">Least squares estimation still has good properties when the noise is not normally distributed, as a way to predict averages, if averages are truly what we want ("BLUE"). However outliers can lead to mis-estimating the accuracy of the model. This is as much about beliefs and past experience as observation -- if outliers are rare, a sample *without* outliers may give a misleading estimate. In the worst case the outliers may be so large the variance doesn't exist, and least squares does completely break down.<br><br>For example it would be important to include outliers like the Global Financial Crisis in an average yearly return on investment, see Nasim Taleb.</div></div>
-
-Various more advanced methods exist for if these are present, such as robust quantile regression and "sandwich" or "bootstrap" estimation of the accuracy of coefficients and contrasts.
-
-
-## Extensions to linear models
-
-### Insufficient data or $p > n$
-
->* regularization with ridge regression and/or LASSO: `glmnet::glmnet( )`
->* Partial Least Squares (PLS) <br>(pick best direction to start moving in and take best leap along it, repeat)
->* Principal Component Regression (PCR)<br>(direction of largest variation in X first)
-
-### Noise not normal (eg binary or count data)
-
->* **Generalized Linear Models:** `glm( )`<br>(logistic regression, binomial, Poisson, negative binomial, gamma, etc)
->* Quasi-Likelihood F-test in case of over-dispersion
-
-### Survival time, with censoring
-
->* Cox survival model: `survival::coxph( )`
-
-
-## Extensions to linear models
-
-### Noise at a coarser grain than single measurements
-
-Individuals tracked over time, repeated measurements, blocks/batches/plots, etc.
-
->* Generalized Least Squares (accounts for covariance in noise)
->* **Mixed Model** (some coefficients are drawn from a random distribution): `lme4`, `lmerTest`
->* Time series models
-
-### Response is non-linear in predictors
-
->* Feature engineering: `poly( )`, `splines::ns( )`
->* Local regression (LOESS): `loess( )`
->* Generalized Additive Models (GAM): `mgcv::gam( )`<br>(splines with regularization)
->* Neural network (plug together many logistic regression models)
-
-Also consider tree methods such as gradient boosted trees.
+>* Test a hypothesis for many sets of responses using limma.
+>* Understand the need for multiple-testing correction.
 
 
 ## Further reading
@@ -781,6 +816,55 @@ Chambers and Hastie (1991) "Statistical Models in S"
 Faraway (2014) "Linear Models with R"
 
 James, Witten, Hastie and Tibshirani (2013) "An Introduction to Statistical Learning"
+
+
+
+## Extra slides
+
+## Extensions to linear models
+
+### Insufficient data or $p > n$
+
+>* Regularization with ridge regression and/or LASSO: `glmnet::glmnet( )`
+>* Partial Least Squares (PLS) <br>(pick best direction to start moving in and take best leap along it, repeat)
+>* Principal Component Regression (PCR)<br>(direction of largest variation in X first)
+
+### Noise not normal (eg binary or count data)
+
+>* **Generalized Linear Models:** `glm( )`<br>(logistic regression, binomial, Poisson, negative binomial, gamma, etc)
+>* Quasi-Likelihood F-test in case of over-dispersion
+
+### Survival time, with censoring
+
+>* Cox survival model: `survival::coxph( )`
+
+
+## Extensions to linear models
+
+### Noise at a coarser grain than single measurements
+
+Individuals tracked over time, repeated measurements, blocks/batches/plots, etc.
+
+>* **Linear Mixed Model** (some coefficients are drawn from a random distribution): `lme4`, `lmerTest`
+>* Time series models.
+
+### Noise in data is poorly understood, or possibly misspecified
+
+>* Quantile regression may be more robust to outliers.<br>(eg try to predict the median)
+>* "Sandwich" estimator gives consistent estimates of standard error, even if variance is not uniform. 
+>* "Bootstrapping" can estimate bias, provide confidence intervals for almost any method of estimation.
+
+
+## Extensions to linear models
+
+### Response is non-linear in predictors
+
+>* Feature engineering: `poly( )`, `splines::ns( )`
+>* Local regression (LOESS): `loess( )`
+>* Generalized Additive Models (GAM): `mgcv::gam( )`<br>(splines with regularization)
+>* Neural network (plug together many logistic regression models)
+
+Also consider tree methods such as gradient boosted trees.
 
 
 
