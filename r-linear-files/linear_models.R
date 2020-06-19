@@ -806,7 +806,7 @@ K <- rbind(c(0,0,1,0.5))
 cfit <- contrasts.fit(fit, t(K))       #linear hypotheses in columns!
 efit <- eBayes(cfit, trend=TRUE)
 
-# The call to eBayes does Emprical Bayes squeezing of the residual
+# The call to eBayes does Empirical Bayes squeezing of the residual
 # variance for each gene (see appendix). This is a bit of magic that
 # allows limma to work well with small numbers of samples.
 
