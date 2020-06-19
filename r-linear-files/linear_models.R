@@ -505,6 +505,17 @@ result <- glht(pvcfit1, mcp(resin="Dunnett"))
 
 # The linear hypotheses actually used can be inspected with
 # result$linfct.
+#
+# The
+# [emmeans](https://cran.r-project.org/web/packages/emmeans/index.html)
+# package also automates many common comparisons. In particualar if you
+# are working with models including interactions this package knows to
+# average over interactions when examining main effects.
+
+library(emmeans)
+emmeans(pvcfit1, ~ resin)
+emmeans(pvcfit1, pairwise ~ resin)
+emmeans(pvcfit1, trt.vs.ctrl ~ resin)
 
 
 
