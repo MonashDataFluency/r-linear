@@ -507,9 +507,11 @@ result <- glht(pvcfit1, mcp(resin="Dunnett"))
 # result$linfct.
 #
 # The emmeans package also automates many common comparisons. In
-# particualar if you are working with models including interactions this
-# package knows to average over interactions when examining main
-# effects. It's up to you to decide if this is sensible!
+# particular, if you are working with models including interactions this
+# package provides results for an "average" individual when examining
+# main effects. By default it treats each level of other factors as
+# being equally likely when calculating this average. It's up to you to
+# decide if this is sensible!
 
 library(emmeans)
 emmeans(pvcfit1, ~ resin)
