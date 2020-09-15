@@ -17,6 +17,8 @@ knitr::opts_chunk$set(fig.width=5, fig.height=5)
 
 "linear model" "general linear model" "linear predictor" "regression" "multiple regression" "multiple linear regression" "multiple linear regression model"
 
+<br/>
+
 Learn to predict a response variable as
 
 * a straight line relationship with a predictor variable
@@ -77,7 +79,9 @@ X = \begin{bmatrix} 1 & 4 \\ 2 & 5 \\ 3 & 6 \end{bmatrix}
 \quad \quad X^\top = \begin{bmatrix} 1 & 2 & 3 \\ 4 & 5 & 6 \end{bmatrix} 
 $$
 
-## Linear maths and R
+## Dot products
+
+"dot product" "weighted sum" "linear combination" "linear function" ...
 
 Taking the **dot product** of two vectors we multiply corresponding elements together and add the results to obtain a total.
 
@@ -93,7 +97,8 @@ In R:
 sum(a*b)
 ```
 
-## Geometry
+
+## Dot products and geometry
 
 <div style="float: left; width: 25%; padding: 2em">
 The dot product is our ruler and set-square.
@@ -114,9 +119,18 @@ The dot product of a vector with itself $a^\top a$ is the square of its length. 
 Two vectors at right angles have a dot product of zero. They are **orthogonal**.
 
 
-## Linear maths and R
+## Matrix vector multiplication
 
 Taking the product of a matrix $X$ and a vector $a$ with length matching the number of columns, the result is a vector containing the dot product of each row of the matrix $X$ with the vector $a$.
+
+$$
+Xa =
+\begin{bmatrix}
+x_{1,1} a_1 + x_{1,2} a_2 + \dots \\
+x_{2,1} a_1 + x_{2,2} a_2 + \dots \\
+\vdots
+\end{bmatrix}
+$$
 
 Can also think of this as a weighted sum of the columns of $X$.
 
@@ -149,7 +163,7 @@ X %*% a
 
 
 
-## Geometry - subspaces
+## Geometry -- subspaces
 <div style="float: right">
 *Example: a 3x2 matrix puts<br>2D vectors into a 2D subspace in 3D.*
 
@@ -274,27 +288,26 @@ $$ \hat \varepsilon = y - X \hat \beta $$
 <br>
 <br>
 <div style="font-size: 60%;">
-(This is *one route* to least squares. Normally distributed noise is [not a strict requirement](https://en.wikipedia.org/wiki/Gauss%E2%80%93Markov_theorem), so long as there aren't wild outliers.)</div>
+(This is *one route* to least squares. [Looser assumptions about noise still lead to least squares](https://en.wikipedia.org/wiki/Gauss%E2%80%93Markov_theorem), so long as there aren't wild outliers.)</div>
+
 
 ## Model fitting in R with `lm( )`
 
 Our starting point for modelling is usually a data frame, but the process of getting $y$ and $X$ from the data frame has some complications, and a special "formula" syntax. 
 
-```
-        data frame
+<div style="margin: 3em;">
+data frame
+            
+<span style="font-size: 300%;">&nbsp;&darr;&nbsp;</span> 
+<span style="font-size: 75%">Weirdness involving "~" formula syntax happens.</span>
 
-            ||
-            || Weirdness involving "~" formula syntax happens
-            \/
+&nbsp;&nbsp;y, X
 
-           y, X
+<span style="font-size: 300%;">&nbsp;&darr;&nbsp;</span>
+<span style="font-size: 75%">Actual magic of model fitting happens.</span>
 
-            ||
-            || Actual magic of model fitting happens
-            \/
-
-        coef, sigma
-```
+coef, sigma
+</div>
 
 First look at examples then discuss process in detail.
 
@@ -330,11 +343,11 @@ Omit with `-1` or `0`.
 > * `height ~ 0 + age` to force a model where newborns are 0cm tall.
 
 
-## Formulas - factors
+## Formulas -- factors
 
 Factors in R represent categorical data, such as treatment groups or batches in an experiment.
 
-R converts a factor into $n_\text{levels}-1$ columns of "indicator variables", aka "one-hot" encoding. <span class="tip">\*<span class="tiptext">The encoding can be adjusted using the `C()` function within a formula. The default differs between S and R languages!</span></span>
+R converts a factor into $n_\text{levels}-1$ columns of "indicator variables", aka "one-hot" encoding. <span class="tip">\*<span class="tiptext">The fundamental issue here is that we can't estimate the coefficients in a model that has both a baseline effect and effects of each level of the factor. R's solution is to treat the first level as the baseline. This won't affect the predictions the model makes, but we need to be careful interpreting the coefficients.<br/><br/>The encoding of factors can be adjusted using the `C()` function within a formula. The default differs between S and R languages!</span></span>
 
 ```{r}
 f <- factor(c("a","a","b","b","c","c"))
@@ -342,7 +355,7 @@ f <- factor(c("a","a","b","b","c","c"))
 model.matrix(~ f)
 ```
 
-## Formulas - factors
+## Formulas -- factors
 
 Need to be careful interpreting the meaning of coefficients for factors.
 
@@ -356,7 +369,7 @@ f <- factor(c("a","a","b","b","c","c"))
 model.matrix(~ f)
 ```
 
-## Formulas - factors without the intercept term
+## Formulas -- factors without the intercept term
 
 R tries to be clever about factor encoding if the intercept is omitted.
 
@@ -535,7 +548,7 @@ Is the increase in RSS in H0 merely proportionate
 
 
 
-## A different way to test: linear hypotheses
+## A different way to test -- linear hypotheses
 
 "linear hypothesis" "general linear hypothesis" "linear restriction" "contrast"
 
@@ -568,7 +581,7 @@ Do section: Multiple factors, many levels
 
 A p-value lets us choose our probability of falsely rejecting a true hypothesis.
 
-If H1 is true, $p$ tends towards zero.
+If H1 is true, $p$ heads to zero as we get more and more data.
 
 If H0 is true, $p$ is a uniformly random number between 0 and 1.
 
@@ -588,11 +601,13 @@ Need to adjust p-values for this problem (see `p.adjust( )`).
 
 Suppose some set of hypotheses are true. What chance do we run of rejecting one or more of them?
 
-### Hypotheses are mutually exclusive
+<div style="float: right; width: 25%; border: 1px solid #888; margin-top: 4em; padding: 0.5em">
+**What if the hypotheses are mutually exclusive?**
 
-> * Only one can be true, so no problem!
+Then only one can be true, so no problem!
 
 Example: reject all values outside a confidence interval.
+</div>
 
 ### Family-Wise Error Rate (FWER) control
 
@@ -627,7 +642,7 @@ Let's look at other things formula syntax can do.
 
 `numeric` vector is represented as itself.
 
-`logical` vector is converted to 0s and 1s.
+`logical` vector is converted to 1s and 0s.
 
 `factor` is represented as $n_\text{levels}-1$ columns containing 1s and 0s. 
 
@@ -770,10 +785,12 @@ Typical example is RNA-Seq gene expression.
 > * Linear model formula based on experiment design.
 > * Each gene can be viewed as a separate set of responses.
 
+<br>
+
 Key features:
 
-> * Residual standard deviation is similar between genes. "Empirical Bayes" shrinking of these standard deviations overcomes problems with small numbers of samples.
 > * A test is performed for each gene. Multiple testing adjustment is crucial!
+> * Residual standard deviation is similar between genes. "Empirical Bayes" shrinking of these standard deviations overcomes problems with small numbers of samples.
 
 <br>
 
@@ -852,7 +869,7 @@ Individuals tracked over time, repeated measurements, blocks/batches/plots, etc.
 
 ### Noise in data is poorly understood, or possibly misspecified
 
->* Quantile regression may be more robust to outliers.<br>(eg try to predict the median)
+>* Quantile regression may be more robust to outliers: `quantreg::rq( )` <br>(eg try to predict the median)
 >* "Sandwich" estimator gives consistent estimates of standard error, even if variance is not uniform. 
 >* "Bootstrapping" can estimate bias, provide confidence intervals for almost any method of estimation.
 
@@ -864,9 +881,9 @@ Individuals tracked over time, repeated measurements, blocks/batches/plots, etc.
 >* Feature engineering: `poly( )`, `splines::ns( )`
 >* Local regression (LOESS): `loess( )`
 >* Generalized Additive Models (GAM): `mgcv::gam( )`<br>(splines with regularization)
->* Neural network (plug together many logistic regression models)
+>* Neural network<br>(many linear models connected with non-linear functions)
 
-Also consider tree methods such as gradient boosted trees.
+Also consider tree methods. Gradient boosted tree methods are unreasonably effective: `xgboost`
 
 
 
