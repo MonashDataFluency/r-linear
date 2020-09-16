@@ -167,7 +167,7 @@ X %*% a
 <div style="float: right">
 *Example: a 3x2 matrix puts<br>2D vectors into a 2D subspace in 3D.*
 
-```{r echo=F, fig.width=2, fig.height=4}
+```{r echo=F,warning=F,message=F, fig.width=2, fig.height=4}
 library(plot3D)
 x <- seq(-3,3,by=1)
 y <- seq(-3,3,by=1)
