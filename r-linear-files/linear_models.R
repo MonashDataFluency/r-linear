@@ -639,8 +639,8 @@ anova(log2_pou3f3fit0, log2_pou3f3fit1)
 
 confint(log2_pou3f3fit1)["toothupper:day",]
 
-# The ratio of fold-change-per-day between the upper and lower molars is
-# confidently within 2^-0.22 to 2^0.19 (0.86 to 1.14).
+# The difference of the slopes of log2 gene expression between lower and
+# upper molars is confidently between -0.22 and 0.19.
 
 look(log2(teeth$gene_pou3f3), log2_pou3f3fit0)
 
@@ -738,10 +738,15 @@ summary(badfit)
 # In this section we look at fitting the same matrix of predictors X to
 # many different sets of responses y. We will use the package limma from
 # Bioconductor. This is a very brief demonstration, and there is much
-# more to this package. See the excellent usersguide.pdf at
+# more to this package. See the RNAseq123 tutorial at https://bioconduct
+# or.org/packages/release/workflows/vignettes/RNAseq123/inst/doc/limmaWo
+# rkflow.html and the usersguide.pdf at
 # https://bioconductor.org/packages/release/bioc/html/limma.html
 
-# 7.1 Load, normalize, log transform ----
+library(edgeR)
+library(limma)
+
+# 7.1 Load the data ----
 #
 # Actually in the teeth dataset, the expression level of all genes was
 # measured!
@@ -753,44 +758,14 @@ rownames(counts) <- counts_df$gene
 dim(counts)
 counts[1:5,]
 
+# 7.2 Model matrix ----
+#
 # The column names match our teeth data frame.
 
+colnames(counts)
 teeth$sample
 
-# A usual first step in RNA-Seq analysis is to convert read counts to
-# Reads Per Million, and log2 transform the results. There are some
-# subtleties here which we breeze over lightly: "TMM" normalization is
-# used as a small adjustment to the total number of reads in each
-# sample. A small constant "prior count" is added to the counts to avoid
-# calculating log2(0). The edgeR and limma manuals describe these steps
-# in more detail.
-
-library(edgeR)
-library(limma)
-
-dgelist <- calcNormFactors(DGEList(counts))
-
-dgelist$samples
-
-log2_cpms <- cpm(dgelist, log=TRUE, prior.count=1)
-
-# There is little chance of detecting differential expression in genes
-# with very low read counts. Including these genes will require a larger
-# False Discovery Rate correction, and also confuses limma's Empirical
-# Bayes parameter estimation. The typical library size in this data set
-# is 40 million reads. Let's only retain genes with an average of 1 read
-# per sample or more. Remembering also the "prior count" of 1, this
-# gives a cutoff of log2(2/40).
-
-keep <- rowMeans(log2_cpms) >= log2(2/40)
-log2_cpms_filtered <- log2_cpms[keep,]
-
-nrow(log2_cpms)
-nrow(log2_cpms_filtered)
-
-# 7.2 Fitting a model to and testing each gene ----
-#
-# We use limma to fit a linear model to each gene. The same model
+# We will use limma to fit a linear model to each gene. The same model
 # formula will be used in each case. limma doesn't automatically convert
 # a formula into a model matrix, so we have to do this step manually.
 # Here I am using a model formula that treats the upper and lower teeth
@@ -799,14 +774,55 @@ nrow(log2_cpms_filtered)
 X <- model.matrix(~ tooth * day, data=teeth)
 X
 
-fit <- lmFit(log2_cpms_filtered, X)
+# limma refers to this matrix as the "design".
+
+# 7.3 Remove low expression genes ----
+#
+# There is little chance of detecting differential expression in genes
+# with very low read counts. Including these genes will require a larger
+# False Discovery Rate correction, and also confuses limma's Empirical
+# Bayes parameter estimation. edgeR provides a function filterByExpr
+# that performs their recommended level of filtering. The filtering
+# takes into account the complexity of the model being fitted, so the
+# "design" matrix is also needed.
+
+keep <- filterByExpr(counts, design=X)
+table(keep)
+
+counts_kept <- counts[keep, ]
+dim(counts_kept)
+
+# 7.4 Normalize, log transform ----
+#
+# Different samples may have produced different numbers of reads. We now
+# normalize this away by converting the read counts to Reads Per
+# Million, and log2 transform the results. There are some subtleties
+# here which we breeze over lightly: "TMM" normalization is used as a
+# small adjustment to the total number of reads in each sample. A small
+# constant "prior count" is added to the counts to avoid calculating
+# log2(0). The edgeR and limma manuals describe these steps in more
+# detail.
+
+dgelist <- calcNormFactors(DGEList(counts_kept))
+dgelist$samples
+
+log2_cpms <- cpm(dgelist, log=TRUE, prior.count=1)
+
+log2_cpms[1:5,]
+
+# 7.5 Fitting a model to and testing each gene ----
+#
+# We are now ready to fit a linear model to each gene.
+
+fit <- lmFit(log2_cpms, X)
 
 class(fit)
 fit$coefficients[1:5,]
 
 # Significance testing in limma is by the use of linear hypotheses
 # (which limma refers to as "contrasts"). A difference between glht and
-# limma's contrasts.fit is that limma uses columns rather than rows.
+# limma's contrasts.fit is that limma expects the linear combinations to
+# be in columns rather than rows.
 #
 # We will first look for genes where the slope over time is not flat,
 # *averaging* the lower and upper teeth.
@@ -814,8 +830,8 @@ fit$coefficients[1:5,]
 # Lower slope: c(0,0,1,0)
 # Upper slope: c(0,0,1,1)
 
-K <- rbind(c(0,0,1,0.5))
-cfit <- contrasts.fit(fit, t(K))       #linear hypotheses in columns!
+K <- rbind( average_slope=c(0,0,1,0.5) )
+cfit <- contrasts.fit(fit, t(K))         #linear combinations in columns!
 efit <- eBayes(cfit, trend=TRUE)
 
 # The call to eBayes does Empirical Bayes squeezing of the residual
@@ -833,9 +849,9 @@ table(significant)
 
 ggplot(all_results, aes(x=AveExpr, y=logFC)) +
     geom_point(size=0.1) +
-    geom_point(data=all_results[significant,], size=0.1, color="red")
+    geom_point(data=all_results[significant,], size=0.5, color="red")
 
-# 7.3 Relation to lm( ) and glht( ) ----
+# 7.6 Relation to lm( ) and glht( ) ----
 #
 # Let's look at a specific gene.
 
@@ -849,14 +865,14 @@ look(rnf144b, rnf144b_fit)
 
 summary( glht(rnf144b_fit, K) )
 
-# 7.4 Confidence intervals ----
+# 7.7 Confidence intervals ----
 #
 # Confidence Intervals should also be of interest. However note that
 # these are not adjusted for multiple testing (see appendix).
 
 topTable(efit, confint=0.95)
 
-# 7.5 F test ----
+# 7.8 F test ----
 #
 # limma can also test several simultaneous constraints on linear
 # combinations of coefficients. Suppose we want to find *any* deviation
@@ -871,23 +887,25 @@ cfit2 <- contrasts.fit(fit, t(K2))
 efit2 <- eBayes(cfit2, trend=TRUE)
 topTable(efit2)
 
-# A shortcut would be to use contrasts.fit(fit, coefficients=2:4) here
-# instead, or to specify a set of coefficients directly to topTable( ).
+# A shortcut here would be to skip the contrasts.fit step and specify a
+# set of coefficients directly to topTable( ).
 
-# 7.6 Challenge - construct some linear hypotheses ----
+# 7.9 Further exercises ----
 #
-# Construct and use linear combinations to find genes that:
+# 1. Construct and use linear combinations to find genes that:
 #
-# 1. Differ in slope between lower and upper molars.
+#     A. Differ in slope between lower and upper molars.
 #
-# 2. Differ in expression on day 16 between the lower and upper molars.
+#     B. Differ in expression on day 16 between the lower and upper
+# molars. (Hint: this can be viewed as the difference in predictions
+# between two individual samples.)
 #
-# Hint: hypothesis 2 can be viewed as the difference in predictions
-# between two individual samples.
+#     C. Construct a pair of linear combinations that when used together
+# in an F test find genes with non-zero slope in either or both the
+# lower and upper molars.
 #
-# 3. Construct a pair of linear combinations that when used together in
-# an F test find genes with non-zero slope in either or both the lower
-# or upper molars.
+# 2. Construct a model matrix in which the change over time is
+# quadratic, and some linear combinations to interrogate it.
 #
 
 
@@ -920,33 +938,47 @@ points(efit$Amean, efit$s2.post^0.25, col="red", cex=0.2)
 # It's worthwhile checking df.prior when using limma, as a low value may
 # indicate a problem with a data-set.
 
-# 8.2 False Coverage Rate corrected CIs ----
+# 8.2 Top confident effect sizes ----
 #
-# We noted the CIs produced by limma were not adjusted for multiple
-# testing. A False Coverage Rate (FCR) corrected CI can be constructed
-# corresponding to a set of genes judged significant. The smaller the
-# selection of genes as a proportion of the whole, the greater the
-# correction required. To ensure a False Coverage Rate of q, we use the
-# confidence interval (1-q*n_genes_selected/n_genes_total)*100%.
-
-all_results <- topTable(efit, n=Inf)
-significant <- all_results$adj.P.Val <= 0.05
-prop_significant <- mean(significant)
-fcr_confint <- 1 - 0.05*prop_significant
-
-all_results <- topTable(efit, confint=fcr_confint, n=Inf)
-
-ggplot(all_results, aes(x=AveExpr, y=logFC)) +
-    geom_point(size=0.1, color="grey") +
-    geom_errorbar(data=all_results[significant,], aes(ymin=CI.L, ymax=CI.R), color="red") +
-    geom_point(data=all_results[significant,], size=0.1)
-
-# The FCR corrected CIs used here have the same q, 0.05, as we used as
-# the cutoff for adj.P.Val. This means they never pass through zero.
+# A little self-promotion: With limma we are able to find genes where
+# our effect of interest is significantly different from zero. However
+# we may make many thousands of discoveries, too many to easily follow
+# up, and some of the effects discovered may be tiny. I have developed a
+# method to rank genes by confident effect size, with multiple testing
+# correction, implemented in the package topconfects. This method builds
+# on the treat method provided by limma.
 #
-# I have some further thoughts on this topic, see the Bioconductor
-# package topconfects (https://bioconductor.org/packages/release/bioc/ht
-# ml/topconfects.html).
+# This is performed with the limma_confects function. limma_confects
+# incorporates the Empirical Bayes variance squeezing step, so remember
+# to specify trend=TRUE if using trend based variance squeezing.
+
+library(topconfects)
+
+result <- limma_confects(cfit, "average_slope", trend=TRUE, fdr=0.05)
+result
+
+# Results are ranked by "confect", confident effect size. If you select
+# genes with abs(confect) >= some value, those genes will have a
+# magnitude of effect greater than that threshold, with controlled FDR.
+# (Exactly the same set of genes is found using treat with this
+# threshold.)
+#
+# Compared to the "most significant" gene, the top gene by topconfects
+# has a larger slope (but lower overall average expression).
+
+hbby <- log2_cpms["Hbb-y",]
+hbby_fit <- lm(hbby ~ tooth * day, data=teeth)
+look(hbby, hbby_fit)
+
+# Highlight genes with slope confidently larger than 0.2 per day.
+ggplot(result$table, aes(x=AveExpr, y=effect)) +
+    geom_point(size=0.1) +
+    geom_point(
+        data=filter(result$table, abs(confect) >= 0.2),
+        size=0.5, color="red")
+
+# See also "False Coverage-statement Rate" for a generally applicable
+# approach to multiple-testing corrected confidence intervals.
 #
 # ---
 

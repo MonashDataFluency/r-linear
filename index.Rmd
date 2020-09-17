@@ -28,7 +28,7 @@ unzip("r-linear-files.zip")
 install.packages(c("tidyverse", "multcomp", "emmeans", "BiocManager"))
 
 # Install some Bioconductor packages:
-BiocManager::install(c("limma","edgeR"))
+BiocManager::install(c("limma","edgeR","topconfects"))
 ```
 
 Now load the file `linear_models.R` in the `r-linear-files` folder.
