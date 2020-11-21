@@ -297,9 +297,7 @@ anova(outfit0, outfit)
 # but I think it is the safest way. Once we start using multiple
 # predictors, the meaning of the output from anova with a single model
 # is likely to be not quite what you want, read the documentation
-# carefully. The aov( ) function also has traps for the unwary. Use lm(
-# ), and anova( ) with two nested models as in this document and the
-# meaning should be as you expect.
+# carefully. drop1(fit, test="F") should usually be used instead.
 #
 # summary( ) also outputs p-values. Too many p-values, summary( )
 # doesn't respect the hierarchy of terms in the model. The p-value for
@@ -374,6 +372,11 @@ confint(pvcfit1)
 
 pvcfit0 <- lm(psize ~ resin, data=pvc)
 anova(pvcfit0, pvcfit1)
+
+# The drop1( ) function with test="F" can be used as a shorthand to test
+# dropping each term that can be dropped from the model formula.
+
+drop1(pvcfit1, test="F")
 
 # 5.2 Interactions ----
 #

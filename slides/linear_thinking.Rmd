@@ -726,11 +726,32 @@ Of particular importance (in my opinion):
 
 ## Generalized Linear Models (GLMs) 
 
+<div style="float: right; width: 33%;padding-left: 2em">
+**Example: count data**
+
+> * Poisson distributed
+> * $\text{Var}(Y) = \text{E}(Y)$
+
+```{r echo=FALSE,fig.width=3,fig.height=2}
+set.seed(1)
+x <- seq(0,20,by=0.2)
+y <- rpois(length(x), x)
+par(mar=c(5,5,0.5,0.5))
+plot(x,y,xlab="E(y)",ylab="y", cex=0.25)
+
+fit <- lm(y~x)
+plot(predict(fit),residuals(fit), cex=0.25)
+```
+
+</div>
+
 **(Not covered today.)**
 
-We are still trying to predict the mean value, but now the response has a distribution that changes based on its mean value.
+We are still trying to predict the mean value, but now the response has a noise distribution that changes based on its mean value.
 
-We want to specify the model on a transformed scale, but the data contains values that can't be transformed.
+> * The noise distributions are characterized by the mean-variance relationship.
+
+We want to specify the model on a transformed scale even if the data contains values that can't be transformed.
 
 Examples:
 
@@ -739,27 +760,22 @@ Examples:
 
 Fit using the function `glm`.
 
-<br>
-
 Survival analysis using Cox regression has some similarities.
-
 
 ## Linear Mixed Models
 
 **(Not covered today.)**
 
 The models we have fitted today contain only **fixed effects**.
-<br>A **mixed model** contains both **fixed effects** and **random effects**.
 
->* A factor may represent individuals from a larger population.
->* There may be a source of random variation affecting multiple responses, such as a batch effect.
+A **mixed model** contains both **fixed effects** and **random effects**.
+
+With a **random effect**, the levels of a factor as represent individuals from some large population. 
 
 Using random effects:
 
 > * Lets us characterize a population.<br>How does an average individual behave, and what is the standard deviation?<br>The model is not about *particular individuals*, but about *the population as a whole*.
 > * Allows analysis of experiments with **nested** factors, such as repeated measurements (technical replicates).
-> * Gives slightly improved estimates of random effects, by "shrinking" estimates toward the mean.
-> * Gives slightly improved estimates of fixed effects, because modelling of random nuisance effects is better.
 
 Fit using a package such as `lme4`.
 
