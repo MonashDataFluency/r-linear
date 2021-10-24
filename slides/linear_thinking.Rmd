@@ -1,5 +1,5 @@
 ---
-title: "Linear models in R (slideshow)"
+title: "Linear models in R"
 author: "Paul Harrison @paulfharrison"
 output: 
     ioslides_presentation:
@@ -88,7 +88,7 @@ Taking the **dot product** of two vectors we multiply corresponding elements tog
 In mathematical notation:
 
 $$
-a^\top b = \sum_{i=1}^{n} a_i b_i
+a^\top b = a_1 b_1 + a_2 b_2 + \dots + a_n b_n
 $$
 
 In R:
@@ -642,9 +642,9 @@ Let's look at other things formula syntax can do.
 
 `numeric` vector is represented as itself.
 
-`logical` vector is converted to 1s and 0s.
-
 `factor` is represented as $n_\text{levels}-1$ columns containing 1s and 0s. 
+
+`logical` vector is treated like a factor with levels FALSE and TRUE.
 
 `matrix` is represented as multiple columns.
 

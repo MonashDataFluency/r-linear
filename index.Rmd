@@ -58,14 +58,21 @@ Built-in to R:
     lmFit, contrasts.fit, eBayes, plotSA, topTable
 
 ## Links
-
 * [Monash Data Fluency](https://www.monash.edu/data-fluency)
 * [Monash Bioinformatics Platform](https://www.monash.edu/researchinfrastructure/bioinformatics)
 * [More workshop material from Monash Bioinformatics Platform](https://www.monash.edu/researchinfrastructure/bioinformatics/training)
+
+<br>
+
 * [Course notes for PH525x](http://genomicsclass.github.io/book/) (initial chapters of this edX course cover similar material to this workshop)
-* [James, Witten, Hastie and Tibshirani (2013) "An Introduction to Statistical Learning"](https://www-bcf.usc.edu/~gareth/ISL/)
-* ["RNA-seq analysis is easy as 1-2-3 with limma, Glimma and edgeR", a Bioconductor workflow](https://bioconductor.org/packages/release/workflows/vignettes/RNAseq123/inst/doc/limmaWorkflow.html)
-* [Dance of the CIs](http://logarithmic.net/2017/dance/)
+* [James, Witten, Hastie and Tibshirani (2013) "An Introduction to Statistical Learning"](https://www.statlearning.com/)
+* [Dance of the CIs app](http://logarithmic.net/2017/dance/) (to give intuition about Confidence Intervals)
+* [The Art of Linear Algebra](https://github.com/kenjihiranabe/The-Art-of-Linear-Algebra/blob/main/The-Art-of-Linear-Algebra.pdf) (to give intuition about matrices and vectors -- sections 1-3 are relevant to this workshop)
+* Testing for differential gene expression often uses linear models. The folks at [WEHI](https://www.wehi.edu.au/research/research-fields/bioinformatics) have written good introductions to this topic:
+    * ["RNA-seq analysis is easy as 1-2-3 with limma, Glimma and edgeR"](https://bioconductor.org/packages/release/workflows/vignettes/RNAseq123/inst/doc/limmaWorkflow.html)
+    * ["A guide to creating design matrices for gene expression experiments"](https://bioconductor.org/packages/release/workflows/vignettes/RNAseq123/inst/doc/designmatrices.html) (design matrix = model matrix)
+
+
 
 ## Author
 
