@@ -272,22 +272,21 @@ $$ \varepsilon_i \sim \mathcal{N}(0,\sigma^2) $$
 
 ## Model fitting -- estimating $\beta$ with geometry
 
-$$ y = X \beta + \varepsilon $$
-$$ \varepsilon_i \sim \mathcal{N}(0,\sigma^2) $$
-
-**Maximum Likelihood**<span class="tip">*<span class="tiptext">"Likelihood" has a technical meaning in statistics: it is the probability of the *data* given the model parameters. This is backwards from normal English usage.</span></span> estimate:<br>
-We choose $\hat\beta$ to maximize the likelihood of $y$.
-
-A very nice consequence of assuming normally distributed noise is that the vector $\varepsilon$ has a spherical distribution, so the choice of $\hat\beta$ making $y$ most likely is the one that places $X \hat\beta$ nearest to $y$
-
 <div style="float: right">
-```{r echo=F,fig.width=2,fig.height=2,animation.hook="gifski", interval=0.1}
+```{r echo=F,fig.width=3,fig.height=3,animation.hook="gifski", interval=0.1}
 for(t in 1:40) {
     par(mar=c(0,0,0,0))
     plot(0,type='n',axes=FALSE,ann=FALSE, 
-         xlim=c(2,6), ylim=c(2,6), asp=1)
+         xlim=c(1,7), ylim=c(1,7), asp=1)
 
     o <- sin(t/40*2*pi)*0.75
+
+    for(i in 10:1) {
+        br = floor(127+128*i/10)
+        rad = qnorm(0.5+0.5*i/11) * 20
+        points(4+o,4+o, pch=21,cex=rad,col=NA,bg=sprintf("#%02x%02x%02x",br,br,255))
+    }
+
     points(3,5, pch=21,bg="white")
     points(4+o,4+o, pch=21,bg="grey")
     arrows(4+o,4+o, 3,5, length=0.1)
@@ -299,12 +298,19 @@ for(t in 1:40) {
 ```
 </div>
 
+$$ y = X \beta + \varepsilon $$
+$$ \varepsilon_i \sim \mathcal{N}(0,\sigma^2) $$
+
+**Maximum Likelihood**<span class="tip">*<span class="tiptext">"Likelihood" has a technical meaning in statistics: it is the probability of the *data* given the model parameters. This is backwards from normal English usage.</span></span> estimate:<br>
+We choose $\hat\beta$ to maximize the likelihood of $y$.
+
+A very nice consequence of assuming normally distributed noise is that the vector $\varepsilon$ has a spherical distribution, so the choice of $\hat\beta$ making $y$ most likely is the one that places $X \hat\beta$ nearest to $y$
+
 Distance is the square root of the sum of squared differences in each dimension, so this is also called a **least squares** estimate. We choose $\hat \beta$ to minimize $\hat \varepsilon^\top \hat \varepsilon$.
 
 $$ \hat \varepsilon = y - X \hat \beta $$
 
 
-<br>
 <br>
 <div style="font-size: 60%;">
 (This is *one route* to least squares. [Looser assumptions about noise still lead to least squares](https://en.wikipedia.org/wiki/Gauss%E2%80%93Markov_theorem), so long as there aren't wild outliers.)</div>
