@@ -304,11 +304,11 @@ $$ \varepsilon_i \sim \mathcal{N}(0,\sigma^2) $$
 **Maximum Likelihood**<span class="tip">*<span class="tiptext">"Likelihood" has a technical meaning in statistics: it is the probability of the *data* given the model parameters. This is backwards from normal English usage.</span></span> estimate:<br>
 We choose $\hat\beta$ to maximize the likelihood of $y$.
 
-A very nice consequence of assuming normally distributed noise is that the vector $\varepsilon$ has a spherical distribution, so the choice of $\hat\beta$ making $y$ most likely is the one that places $X \hat\beta$ nearest to $y$
-
-Distance is the square root of the sum of squared differences in each dimension, so this is also called a **least squares** estimate. We choose $\hat \beta$ to minimize $\hat \varepsilon^\top \hat \varepsilon$.
+A very nice consequence of assuming normally distributed noise is that the vector $\varepsilon$ has a spherical distribution, so the choice of $\hat\beta$ making $y$ most likely is the one that places $X \hat\beta$ nearest to $y$.
 
 $$ \hat \varepsilon = y - X \hat \beta $$
+
+The length of $\hat \varepsilon$, which we seek to minimize, is the square root of the sum of squares of its elements $\hat \varepsilon^\top \hat \varepsilon$. So this is also called a **least squares** estimate.
 
 
 <br>

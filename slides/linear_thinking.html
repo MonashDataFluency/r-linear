@@ -423,11 +423,11 @@ y_n &amp;= \beta_1 x_{n,1} + \beta_2 x_{n,2} + \dots + \beta_p x_{n,p} + \vareps
 <p><strong>Maximum Likelihood</strong><span class="tip">*<span class="tiptext">
 &ldquo;Likelihood&rdquo; has a technical meaning in statistics: it is the probability of the <em>data</em> given the model parameters. This is backwards from normal English usage.</span></span> estimate:<br> We choose \(\hat\beta\) to maximize the likelihood of \(y\).</p>
 
-<p>A very nice consequence of assuming normally distributed noise is that the vector \(\varepsilon\) has a spherical distribution, so the choice of \(\hat\beta\) making \(y\) most likely is the one that places \(X \hat\beta\) nearest to \(y\)</p>
-
-<p>Distance is the square root of the sum of squared differences in each dimension, so this is also called a <strong>least squares</strong> estimate. We choose \(\hat \beta\) to minimize \(\hat \varepsilon^\top \hat \varepsilon\).</p>
+<p>A very nice consequence of assuming normally distributed noise is that the vector \(\varepsilon\) has a spherical distribution, so the choice of \(\hat\beta\) making \(y\) most likely is the one that places \(X \hat\beta\) nearest to \(y\).</p>
 
 <p>\[ \hat \varepsilon = y - X \hat \beta \]</p>
+
+<p>The length of \(\hat \varepsilon\), which we seek to minimize, is the square root of the sum of squares of its elements \(\hat \varepsilon^\top \hat \varepsilon\). So this is also called a <strong>least squares</strong> estimate.</p>
 
 <br>
 
