@@ -1,5 +1,5 @@
 ---
-title: "Linear models in R"
+title: "Linear models in R slideshow"
 author: "Paul Harrison @paulfharrison"
 output: 
     ioslides_presentation:
@@ -280,6 +280,25 @@ We choose $\hat\beta$ to maximize the likelihood of $y$.
 
 A very nice consequence of assuming normally distributed noise is that the vector $\varepsilon$ has a spherical distribution, so the choice of $\hat\beta$ making $y$ most likely is the one that places $X \hat\beta$ nearest to $y$
 
+<div style="float: right">
+```{r echo=F,fig.width=2,fig.height=2,animation.hook="gifski", interval=0.1}
+for(t in 1:40) {
+    par(mar=c(0,0,0,0))
+    plot(0,type='n',axes=FALSE,ann=FALSE, 
+         xlim=c(2,6), ylim=c(2,6), asp=1)
+
+    o <- sin(t/40*2*pi)*0.75
+    points(3,5, pch=21,bg="white")
+    points(4+o,4+o, pch=21,bg="grey")
+    arrows(4+o,4+o, 3,5, length=0.1)
+
+    text(3.5+o/2, 4.5+o/2, adj=c(-1.0,-0.5), expression(hat(epsilon)))
+    text(3,5, adj=c(0,-0.75), "y")
+    text(4+o,4+o, adj=c(0,1.25), expression(Chi * hat(beta)))
+}
+```
+</div>
+
 Distance is the square root of the sum of squared differences in each dimension, so this is also called a **least squares** estimate. We choose $\hat \beta$ to minimize $\hat \varepsilon^\top \hat \varepsilon$.
 
 $$ \hat \varepsilon = y - X \hat \beta $$
@@ -360,8 +379,8 @@ model.matrix(~ f)
 Need to be careful interpreting the meaning of coefficients for factors.
 
 > * `(Intercept)` is the mean for "a".
-> * `fb` is the *difference* between "b" and "a".
-> * `fc` is the *difference* between "c" and "a".
+> * `fb` is the *step* from "a" to "b".
+> * `fc` is the *step* from "a" to "c".
 
 ```{r}
 f <- factor(c("a","a","b","b","c","c"))
@@ -375,7 +394,7 @@ R tries to be clever about factor encoding if the intercept is omitted.
 
 Without an intercept, each coefficient is simply the mean for that level. 
 
-Can't do this with multiple factors.<span class="tip">*<span class="tiptext">Without the intercept term, R will only do this for the first factor. Further factors are encoded as before, omitting the first level. If R didn't do this, there would be multiple choices of coefficients able to make the exact same prediction (the predictors would not be linearly independent).</span></span>
+Can't do this with multiple factors at once.<span class="tip">*<span class="tiptext">Without the intercept term, R will only do this for the first factor. Further factors are encoded as before, omitting the first level. If R didn't do this, there would be multiple choices of coefficients able to make the exact same prediction (the predictors would not be linearly independent).</span></span>
 
 ```{r}
 f <- factor(c("a","a","b","b","c","c"))
@@ -540,7 +559,7 @@ $$
 RSS = Residual Sum of Squares
 
 Is the increase in RSS in H0 merely proportionate 
-<br>to the extra degree(s) of freedom?
+<br>to the extra residual degree(s) of freedom?
 
 <br>
 
@@ -599,7 +618,7 @@ Need to adjust p-values for this problem (see `p.adjust( )`).
 
 ## Multiple testing
 
-Suppose some set of hypotheses are true. What chance do we run of rejecting one or more of them?
+Suppose some set of null hypotheses are true. What chance do we run of rejecting one or more of them?
 
 <div style="float: right; width: 25%; border: 1px solid #888; margin-top: 4em; padding: 0.5em">
 **What if the hypotheses are mutually exclusive?**
@@ -760,7 +779,6 @@ Examples:
 
 Fit using the function `glm`.
 
-Survival analysis using Cox regression has some similarities.
 
 ## Linear Mixed Models
 

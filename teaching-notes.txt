@@ -69,10 +69,23 @@ Need to keep up a slightly faster pace in the introductory vector/matrix section
 The morning and afternoon tea breaks are very much needed.
 
 
+2021-10-27&28 10:10am-2:15pm (8 hours total, including 40 minutes of breaks)
+This workshop was held over two days. Since it was held during the plague years, it was an online Zoom workshop.
 
+We followed this schedule for both days:
 
+10:00am           Log on early if you want help setting up
+10:10am           Begin
+11:20am - 11:30am Break
+12:40pm - 12:50pm Break
+14:15pm           End
+14:15pm - 14:30pm We will stay online to answer questions
 
+We used the full allocated time 10:10-2:15 for both days.
 
+We allowed people to move between breakout rooms. A group of people who knew each other all moved to one room for the challenge in section 6, leading to a lively discussion. A downside was that some other breakout rooms only had a few people in them. Allow a good chunk of time for the section 6 challenge, say 20 minutes.
+
+We recommended people use RStuio Cloud, but left open the option of using RStudio on their own machine. One person ran into problems installing up-to-date versions of packages on their Windows machine, seemingly due to the way Monash University laptops tend to put home directories on a network drive.
 
 
 

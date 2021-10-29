@@ -1,5 +1,5 @@
 ---
-title: "Linear models in R"
+title: "Linear models in R workshop"
 output: html_document
 editor_options: 
   chunk_output_type: console
@@ -383,11 +383,11 @@ confint(pvcfit1)
 
 This model assumes the influence of the two factors is additive, the model only contains the "main effects". The meanings of the coefficients are:
 
-* "(Intercept)" is particle size for Alice and R1
-* "operatorBob" is particle size for Bob relative to Alice
-* "operatorCarl" is particle size for Carl relative to Alice
-* "resinR2" is particle size for R2 relative to R1
-* "resinR3" is particle size for R3 relative to R1
+* "(Intercept)" is the particle size for Alice and R1
+* "operatorBob" is the step in particle size going from Alice to Bob
+* "operatorCarl" is the step in particle size going from Alice to Carl
+* "resinR2" is the step in particle size going from R1 to R2
+* "resinR3" is the step in particle size going from R1 to R3
 * (etc)
 
 
@@ -421,11 +421,11 @@ pvcfit2
 This model allows for interactions between the two factors. There are enough predictors in the model matrix that each combination of levels can take on a distinct value. So we now have
 
 * "(Intercept)" is particle size for Alice and R1
-* "operatorBob" is particle size for Bob relative to Alice, for R1
-* "operatorCarl" is particle size for Carl relative to Alice, for R1
-* "resinR2" is particle size for R2 relative to R1, for Alice
+* "operatorBob" is the step in particle size from Alice to Bob, for R1
+* "operatorCarl" is the step in particle size from Alice to Carl, for R1
+* "resinR2" is the step in particle size from R1 to R2, for Alice
 * (etc)
-* "operatorBob:resinR2" is particle size for Bob and R2, relative to `(Intercept)+operatorBob+resinR2`.
+* "operatorBob:resinR2" is the particle size for Bob and R2, relative to `(Intercept)+operatorBob+resinR2`.
 * (etc)
 
 
@@ -719,7 +719,7 @@ Even if predictors are not perfectly multicollinear, correlation between predict
 A possible solution to this problem would be to use a "mixed model", but this is beyond the scope of today's workshop.
 
 
-## Challenge - Wnt2 gene {.challenge}
+## Challenge - Wnt2 gene (20 minutes) {.challenge}
 
 Look at the expression of gene Wnt2 in column `gene_wnt2`.
 

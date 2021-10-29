@@ -16,10 +16,22 @@ begin <- function() {
     plot(0,type='n',axes=FALSE,ann=FALSE, 
          xlim=c(-1,6), ylim=c(-1,6), asp=1)
 
-    arrows(-1,0,5,0)
-    text(5,0, adj=c(-0.5,0.5), "y[1]")
-    arrows(0,-1,0,5)
-    text(0,5, adj=c(0.5,-0.5), "y[2]")
+    arrows(-1,0,5.5,0)
+    text(5.5,0, adj=c(-0.5,0.5), "y[1]")
+    arrows(0,-1,0,5.5)
+    text(0,5.5, adj=c(0.5,-0.5), "y[2]")
+
+    text(1,0, adj=c(0,1.5),cex=0.75, "1")
+    text(2,0, adj=c(0,1.5),cex=0.75, "2")
+    text(3,0, adj=c(0,1.5),cex=0.75, "3")
+    text(4,0, adj=c(0,1.5),cex=0.75, "4")
+    text(5,0, adj=c(0,1.5),cex=0.75, "5")
+
+    text(0,1, adj=c(1.5,0.5),cex=0.75, "1")
+    text(0,2, adj=c(1.5,0.5),cex=0.75, "2")
+    text(0,3, adj=c(1.5,0.5),cex=0.75, "3")
+    text(0,4, adj=c(1.5,0.5),cex=0.75, "4")
+    text(0,5, adj=c(1.5,0.5),cex=0.75, "5")
 }
 
 the_truth <- function() {
@@ -63,10 +75,10 @@ to_test <- function() {
     text(1.5, 2.5, adj=c(0.5, -1.5),srt=60,col=red, expression(hat(epsilon)[0]))
 
     points(0,0, pch=21,bg="black")
-    text(0,0, adj=c(-0,1.1), " H0 restricted\n  to this point")
+    text(0,0, adj=c(-0,1.1), " H0\n can predict within\n this nested subspace (here, a point)")
 
     line(-1,-1, 5,5)
-    text(2,2, srt=45, adj=c(0.5,0), "H1 can predict anything on this line")
+    text(2,2, srt=45, adj=c(0.5,1.1), "H1 can predict anything in\nthis subspace (here, a line)")
 
     arrows(4,4, 3,5, length=0.1, col=red)
     line(3.8,3.8, 3.6,4.0)

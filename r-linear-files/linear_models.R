@@ -358,11 +358,11 @@ confint(pvcfit1)
 # model only contains the "main effects". The meanings of the
 # coefficients are:
 #
-# * "(Intercept)" is particle size for Alice and R1
-# * "operatorBob" is particle size for Bob relative to Alice
-# * "operatorCarl" is particle size for Carl relative to Alice
-# * "resinR2" is particle size for R2 relative to R1
-# * "resinR3" is particle size for R3 relative to R1
+# * "(Intercept)" is the particle size for Alice and R1
+# * "operatorBob" is the step in particle size going from Alice to Bob
+# * "operatorCarl" is the step in particle size going from Alice to Carl
+# * "resinR2" is the step in particle size going from R1 to R2
+# * "resinR3" is the step in particle size going from R1 to R3
 # * (etc)
 #
 # We can use anova( ) to test if there is evidence either of these main
@@ -395,12 +395,13 @@ pvcfit2
 # can take on a distinct value. So we now have
 #
 # * "(Intercept)" is particle size for Alice and R1
-# * "operatorBob" is particle size for Bob relative to Alice, for R1
-# * "operatorCarl" is particle size for Carl relative to Alice, for R1
-# * "resinR2" is particle size for R2 relative to R1, for Alice
+# * "operatorBob" is the step in particle size from Alice to Bob, for R1
+# * "operatorCarl" is the step in particle size from Alice to Carl, for
+# R1
+# * "resinR2" is the step in particle size from R1 to R2, for Alice
 # * (etc)
-# * "operatorBob:resinR2" is particle size for Bob and R2, relative to
-# (Intercept)+operatorBob+resinR2.
+# * "operatorBob:resinR2" is the particle size for Bob and R2, relative
+# to (Intercept)+operatorBob+resinR2.
 # * (etc)
 
 anova(pvcfit1, pvcfit2)
@@ -724,7 +725,7 @@ summary(badfit)
 # A possible solution to this problem would be to use a "mixed model",
 # but this is beyond the scope of today's workshop.
 
-# 6.4 Challenge - Wnt2 gene ----
+# 6.4 Challenge - Wnt2 gene (20 minutes) ----
 #
 # Look at the expression of gene Wnt2 in column gene_wnt2.
 #
