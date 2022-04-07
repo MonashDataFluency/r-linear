@@ -537,6 +537,7 @@ library(emmeans)
 emmeans(pvcfit1, ~ resin)
 emmeans(pvcfit1, pairwise ~ resin)
 emmeans(pvcfit1, trt.vs.ctrl ~ resin)
+confint( emmeans(pvcfit1, trt.vs.ctrl ~ resin)$contrasts )
 ```
 
 
@@ -820,7 +821,7 @@ cfit <- contrasts.fit(fit, t(K))         #linear combinations in columns!
 efit <- eBayes(cfit, trend=TRUE)
 ```
 
-The call to `eBayes` does Empirical Bayes squeezing of the residual variance for each gene (see appendix). This is a bit of magic that allows limma to work well with small numbers of samples.
+The call to `eBayes` does Empirical Bayes squeezing of the residual variance for each gene (see Appendix B). This is a bit of magic that allows limma to work well with small numbers of samples.
 
 ```{r}
 topTable(efit)
@@ -859,7 +860,7 @@ summary( glht(rnf144b_fit, K) )
 
 ## Confidence intervals
 
-Confidence Intervals should also be of interest. However note that these are not adjusted for multiple testing (see appendix).
+Confidence Intervals should also be of interest. However note that these are not adjusted for multiple testing (see Appendix B).
 
 ```{r}
 topTable(efit, confint=0.95)
@@ -897,7 +898,81 @@ A shortcut here would be to skip the `contrasts.fit` step and specify a set of c
 2. Construct a model matrix in which the change over time is quadratic, and some linear combinations to interrogate it.
 
 
-# Appendix
+
+# Appendix A - mixed models
+
+In this workshop we have looked at linear models with fixed effects only. A linear mixed model contains both fixed and random effects. Random effects are appropriate for individuals drawn from a population. The model we obtain will include how much variation there is in this population.
+
+Mixed models would be a whole further workshop, but I will attempt a rough outline here.
+
+In R, mixed models are most commonly fitted using the `lmer` function in `lme4`. A point of confusion you will encounter is that there are a variety of ways to perform significance tests. The authors of `lme4` duck out of this debate entirely and only provide t statistics. However packages such as `lmerTest`, `emmeans` and `pbkrtest` can provide p-values and CIs from an `lmer` model.
+
+My recommendation of a safe choice, from my reading, is to fit a model using the REML method (the default for `lmer`) and then test it using the Kenward-Roger method. The Satterthwaite method is also decent, usually producing nearly identical results with less computation. Other methods may produce p-values that are too small with small data sets. This includes the `multcomp` package that we used earlier, unfortunately. For more information see: 
+
+Luke, S.G. (2017). Evaluating significance in linear mixed-effects models in *R. Behav Res* 49, 1494–1502 https://doi.org/10.3758/s13428-016-0809-y
+
+The differences between methods disappear when your data is large enough, but "large enough" might mean not just many rows in your data frame but also many levels for your random effects.
+
+I will briefly demonstrate `lmer` with the PVC particle dataset, now treating resin batches as a random effect.
+
+```{r warning=FALSE,message=FALSE}
+library(lmerTest)     # lmerTest builds on lme4, can produce p-values
+library(emmeans)      # emmeans can provide Kenward-Roger CIs
+
+pvc <- read_csv("r-linear-files/pvc.csv")
+pvc$operator <- factor(pvc$operator)
+pvc$resin <- factor(pvc$resin)
+
+pvcfit_mixed <- lmer(psize ~ operator + (1|resin), data=pvc, REML=TRUE)
+pvcfit_mixed
+```
+
+We use new `( | )` notation to specify random effects. Right of the `|` you give the factor specifying individuals from a population. Left of the `|` you give predictors whose coefficients may vary between individuals. In the example above we are saying the the intercept may vary between individuals.
+
+The mean about which individuals vary must also be included as a fixed effect in the model! Here an intercept term is implicitly included in the model as usual. However if your random effect specified a slope or some-such it would also need to be given as a fixed effect. Otherwise you would be saying the slope varies around zero.
+
+A standard deviation has been estimated for the effect of different batches of resin on particle size, as well as the usual residual standard deviation. This is an extra source of random variation around the prediction from the fixed effect part of the model.
+
+`drop1` from `lmerTest` can be used to test whether fixed effects are statistically significant.
+
+```{r}
+drop1(pvcfit_mixed, ddf="Kenward-Roger")
+```
+
+`ranova` from `lmerTest` can be used to test whether random effects are statistically significant.
+
+```{r}
+ranova(pvcfit_mixed)
+```
+
+`emmeans` can be used on the fixed effects of the model.
+
+```{r}
+result <- emmeans(pvcfit_mixed, pairwise ~ operator, lmer.df="Kenward-Roger")
+result$emmeans
+confint(result$contrasts)
+```
+
+For comparison, here are similar results from the fixed effects model:
+
+```{r}
+pvcfit_fixed <- lm(psize ~ operator + resin, data=pvc)
+
+drop1(pvcfit_fixed, test="F")
+
+result_fixed <- emmeans(pvcfit_fixed, pairwise ~ operator)
+result_fixed$emmeans
+confint(result_fixed$contrasts)
+```
+
+The simpler fixed effects model can be a useful check that you are fitting the mixed effects model you intend. The results will usually be similar, and any differences may be instructive. A fixed effect model might be chosen either by ignoring random effects or including them as fixed effects. In this example we see:
+
+* The pairwise comparisons are identical.
+
+* CIs for the means for each operator are wider for the mixed model. This is because they are an estimate of the mean for the whole population of resins. For the fixed effects model, we get the CI for the mean of exactly the eight resins present in the data.
+
+
+# Appendix B - more on limma
 
 ## Empirical Bayes variance squeezing
 

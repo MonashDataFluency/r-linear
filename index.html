@@ -187,7 +187,9 @@ download.file(
 unzip(&quot;r-linear-files.zip&quot;)
 
 # Install some CRAN packages:
-install.packages(c(&quot;tidyverse&quot;, &quot;multcomp&quot;, &quot;emmeans&quot;, &quot;BiocManager&quot;))
+install.packages(c(
+    &quot;tidyverse&quot;, &quot;multcomp&quot;, &quot;emmeans&quot;, 
+    &quot;lme4&quot;, &quot;lmerTest&quot;, &quot;pbkrtest&quot;, &quot;BiocManager&quot;))
 
 # Install some Bioconductor packages:
 BiocManager::install(c(&quot;limma&quot;,&quot;edgeR&quot;,&quot;topconfects&quot;))</code></pre>
@@ -202,18 +204,24 @@ BiocManager::install(c(&quot;limma&quot;,&quot;edgeR&quot;,&quot;topconfects&quo
 <div id="key-functions-to-remember" class="section level2">
 <h2>Key functions to remember</h2>
 <p>Built-in to R:</p>
-<pre><code>lm, anova, model.matrix, coef, sigma, df.residual, predict, confint, summary
+<pre><code>lm, model.matrix, coef, sigma, df.residual,
+predict, confint, summary, anova, drop1, 
 I, poly</code></pre>
 <p><code>splines</code> – curve fitting:</p>
 <pre><code>ns, bs</code></pre>
-<p><code>multcomp</code> – linear hypothesis tests and multiple comparisons:</p>
-<pre><code>glht, mcp, confint, summary</code></pre>
+<p><code>multcomp</code> and <code>emmeans</code> – linear hypothesis tests and multiple comparisons:</p>
+<pre><code>glht, mcp, confint, summary, emmeans</code></pre>
 <p><code>limma</code> and <code>edgeR</code> – fitting many models to gene expression data:</p>
 <pre><code>DGEList, calcNormFactors, cpm,
 lmFit, contrasts.fit, eBayes, plotSA, topTable</code></pre>
 </div>
 <div id="links" class="section level2">
 <h2>Links</h2>
+<ul>
+<li><p>Postgraduate students at Monash can access <a href="https://www.monash.edu/researchinfrastructure/datascienceandai/capabilities/statistical-consulting">statistical consulting</a>, courtesy of the Data Science and AI Platform. This is a good service for beginner to intermediate statistical questions.</p></li>
+<li><p>The <a href="https://www.monash.edu/medicine/sphpm/units/biostats-consulting">Biostatistics Consulting Platform</a> in the Monash Faculty of Medicine may be more suitable for advanced questions about experimental design and analysis.</p></li>
+</ul>
+<p><br></p>
 <ul>
 <li><a href="https://www.monash.edu/data-fluency">Monash Data Fluency</a></li>
 <li><a href="https://www.monash.edu/researchinfrastructure/bioinformatics">Monash Bioinformatics Platform</a></li>

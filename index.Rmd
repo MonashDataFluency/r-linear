@@ -25,7 +25,9 @@ download.file(
 unzip("r-linear-files.zip")
 
 # Install some CRAN packages:
-install.packages(c("tidyverse", "multcomp", "emmeans", "BiocManager"))
+install.packages(c(
+    "tidyverse", "multcomp", "emmeans", 
+    "lme4", "lmerTest", "pbkrtest", "BiocManager"))
 
 # Install some Bioconductor packages:
 BiocManager::install(c("limma","edgeR","topconfects"))
@@ -41,16 +43,17 @@ Now load the file `linear_models.R` in the `r-linear-files` folder.
 
 Built-in to R: 
 
-    lm, anova, model.matrix, coef, sigma, df.residual, predict, confint, summary
+    lm, model.matrix, coef, sigma, df.residual,
+    predict, confint, summary, anova, drop1, 
     I, poly
 
 `splines` -- curve fitting:
 
     ns, bs
 
-`multcomp` -- linear hypothesis tests and multiple comparisons: 
+`multcomp` and `emmeans` -- linear hypothesis tests and multiple comparisons: 
 
-    glht, mcp, confint, summary
+    glht, mcp, confint, summary, emmeans
 
 `limma` and `edgeR` -- fitting many models to gene expression data: 
 
@@ -58,6 +61,13 @@ Built-in to R:
     lmFit, contrasts.fit, eBayes, plotSA, topTable
 
 ## Links
+
+* Postgraduate students at Monash can access [statistical consulting](https://www.monash.edu/researchinfrastructure/datascienceandai/capabilities/statistical-consulting), courtesy of the Data Science and AI Platform. This is a good service for beginner to intermediate statistical questions.
+
+* The [Biostatistics Consulting Platform](https://www.monash.edu/medicine/sphpm/units/biostats-consulting) in the Monash Faculty of Medicine may be more suitable for advanced questions about experimental design and analysis.
+
+<br>
+
 * [Monash Data Fluency](https://www.monash.edu/data-fluency)
 * [Monash Bioinformatics Platform](https://www.monash.edu/researchinfrastructure/bioinformatics)
 * [More workshop material from Monash Bioinformatics Platform](https://www.monash.edu/researchinfrastructure/bioinformatics/training)
