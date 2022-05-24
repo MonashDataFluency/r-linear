@@ -927,7 +927,7 @@ pvcfit_mixed <- lmer(psize ~ operator + (1|resin), data=pvc, REML=TRUE)
 pvcfit_mixed
 ```
 
-We use new `( | )` notation to specify random effects. Right of the `|` you give the factor specifying individuals from a population. Left of the `|` you give predictors whose coefficients may vary between individuals. In the example above we are saying the the intercept may vary between individuals.
+We use new `( | )` notation to specify random effects. Right of the `|` you give the factor specifying individuals from a population. Left of the `|` you give predictors whose coefficients may vary between individuals. In the example above we are saying that the intercept may vary between individuals.
 
 The mean about which individuals vary must also be included as a fixed effect in the model! Here an intercept term is implicitly included in the model as usual. However if your random effect specified a slope or some-such it would also need to be given as a fixed effect. Otherwise you would be saying the slope varies around zero.
 

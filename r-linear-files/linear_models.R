@@ -965,7 +965,7 @@ pvcfit_mixed
 # We use new ( | ) notation to specify random effects. Right of the |
 # you give the factor specifying individuals from a population. Left of
 # the | you give predictors whose coefficients may vary between
-# individuals. In the example above we are saying the the intercept may
+# individuals. In the example above we are saying that the intercept may
 # vary between individuals.
 #
 # The mean about which individuals vary must also be included as a fixed

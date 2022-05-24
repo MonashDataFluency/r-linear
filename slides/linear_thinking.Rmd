@@ -112,7 +112,7 @@ knitr::include_graphics("../figures/Triangle-Ruler.png")
 
 A vector can be thought of as an arrow in a space.
 
-The dot product of a vector with itself $a^\top a$ is the square of its length. Pythagorus!
+The dot product of a vector with itself $a^\top a$ is the square of its length. Pythagoras!
 
 ### Right angles
 
