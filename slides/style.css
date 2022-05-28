@@ -7,6 +7,10 @@ h1,h2,h3 {
     color: #048;
 }
 
+strong {
+    color: #0bb;
+}
+
 .tip {
     position: relative;
     display: inline-block;

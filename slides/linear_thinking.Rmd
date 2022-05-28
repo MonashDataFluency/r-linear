@@ -112,7 +112,9 @@ knitr::include_graphics("../figures/Triangle-Ruler.png")
 
 A vector can be thought of as an arrow in a space.
 
-The dot product of a vector with itself $a^\top a$ is the square of its length. Pythagoras!
+The dot product of a vector with itself $a^\top a$ is the square of its length. 
+<br>= Pythagoras, but in as many dimensions as we like.
+<br>= Euclidean distance (squared).
 
 ### Right angles
 
@@ -505,7 +507,9 @@ fit1 <- lm(y ~ 1)
 
 Two model formulas representing null hypothesis H0 and alternative hypothesis H1.
 
-H0 must *nest* within H1.
+**H0 must *nest* within H1. Usually this means H1 has all of the predictors in H0, plus a few more.**
+
+<br>
 
 $\hat\varepsilon_0$ can't be shorter than $\hat\varepsilon_1$
 
@@ -536,7 +540,7 @@ begin()
 to_test()
 ```
 
-## Testing hypotheses -- the gory details
+## Testing hypotheses -- details
 
 <div style="float: right; width: 15em">
 ```{r}
@@ -550,6 +554,9 @@ F <- (RSS0-RSS1)/(df0-df1) / (RSS1/df1)
 F
 pf(F, df0-df1, df1, lower.tail=FALSE)
 ```
+
+
+For low residual degrees of freedom $n-p_1$, large values of $F$ can still occur by chance, so our toy example is not statistically sigificant even with this large $F$ statistic.
 </div>
 $$
 RSS_0 = \hat\varepsilon_0^\top \hat\varepsilon_0 \\
@@ -565,7 +572,9 @@ $$
 RSS = Residual Sum of Squares
 
 Is the increase in RSS in H0 merely proportionate 
-<br>to the extra residual degree(s) of freedom?
+<br>to the extra residual degree(s) of freedom? 
+
+Then $F$ will be close to 1. 
 
 <br>
 
@@ -578,7 +587,7 @@ Is the increase in RSS in H0 merely proportionate
 "linear hypothesis" "general linear hypothesis" "linear restriction" "contrast"
 
 <br>
-A **linear hypothesis** test tests an H0 in which some linear combination of coefficients in H1 is restricted to be zero.
+A **linear hypothesis test** tests an H0 in which some linear combination of coefficients in H1 is restricted to be zero.
 
 <br>
 From a linear combination of coefficients we obtain:
@@ -600,6 +609,30 @@ Use `multcomp` package.
 ##
 
 Do section: Multiple factors, many levels
+
+
+## Nested models revision
+
+To test our H0, it must nest within H1.
+
+>* It must be possible for any set of predictions $X\beta$ from H0 also to be made by H1.
+
+<br>
+
+Testing linear restrictions using `glht` naturally obeys this, as the H0 is defined by restrictions on the coefficients of H1.
+
+<br>
+
+With the `anova` test, you need to ensure nesting yourself.
+
+Generally we ensure this by making the predictors for H0 a subset of the predictors for H1.
+
+>* Exactly equivalent to restricting the coefficients for these predictors to be zero, using `glht`.
+
+<br>
+
+**`anova` will not give an error if your models don't nest, but results will be invalid.**
+
 
 
 ## What is a p-value anyway?
@@ -772,11 +805,11 @@ plot(predict(fit),residuals(fit), cex=0.25)
 
 **(Not covered today.)**
 
-We are still trying to predict the mean value, but now the response has a noise distribution that changes based on its mean value.
+We are still trying to predict the mean value, but now the response has **a noise distribution that changes based on its mean value**.
 
 > * The noise distributions are characterized by the mean-variance relationship.
 
-We want to specify the model on a transformed scale even if the data contains values that can't be transformed.
+We want to **fit the model on a transformed scale** even if the data contains values that can't be transformed.
 
 Examples:
 
@@ -876,6 +909,8 @@ Faraway (2014) "Linear Models with R"
 
 James, Witten, Hastie and Tibshirani (2013) "An Introduction to Statistical Learning"
 
+<br>
+**Also see links on the workshop home page.**
 
 
 ## Extra slides

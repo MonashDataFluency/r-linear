@@ -15,6 +15,7 @@ knitr::opts_chunk$set(fig.align="center", fig.width=5,fig.height=5)
 library(MASS)       # ginv -- coefficient estimation
 library(splines)    # ns, bs -- spline curves
 library(multcomp)   # glht -- linear hypotheses
+library(emmeans)    # estimated marginal means
 library(edgeR)      # cpm, etc -- RNA-Seq normalization
 library(limma)      # lmFit, etc -- fitting many models
 library(tidyverse)  # working with data frames, plotting
@@ -48,7 +49,7 @@ sum(a*b)
 t(a) %*% b
 ```
 
-The *geometric* length of a vector is (by Pythagorus):
+The *geometric* length of a vector is (by Pythagoras, aka Euclidean distance):
 
 ```{r}
 sqrt(sum(a*a))
@@ -107,7 +108,7 @@ B. The mean of all four values.
 
 The age (year) and height (cm) of 10 people has been measured. We want a model that can predict height based on age.
 
-```{r}
+```{r warning=FALSE,message=FALSE}
 people <- read_csv(
     "age, height
       10,    131
@@ -247,7 +248,7 @@ plot(fit)
 
 Consider a simple experiment where some outcome is measured for an untreated and a treated group. This can be viewed as a one-way ANalysis Of VAriance (ANOVA) experiment. (This is one of two senses in which the term ANOVA will be used today.)
 
-```{r}
+```{r warning=FALSE,message=FALSE}
 outcomes <- read_csv(
        "group, outcome
     untreated,  4.98
@@ -274,7 +275,7 @@ model.matrix(outfit)
 
 ## How coefficients are estimated
 
-Coefficients are estimated from responses by multiplying by the "Moore-Penrose generalized inverse" of X. It can be useful to examine this to work out exactly what a fit is doing. Each row shows how the corresponding coefficient is estimated.
+Coefficients can be estimated from responses by multiplying by the "Moore-Penrose generalized inverse" of X. It can be useful to examine this matrix to work out exactly what a fit is doing. Each row shows how the corresponding coefficient is estimated.
 
 ```{r}
 X <- model.matrix(outfit)
@@ -288,7 +289,7 @@ Here we can see the first coefficient is the average of the "untreated" samples,
 ( `y` contains noise, assumed to be identically normally distributed for each observation. Transformation of this noise by `ginv(X)` tells us the distribution of errors in the coefficients (see `vcov()`). This can be further propagated to give the distribution of errors in predictions, and in other linear combinations of coefficients. )
 
 
-## Challenge - the meanings of coefficients {.challenge}
+## Class exercise - the meanings of coefficients {.challenge}
 
 We now consider the formula `outcome ~ 0 + group`.
 
@@ -310,7 +311,7 @@ Now perform the actual linear model fit:
 outfit2 <- lm(outcome ~ 0 + group, data=outcomes)
 ```
 
-4. Using `sigma`, does the new model fit the data better or worse than the original?
+4. Looking at the `residuals` and `sigma`, does the new model fit the data better or worse than the original?
 
 
 ## Testing a hypothesis
@@ -433,10 +434,14 @@ This model allows for interactions between the two factors. There are enough pre
 anova(pvcfit1, pvcfit2)
 ```
 
+We do not reject the main effects model. Our data does not provide evidence that the interaction model is needed. Until fresh data demands that we need an interaction model, we will proceed with the main effects model.
+
+Note: Ideally we would have checked for evidence of an interaction effect *before* examining the main effects model in the previous section.
+
 
 ## Contrasts and confidence intervals
 
-`anova( )` lets us test if a particular factor or interaction is needed at all, and `summary( )` allows us to see if any levels of a factor differ from the first level. However we may wish to perform different comparisons of the levels of a factor -- this is called a "contrast". We might also want to test some more complicated combination of coefficients such as a difference between two hypothetical individuals. In general this is called a "linear hypotheses" or a "general linear hypothesis".
+`anova( )` lets us test if a particular factor or interaction is needed at all, and `summary( )` allows us to see if any levels of a factor differ from the first level. However we may wish to perform different comparisons of the levels of a factor -- this is called a "contrast". We might also want to test some more complicated combination of coefficients such as a difference between two hypothetical individuals. In general this is called a "linear hypothesis" or a "general linear hypothesis".
 
 Say we want to compare Bob and Carl's particle sizes. We will use the `pvcfit1` model.
 
@@ -514,31 +519,42 @@ Using the `pvcfit1` model, construct linear hypotheses to see if the effect of:
 
 
 
-## An easier way to specify contrasts
+## Easier ways to specify contrasts
 
 So far we have been manually constructing linear hypotheses. The `multcomp` package automates this for some common situations. To compare all pairs of levels within a factor, use the `mcp` function, giving the factor to test as the name of an argument and specifying to test "Tukey" contrasts:
 
 ```{r}
-result <- glht(pvcfit1, mcp(resin="Tukey"))
+result <- glht(pvcfit1, mcp(operator="Tukey"))
 ```
 
 To compare the first level of a factor to all other levels, specify to test "Dunnett" contrasts:
 
 ```{r}
-result <- glht(pvcfit1, mcp(resin="Dunnett"))
+result <- glht(pvcfit1, mcp(operator="Dunnett"))
 ```
 
 The linear hypotheses actually used can be inspected with `result$linfct`.
 
-The `emmeans` package also automates many common comparisons. In particular, if you are working with models including interactions this package provides results for an "average" individual when examining main effects. By default it treats each level of other factors as being equally likely when calculating this average. It's up to you to decide if this is sensible!
+The `emmeans` package also automates many common comparisons.
 
-```{r eval=FALSE}
+```{r}
 library(emmeans)
-emmeans(pvcfit1, ~ resin)
-emmeans(pvcfit1, pairwise ~ resin)
-emmeans(pvcfit1, trt.vs.ctrl ~ resin)
-confint( emmeans(pvcfit1, trt.vs.ctrl ~ resin)$contrasts )
+
+# Mean of the predictions for a set of typical individuals. 
+# Not the mean of your input data!
+emmeans(pvcfit1, ~ operator)
+
+# Differences in the mean of predictions between groups.
+emmeans(pvcfit1, trt.vs.ctrl ~ operator)
+emmeans(pvcfit1, pairwise ~ operator)
+confint( emmeans(pvcfit1, pairwise ~ operator)$contrasts )
 ```
+
+`emmeans` does not calculate means from your data directly. Instead it calculates the mean of the predictions for a set of typical individuals (the "reference grid"). If individuals in your groups are affected by known variables, and you include these variables as predictors in your model, `emmeans` will naturally adjust for these to provide fair comparisons between groups.
+
+By default `emmeans` will use a reference grid with one individual for each combination of the levels of the factors in your model. For any numeric predictor, the average of the input data is used. It is up to you to decide if this is sensible! This approach provides reasonable means even in models with interaction terms.
+
+`emmeans` is a super cool package, and has great documentation. In practice, this is usually our preferred option.
 
 
 # Gene expression example

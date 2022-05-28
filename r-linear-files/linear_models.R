@@ -7,6 +7,7 @@
 library(MASS)       # ginv -- coefficient estimation
 library(splines)    # ns, bs -- spline curves
 library(multcomp)   # glht -- linear hypotheses
+library(emmeans)    # estimated marginal means
 library(edgeR)      # cpm, etc -- RNA-Seq normalization
 library(limma)      # lmFit, etc -- fitting many models
 library(tidyverse)  # working with data frames, plotting
@@ -36,7 +37,8 @@ a * b
 sum(a*b)
 t(a) %*% b
 
-# The *geometric* length of a vector is (by Pythagorus):
+# The *geometric* length of a vector is (by Pythagoras, aka Euclidean
+# distance):
 
 sqrt(sum(a*a))
 
@@ -235,10 +237,10 @@ model.matrix(outfit)
 
 # 4.1 How coefficients are estimated ----
 #
-# Coefficients are estimated from responses by multiplying by the
+# Coefficients can be estimated from responses by multiplying by the
 # "Moore-Penrose generalized inverse" of X. It can be useful to examine
-# this to work out exactly what a fit is doing. Each row shows how the
-# corresponding coefficient is estimated.
+# this matrix to work out exactly what a fit is doing. Each row shows
+# how the corresponding coefficient is estimated.
 
 X <- model.matrix(outfit)
 y <- outcomes$outcome
@@ -255,7 +257,7 @@ ginv(X) %*% y
 # further propagated to give the distribution of errors in predictions,
 # and in other linear combinations of coefficients. )
 
-# 4.2 Challenge - the meanings of coefficients ----
+# 4.2 Class exercise - the meanings of coefficients ----
 #
 # We now consider the formula outcome ~ 0 + group.
 #
@@ -276,8 +278,8 @@ model.matrix(~ 0 + group, data=outcomes)
 
 outfit2 <- lm(outcome ~ 0 + group, data=outcomes)
 
-# 4. Using sigma, does the new model fit the data better or worse than
-# the original?
+# 4. Looking at the residuals and sigma, does the new model fit the data
+# better or worse than the original?
 #
 # 4.3 Testing a hypothesis ----
 #
@@ -406,6 +408,15 @@ pvcfit2
 
 anova(pvcfit1, pvcfit2)
 
+# We do not reject the main effects model. Our data does not provide
+# evidence that the interaction model is needed. Until fresh data
+# demands that we need an interaction model, we will proceed with the
+# main effects model.
+#
+# Note: Ideally we would have checked for evidence of an interaction
+# effect *before* examining the main effects model in the previous
+# section.
+
 # 5.3 Contrasts and confidence intervals ----
 #
 # anova( ) lets us test if a particular factor or interaction is needed
@@ -414,7 +425,7 @@ anova(pvcfit1, pvcfit2)
 # comparisons of the levels of a factor -- this is called a "contrast".
 # We might also want to test some more complicated combination of
 # coefficients such as a difference between two hypothetical
-# individuals. In general this is called a "linear hypotheses" or a
+# individuals. In general this is called a "linear hypothesis" or a
 # "general linear hypothesis".
 #
 # Say we want to compare Bob and Carl's particle sizes. We will use the
@@ -492,7 +503,7 @@ ggplot(pvc, aes(x=resin, y=residuals(pvcfit1))) +
 # 1. R8 is different to R4
 # 2. R2 is different to R1
 #
-# 5.6 An easier way to specify contrasts ----
+# 5.6 Easier ways to specify contrasts ----
 #
 # So far we have been manually constructing linear hypotheses. The
 # multcomp package automates this for some common situations. To compare
@@ -500,28 +511,44 @@ ggplot(pvc, aes(x=resin, y=residuals(pvcfit1))) +
 # factor to test as the name of an argument and specifying to test
 # "Tukey" contrasts:
 
-result <- glht(pvcfit1, mcp(resin="Tukey"))
+result <- glht(pvcfit1, mcp(operator="Tukey"))
 
 # To compare the first level of a factor to all other levels, specify to
 # test "Dunnett" contrasts:
 
-result <- glht(pvcfit1, mcp(resin="Dunnett"))
+result <- glht(pvcfit1, mcp(operator="Dunnett"))
 
 # The linear hypotheses actually used can be inspected with
 # result$linfct.
 #
-# The emmeans package also automates many common comparisons. In
-# particular, if you are working with models including interactions this
-# package provides results for an "average" individual when examining
-# main effects. By default it treats each level of other factors as
-# being equally likely when calculating this average. It's up to you to
-# decide if this is sensible!
+# The emmeans package also automates many common comparisons.
 
 library(emmeans)
-emmeans(pvcfit1, ~ resin)
-emmeans(pvcfit1, pairwise ~ resin)
-emmeans(pvcfit1, trt.vs.ctrl ~ resin)
-confint( emmeans(pvcfit1, trt.vs.ctrl ~ resin)$contrasts )
+
+# Mean of the predictions for a set of typical individuals.
+# Not the mean of your input data!
+emmeans(pvcfit1, ~ operator)
+
+# Differences in the mean of predictions between groups.
+emmeans(pvcfit1, trt.vs.ctrl ~ operator)
+emmeans(pvcfit1, pairwise ~ operator)
+confint( emmeans(pvcfit1, pairwise ~ operator)$contrasts )
+
+# emmeans does not calculate means from your data directly. Instead it
+# calculates the mean of the predictions for a set of typical
+# individuals (the "reference grid"). If individuals in your groups are
+# affected by known variables, and you include these variables as
+# predictors in your model, emmeans will naturally adjust for these to
+# provide fair comparisons between groups.
+#
+# By default emmeans will use a reference grid with one individual for
+# each combination of the levels of the factors in your model. For any
+# numeric predictor, the average of the input data is used. It is up to
+# you to decide if this is sensible! This approach provides reasonable
+# means even in models with interaction terms.
+#
+# emmeans is a super cool package, and has great documentation. In
+# practice, this is usually our preferred option.
 
 
 
