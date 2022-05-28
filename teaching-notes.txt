@@ -88,6 +88,6 @@ We allowed people to move between breakout rooms. A group of people who knew eac
 We recommended people use RStuio Cloud, but left open the option of using RStudio on their own machine. One person ran into problems installing up-to-date versions of packages on their Windows machine, seemingly due to the way Monash University laptops tend to put home directories on a network drive.
 
 
-
-
+2022-05-25
+Just a note that making the second break a 20 minute lunch break may be better.
 
