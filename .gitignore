@@ -1,6 +1,7 @@
 r-linear.Rproj
 r-linear.sublime-*
 notes.txt
+.vscode
 
 # knit cache directories
 *_cache/

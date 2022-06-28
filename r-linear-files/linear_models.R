@@ -762,6 +762,24 @@ summary(badfit)
 # 2. Justify a particular model by rejecting simpler alternatives using
 # anova( ).
 #
+# Some notes:
+#
+# * I haven't given you a way to compare different transformations of
+# the response variable gene_wnt2. This is a tricky problem! Here I ask
+# you to eyeball the data or trust me when I say log transformation is
+# appropriate.
+#
+# * Excessive step-wise comparison of models like in this challenge
+# raises problems similar to multiple testing, and can be criticized for
+# not properly controlling statistical significance. If you have
+# nuisance variables that you are not sure if you need to adjust for, it
+# is ok to leave them in a model whether or not they appear significant.
+#
+# * An altenative approach is to rank models by the Akaike Information
+# Criterion (AIC) or similar. AIC lets you compare models even if they
+# are not nested (but you still can't compare different transformations
+# of the response variable).
+#
 
 
 #/////////////////////////////////////
