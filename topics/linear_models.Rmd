@@ -749,9 +749,9 @@ Some notes:
 
 * I haven't given you a way to compare different transformations of the response variable `gene_wnt2`. This is a tricky problem! Here I ask you to eyeball the data or trust me when I say log transformation is appropriate.
 
-* Excessive step-wise comparison of models like in this challenge raises problems similar to multiple testing, and can be criticized for not properly controlling statistical significance. If you have nuisance variables that you are not sure if you need to adjust for, it is ok to leave them in a model whether or not they appear significant.
-
 * An altenative approach is to rank models by the Akaike Information Criterion (AIC) or similar. AIC lets you compare models even if they are not nested (but you still can't compare different transformations of the response variable).
+
+* Mechanical step-wise comparison of models based on many possible variables raises problems similar to multiple testing, and will not properly control statistical significance. Use significance tests (or AIC) in moderation, taking into account your understanding of the domain. If there are nuisance variables that you are not sure if you need to adjust for, it is ok to leave them in a model whether or not they appear significant.
 
 
 
