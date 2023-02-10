@@ -580,7 +580,7 @@ teeth$mouse <- factor(teeth$mouse)
 # A convenience to examine different model fits
 more_data <- expand.grid(
     day=seq(14.3,18.2,by=0.01),
-    tooth=as_factor(c("lower","upper")))
+    tooth=factor(c("lower","upper")))
 
 look <- function(y, fit=NULL) {
     p <- ggplot(teeth,aes(x=day,group=tooth))
@@ -589,8 +589,8 @@ look <- function(y, fit=NULL) {
             more_data,
             predict(fit, more_data, interval="confidence"))
         p <- p +
-            geom_ribbon(data=more_ci, aes(ymin=lwr,ymax=upr),alpha=0.1) +
-            geom_line(data=more_ci,aes(y=fit,color=tooth))
+            geom_ribbon(aes(ymin=lwr,ymax=upr), data=more_ci, alpha=0.1) +
+            geom_line(aes(y=fit,color=tooth), data=more_ci)
     }
     p + geom_point(aes(y=y,color=tooth)) +
         labs(y=deparse(substitute(y)))
@@ -769,7 +769,7 @@ summary(badfit)
 # you to eyeball the data or trust me when I say log transformation is
 # appropriate.
 #
-# * An altenative approach is to rank models by the Akaike Information
+# * An alternative approach is to rank models by the Akaike Information
 # Criterion (AIC) or similar. AIC lets you compare models even if they
 # are not nested (but you still can't compare different transformations
 # of the response variable).
