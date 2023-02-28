@@ -417,11 +417,11 @@ display: none;
 </div>
 <div id="setup" class="section level2">
 <h2>Setup</h2>
-<p>This workshop is designed to work with <a href="https://rstudio.cloud/">RStudio Cloud</a>. Go to <a href="https://rstudio.cloud/" class="uri">https://rstudio.cloud/</a>
-(Monash users can log in with their Monash google account) and create a
-new project. The workshop can also be done using R locally on your
-laptop (if doing this, we also recommend you create a new project to
-contain the files).</p>
+<p>This workshop is designed to work with RStudio running in <a href="https://posit.cloud/">Posit Cloud</a>. Go to <a href="https://posit.cloud/" class="uri">https://posit.cloud/</a> and
+create a new project. Monash users can log in with their Monash Google
+account. The workshop can also be done using R locally on your laptop
+(if doing this, we also recommend you create a new project to contain
+the files).</p>
 <p>Running the R code below will download files and install packages
 used in this workshop.</p>
 <pre class="r"><code># Download data
@@ -497,14 +497,20 @@ app</a> (to give intuition about Confidence Intervals)</li>
 Art of Linear Algebra</a> (to give intuition about matrices and vectors
 – sections 1-3 are relevant to this workshop)</li>
 <li>Testing for differential gene expression often uses linear models.
-The folks at <a href="https://www.wehi.edu.au/research/research-fields/bioinformatics">WEHI</a>
-have written good introductions to this topic:
+The developers of <code>limma</code> and <code>edgeR</code> at <a href="https://www.wehi.edu.au/research/research-fields/bioinformatics">WEHI</a>
+have written some good introductions to this topic:
 <ul>
 <li><a href="https://bioconductor.org/packages/release/workflows/vignettes/RNAseq123/inst/doc/limmaWorkflow.html">“RNA-seq
 analysis is easy as 1-2-3 with limma, Glimma and edgeR”</a></li>
 <li><a href="https://bioconductor.org/packages/release/workflows/vignettes/RNAseq123/inst/doc/designmatrices.html">“A
 guide to creating design matrices for gene expression experiments”</a>
 (design matrix = model matrix)</li>
+<li>For samples of variable sequencing depth or quality, limma’s
+<code>voom</code> or <code>voomWithQualityWeights</code> can be used to
+account for heteroscedasticity. If using a model other than
+<code>~ 0 + group</code>, read the note in the documentation for
+<code>contrasts.fit()</code> and consider using
+<code>contrastAsCoef()</code>.</li>
 </ul></li>
 <li>Mixed effects models are a popular next step beyond the fixed
 effects models covered in this workshop.

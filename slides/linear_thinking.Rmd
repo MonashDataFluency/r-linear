@@ -1,6 +1,6 @@
 ---
 title: "Linear models in R slideshow"
-author: "Paul Harrison @paulfharrison"
+author: "Paul Harrison"
 output: 
     ioslides_presentation:
         widescreen: true
@@ -827,14 +827,14 @@ The models we have fitted today contain only **fixed effects**.
 
 A **mixed model** contains both **fixed effects** and **random effects**.
 
-With a **random effect**, the levels of a factor as represent individuals from some large population. 
+With a **random effect**, the levels of a factor represent individuals from some large population. 
 
 Using random effects:
 
-> * Lets us characterize a population.<br>How does an average individual behave, and what is the standard deviation?<br>The model is not about *particular individuals*, but about *the population as a whole*.
-> * Allows analysis of experiments with **nested** factors, such as repeated measurements (technical replicates).
+> * Lets us characterize a population. The model is not about *particular individuals*, but about *individuals randomly chosen from a large population*. How does an average individual behave, and what is the standard deviation?
+> * Allows analysis of experiments with **nested factors**, such as repeated measurements (technical replicates).
 
-Fit using a package such as `lme4`.
+Fit using a package such as `lme4`. See example code in workshop appendix.
 
 
 ## Screening many responses
