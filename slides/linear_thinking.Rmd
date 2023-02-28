@@ -637,7 +637,7 @@ Generally we ensure this by making the predictors for H0 a subset of the predict
 
 ## What is a p-value anyway?
 
-A p-value lets us choose our probability of falsely rejecting a true hypothesis.
+A p-value lets us choose our probability of falsely rejecting a true hypothesis ([type I error](https://en.wikipedia.org/wiki/Type_I_and_type_II_errors)).
 
 If H1 is true, $p$ heads to zero as we get more and more data.
 
