@@ -3814,6 +3814,73 @@ Terminology is a little tricky here. The limma package refers to linear combinat
 
 <p><br> Use <code>multcomp</code> package.</p>
 
+</article></slide><slide class=""><hgroup><h2>\(R^2\)</h2></hgroup><article  id="r2" class="smaller ">
+
+<p>&ldquo;coefficient of determination&rdquo;</p>
+
+<p><br></p>
+
+<p>Ok, we can reject a simple model using a more complex model, <br>but maybe we may simply have enough data to detect subtle and unimportant differences.</p>
+
+<p>How can we quantify how good a model is?</p>
+
+</article></slide><slide class=""><hgroup><h2>\(R^2\)</h2></hgroup><article  id="r2-1" class="smaller ">
+
+<p>&ldquo;coefficient of determination&rdquo;</p>
+
+<p><br></p>
+
+<p><strong>How much of the variation in the data is explained by a model?</strong></p>
+
+<ul>
+<li>We can think of there being a pool of variance in the data, varying around the overall mean<span class="tip">*<span class="tiptext">
+If the model omits the intercept with <code>~0+...</code>, <code>summary( )</code> will instead view this pool of variance as varying around 0.</span></span>.</li>
+</ul>
+
+<ul>
+<li>Our model explains some proportion of this variance, called \(R^2\).</li>
+</ul>
+
+<p>\(TSS\) = Total Sum of Squares (vs mean)</p>
+
+<p>\(RSS\) = Residual Sum of Squares</p>
+
+<p>\[
+R^2 = \frac{TSS-RSS}{TSS}
+\]</p>
+
+<p><br></p>
+
+<p>\(R^2\) is reported by <code>summary( )</code>.</p>
+
+</article></slide><slide class=""><hgroup><h2>\(R^2\)</h2></hgroup><article  id="r2-2" class="smaller ">
+
+<p>&ldquo;coefficient of determination&rdquo;</p>
+
+<p><br></p>
+
+<p>With a single predictor, \(R^2\) is exactly the Pearson correlation \(r^2\).</p>
+
+<p><br></p>
+
+<p><strong>Overfitting:</strong></p>
+
+<ul>
+<li>Even a random predictor will allow a portion of the pool of variance to be removed.</li>
+<li>To account for this use <em>adjusted</em> \(R^2\), also reported by <code>summary( )</code>.</li>
+</ul>
+
+<p><br></p>
+
+<p><strong>See also:</strong></p>
+
+<ul>
+<li>Standardized coefficients.</li>
+<li>Partial and part \(R^2\).</li>
+</ul>
+
+<p>Mental exercise: reconcile this variance pool view with our geometric view of model fitting.</p>
+
 </article></slide><slide class=""><hgroup><h2></h2></hgroup><article  id="section-3" class="smaller ">
 
 <p>Do section: Multiple factors, many levels</p>
@@ -4149,7 +4216,9 @@ Terminology is a little tricky here. The limma package refers to linear combinat
 
 <p>James, Witten, Hastie and Tibshirani (2013) &ldquo;An Introduction to Statistical Learning&rdquo;</p>
 
-<p><br> <strong>Also see links on the workshop home page.</strong></p>
+<p>Harrel (2015) &ldquo;Regression Modeling Strategies&rdquo;</p>
+
+<p><br> <strong>See links on the workshop home page.</strong></p>
 
 </article></slide><slide class=""><hgroup><h2>Extra slides</h2></hgroup><article  id="extra-slides" class="smaller ">
 

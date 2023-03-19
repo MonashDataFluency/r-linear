@@ -606,6 +606,70 @@ Examples:
 Use `multcomp` package.
 
 
+## $R^2$
+
+"coefficient of determination"
+
+<br>
+
+Ok, we can reject a simple model using a more complex model, 
+<br>but maybe we may simply have enough data to detect subtle and unimportant differences.
+
+How can we quantify how good a model is?
+
+
+
+## $R^2$
+
+"coefficient of determination"
+
+<br>
+
+**How much of the variation in the data is explained by a model?**
+
+> * We can think of there being a pool of variance in the data, varying around the overall mean<span class="tip">*<span class="tiptext">If the model omits the intercept with `~0+...`, `summary( )` will instead view this pool of variance as varying around 0.</span></span>.
+
+> * Our model explains some proportion of this variance, called $R^2$.
+
+$TSS$ = Total Sum of Squares (vs mean)
+
+$RSS$ = Residual Sum of Squares
+
+$$
+R^2 = \frac{TSS-RSS}{TSS}
+$$
+
+<br>
+
+$R^2$ is reported by `summary( )`.
+
+
+## $R^2$
+
+"coefficient of determination"
+
+<br>
+
+With a single predictor, $R^2$ is exactly the Pearson correlation $r^2$.
+
+<br>
+
+**Overfitting:**
+
+> * Even a random predictor will allow a portion of the pool of variance to be removed.
+> * To account for this use *adjusted* $R^2$, also reported by `summary( )`.
+
+<br>
+
+**See also:**
+
+> * Standardized coefficients.
+> * Partial and part $R^2$.
+
+Mental exercise: reconcile this variance pool view with our geometric view of model fitting.
+
+
+
 ##
 
 Do section: Multiple factors, many levels
@@ -909,8 +973,10 @@ Faraway (2014) "Linear Models with R"
 
 James, Witten, Hastie and Tibshirani (2013) "An Introduction to Statistical Learning"
 
+Harrel (2015) "Regression Modeling Strategies"
+
 <br>
-**Also see links on the workshop home page.**
+**See links on the workshop home page.**
 
 
 ## Extra slides
