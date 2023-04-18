@@ -9,7 +9,7 @@ output:
 ## Workshop notes
 
 * [Slideshow](slides/linear_thinking.html)
-* [Linear models in R](topics/linear_models.html)
+* [Workshop](topics/linear_models.html)
 
 ## Setup
 

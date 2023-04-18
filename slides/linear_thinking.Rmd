@@ -560,7 +560,9 @@ pf(F, df0-df1, df1, lower.tail=FALSE)
 For low residual degrees of freedom $n-p_1$, large values of $F$ can still occur by chance, so our toy example is not statistically sigificant even with this large $F$ statistic.
 </div>
 $$
-RSS_0 = \hat\varepsilon_0^\top \hat\varepsilon_0 \\
+RSS_0 = \hat\varepsilon_0^\top \hat\varepsilon_0
+$$
+$$
 RSS_1 = \hat\varepsilon_1^\top \hat\varepsilon_1
 $$
 
@@ -607,18 +609,6 @@ Examples:
 Use `multcomp` package.
 
 
-## $R^2$
-
-"coefficient of determination"
-
-<br>
-
-Ok, we can reject a simple model using a more complex model, 
-<br>but maybe we may simply have enough data to detect subtle and unimportant differences.
-
-How can we quantify how good a model is?
-
-
 
 ## $R^2$
 
@@ -632,9 +622,9 @@ How can we quantify how good a model is?
 
 > * Our model explains some proportion of this variance, called $R^2$.
 
-$TSS$ = Total Sum of Squares (vs mean)
+&nbsp;&nbsp;&nbsp;&nbsp; $TSS$ = Total Sum of Squares (vs mean)
 
-$RSS$ = Residual Sum of Squares
+&nbsp;&nbsp;&nbsp;&nbsp; $RSS$ = Residual Sum of Squares
 
 $$
 R^2 = \frac{TSS-RSS}{TSS}
@@ -642,7 +632,7 @@ $$
 
 <br>
 
-$R^2$ is reported by `summary( )`.
+$R^2$ is reported by `summary( )` as "Multiple R-squared".
 
 
 ## $R^2$
@@ -664,10 +654,9 @@ With a single predictor, $R^2$ is exactly the Pearson correlation $r^2$.
 
 **See also:**
 
-> * Standardized coefficients.
 > * Partial and part $R^2$.
-
-Mental exercise: reconcile this variance pool view with our geometric view of model fitting.
+> * Standardized coefficients.
+> * Effect sizes such as Cohen's $d$.
 
 
 

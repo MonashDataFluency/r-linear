@@ -3769,7 +3769,8 @@ F</pre>
 <p>For low residual degrees of freedom \(n-p_1\), large values of \(F\) can still occur by chance, so our toy example is not statistically sigificant even with this large \(F\) statistic.</p></div>
 
 <p>\[
-RSS_0 = \hat\varepsilon_0^\top \hat\varepsilon_0 \\
+RSS_0 = \hat\varepsilon_0^\top \hat\varepsilon_0
+\] \[
 RSS_1 = \hat\varepsilon_1^\top \hat\varepsilon_1
 \]</p>
 
@@ -3820,16 +3821,6 @@ Terminology is a little tricky here. The limma package refers to linear combinat
 
 <p><br></p>
 
-<p>Ok, we can reject a simple model using a more complex model, <br>but maybe we may simply have enough data to detect subtle and unimportant differences.</p>
-
-<p>How can we quantify how good a model is?</p>
-
-</article></slide><slide class=""><hgroup><h2>\(R^2\)</h2></hgroup><article  id="r2-1" class="smaller ">
-
-<p>&ldquo;coefficient of determination&rdquo;</p>
-
-<p><br></p>
-
 <p><strong>How much of the variation in the data is explained by a model?</strong></p>
 
 <ul>
@@ -3841,9 +3832,9 @@ If the model omits the intercept with <code>~0+...</code>, <code>summary( )</cod
 <li>Our model explains some proportion of this variance, called \(R^2\).</li>
 </ul>
 
-<p>\(TSS\) = Total Sum of Squares (vs mean)</p>
+<p>     \(TSS\) = Total Sum of Squares (vs mean)</p>
 
-<p>\(RSS\) = Residual Sum of Squares</p>
+<p>     \(RSS\) = Residual Sum of Squares</p>
 
 <p>\[
 R^2 = \frac{TSS-RSS}{TSS}
@@ -3851,9 +3842,9 @@ R^2 = \frac{TSS-RSS}{TSS}
 
 <p><br></p>
 
-<p>\(R^2\) is reported by <code>summary( )</code>.</p>
+<p>\(R^2\) is reported by <code>summary( )</code> as &ldquo;Multiple R-squared&rdquo;.</p>
 
-</article></slide><slide class=""><hgroup><h2>\(R^2\)</h2></hgroup><article  id="r2-2" class="smaller ">
+</article></slide><slide class=""><hgroup><h2>\(R^2\)</h2></hgroup><article  id="r2-1" class="smaller ">
 
 <p>&ldquo;coefficient of determination&rdquo;</p>
 
@@ -3875,11 +3866,10 @@ R^2 = \frac{TSS-RSS}{TSS}
 <p><strong>See also:</strong></p>
 
 <ul>
-<li>Standardized coefficients.</li>
 <li>Partial and part \(R^2\).</li>
+<li>Standardized coefficients.</li>
+<li>Effect sizes such as Cohen’s \(d\).</li>
 </ul>
-
-<p>Mental exercise: reconcile this variance pool view with our geometric view of model fitting.</p>
 
 </article></slide><slide class=""><hgroup><h2></h2></hgroup><article  id="section-3" class="smaller ">
 
