@@ -748,10 +748,10 @@ summary( lm(day ~ mouse, data=teeth) )
 # treatment is done in a separate batch.
 #
 # Even if predictors are not perfectly multicollinear, correlation
-# between predictors can make their estimates inaccurate. One way to
-# check for this is to attempt to predict each of the predictors with a
-# linear model that uses the remaining predictors (see "Variance
-# Inflation Factor").
+# between predictors can make their coefficient estimates inaccurate.
+# One way to check for this is to attempt to predict each of the
+# predictors with a linear model that uses the remaining predictors (see
+# "Variance Inflation Factor").
 #
 # A possible solution to this problem would be to use a "mixed model",
 # but this is beyond the scope of today's workshop.
