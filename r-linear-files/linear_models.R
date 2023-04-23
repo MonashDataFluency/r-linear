@@ -571,7 +571,7 @@ confint( emmeans(pvcfit1, pairwise ~ operator)$contrasts )
 
 teeth <- read_csv("r-linear-files/teeth.csv")
 
-teeth$tooth <- factor(teeth$tooth, c("lower","upper"))
+teeth$tooth <- factor(teeth$tooth, levels=c("lower","upper"))
 teeth$mouse <- factor(teeth$mouse)
 
 # It will be convenient to have a quick way to examine different genes
@@ -580,7 +580,7 @@ teeth$mouse <- factor(teeth$mouse)
 # A convenience to examine different model fits
 more_data <- expand.grid(
     day=seq(14.3,18.2,by=0.01),
-    tooth=factor(c("lower","upper")))
+    tooth=factor(c("lower","upper"), levels=c("lower","upper")))
 
 look <- function(y, fit=NULL) {
     p <- ggplot(teeth,aes(x=day,group=tooth))
@@ -739,16 +739,19 @@ summary(badfit)
 # predictor from the model. As a different mouse produced data for each
 # different day, mouse is confounded with day. day can be constructed as
 # a linear combination of the intercept term and the mouse terms. The
-# model suffers from multicollinearity.
-#
+# model matrix suffers from multicollinearity. There is no single best
+# choice of coefficients.
+
+summary( lm(day ~ mouse, data=teeth) )
+
 # Another example of confounding would be an experiment in which each
 # treatment is done in a separate batch.
 #
 # Even if predictors are not perfectly multicollinear, correlation
 # between predictors can make their estimates inaccurate. One way to
 # check for this is to attempt to predict each of the predictors with a
-# linear model that uses the remaining predictors (see "Variance
-# Inflation Factor").
+# linear model that uses the remaining predictors, as above (see also
+# "Variance Inflation Factor").
 #
 # A possible solution to this problem would be to use a "mixed model",
 # but this is beyond the scope of today's workshop.
