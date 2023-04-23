@@ -720,14 +720,14 @@ look(log2(teeth$gene_smoc1), spline_fit)
 
 ## Day is confounded with mouse
 
-There may be individual differences between mice. We would like to take this into our account in a model. In general it is common to include batch effect terms in a model in order to correctly model the data (and increase the significance level of results), even if they are not directly of interest.
+There may be individual differences between mice. We would like to take this into our account in a model. In general it is common to include batch effect terms in a model, to correctly model the data (and obtain smaller p-values), even if they are not directly of interest.
 
 ```{r}
 badfit <- lm(log2(gene_ace) ~ tooth + day + mouse, data=teeth)
 summary(badfit)
 ```
 
-In this case this is not possible, and R has arbirarily dropped a predictor from the model. As a different mouse produced data for each different day, `mouse` is confounded with `day`. `day` can be constructed as a linear combination of the intercept term and the `mouse` terms. The model matrix suffers from multicollinearity. There is no single best choice of coefficients.
+In this case this is not possible, and R has arbitrarily dropped a predictor from the model. As a different mouse produced data for each different day, `mouse` is confounded with `day`. The model matrix suffers from multicollinearity: the `day` column can be constructed as a linear combination of the intercept column and the `mouse` columns. There is no single best choice of coefficients.
 
 ```{r}
 summary( lm(day ~ mouse, data=teeth) )
