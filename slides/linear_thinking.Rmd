@@ -641,22 +641,21 @@ $R^2$ is reported by `summary( )` as "Multiple R-squared".
 
 <br>
 
-With a single predictor, $R^2$ is exactly the Pearson correlation $r^2$.
+With a single predictor, $R^2$ is exactly the squared Pearson correlation $r^2$.
+
+See also standardized coefficients.
 
 <br>
 
 **Overfitting:**
 
-> * Even a random predictor will allow a portion of the pool of variance to be removed.
-> * To account for this use *adjusted* $R^2$, also reported by `summary( )`.
+Even a random predictor will allow a portion of the pool of variance to be removed.
 
-<br>
+> * Account for this using *adjusted* $R^2$, also reported by `summary( )`.
 
-**See also:**
+Coefficients are estimates, adding further error to predictions.
 
-> * Partial and part $R^2$.
-> * Standardized coefficients.
-> * Effect sizes such as Cohen's $d$.
+> * Estimate model performance by Cross Validation, or rank models by AIC.
 
 
 
