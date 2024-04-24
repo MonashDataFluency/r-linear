@@ -1,0 +1,103 @@
+---
+title: "Solutions"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+# Linear hypothesis test challenge
+
+## Setup
+
+```{r message=FALSE,warning=FALSE}
+library(tidyverse)
+
+pvc <- read_csv("r-linear-files/pvc.csv")
+pvc$operator <- factor(pvc$operator)
+pvc$resin <- factor(pvc$resin)
+
+pvcfit1 <- lm(psize ~ operator + resin, data=pvc)
+```
+
+## Solution
+
+```{r message=FALSE}
+library(multcomp)
+
+K2 <- rbind(                   # R2 R3 R4 R5 R6 R7 R8
+    R8_vs_R4      = c(0,  0, 0,   0, 0,-1, 0, 0, 0, 1),
+    R2_vs_R1      = c(0,  0, 0,   1, 0, 0, 0, 0, 0, 0))
+
+result2 <- glht(pvcfit1, K2)
+
+summary(result2)
+confint(result2)
+
+par(mar=c(2,10,2,2))
+plot(result2)
+```
+
+# Gene expression challenge
+
+## Setup
+
+```{r message=FALSE,warning=FALSE}
+library(tidyverse)
+
+teeth <- read_csv("r-linear-files/teeth.csv")
+
+teeth$tooth <- factor(teeth$tooth, levels=c("lower","upper"))
+teeth$mouse <- factor(teeth$mouse)
+
+# A convenience to examine different model fits
+more_data <- expand.grid(
+    day=seq(14.3,18.2,by=0.01),
+    tooth=factor(c("lower","upper"), levels=c("lower","upper")))
+
+look <- function(y, fit=NULL) {
+    p <- ggplot(teeth,aes(x=day,group=tooth))
+    if (!is.null(fit)) {
+        more_ci <- cbind(
+            more_data, 
+            predict(fit, more_data, interval="confidence"))
+        p <- p + 
+            geom_ribbon(aes(ymin=lwr,ymax=upr), data=more_ci, alpha=0.1) + 
+            geom_line(aes(y=fit,color=tooth), data=more_ci)
+    }
+    p + geom_point(aes(y=y,color=tooth)) +
+        labs(y=deparse(substitute(y)))
+}
+```
+
+## Possible solution
+
+```{r}
+library(splines)
+
+look(log2(teeth$gene_wnt2))
+
+wnt2_additive <- lm(log2(gene_wnt2) ~ tooth + day, data=teeth)
+look(log2(teeth$gene_wnt2), wnt2_additive)
+
+wnt2_interaction <- lm(log2(gene_wnt2) ~ tooth * day, data=teeth)
+look(log2(teeth$gene_wnt2), wnt2_interaction)
+
+# We can reject wnt2_additive using wnt2_interaction
+anova(wnt2_additive, wnt2_interaction)
+
+wnt2_poly <- lm(log2(gene_wnt2) ~ tooth * poly(day,2), data=teeth)
+look(log2(teeth$gene_wnt2), wnt2_poly)
+
+# We can reject wnt2_interaction using wnt2_poly
+anova(wnt2_interaction, wnt2_poly)
+
+wnt2_ns <- lm(log2(gene_wnt2) ~ tooth * ns(day,2), data=teeth)
+look(log2(teeth$gene_wnt2), wnt2_ns)
+
+# wnt2_poly and wnt2_ns don't nest.
+# Not valid to compare using anova(), but can use AIC().
+
+AIC(wnt2_additive, wnt2_interaction, wnt2_poly, wnt2_ns)
+
+# Further models possible...
+```

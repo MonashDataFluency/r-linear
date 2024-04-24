@@ -107,6 +107,13 @@ This course has been developed for the [Monash Bioinformatics Platform](https://
 
 * [GitHub repository](https://github.com/MonashDataFluency/r-linear)
 
-<p style="margin-top: 5em; text-align: right">
+<br>
+<br>
+
+<div style="font-size: 75%">
+[Solutions to challenges](topics/solutions.html)
+</div>
+
+<p style="margin-top: 2em; text-align: right">
 <a href="https://www.monash.edu/researchinfrastructure/bioinformatics"><img src="figures/MBP-banner.png" width="675"></a>
 </p>

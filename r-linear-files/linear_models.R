@@ -145,6 +145,10 @@ df.residual(fit)
 predict(fit)
 predict(fit, interval="confidence")
 
+# (Note: This is a 95% confidence interval for *uncertainty in the
+# model*. Individuals *additionally* vary with standard deviation
+# sigma.)
+#
 # We can also calculate predictions manually.
 
 # Prediction for a 15-year old
@@ -179,7 +183,8 @@ ggplot(people, aes(x=age, y=height)) + geom_smooth(method="lm") + geom_point()
 
 # 3.2 Residuals ----
 #
-# The residuals are the differences between predicted and actual values.
+# The residuals are the differences between the actual and predicted
+# values.
 
 residuals(fit)
 
@@ -527,12 +532,17 @@ library(emmeans)
 
 # Mean of the predictions for a set of typical individuals.
 # Not the mean of your input data!
-emmeans(pvcfit1, ~ operator)
+operator_means <- emmeans(pvcfit1, ~ operator)
+operator_means
 
 # Differences in the mean of predictions between groups.
-emmeans(pvcfit1, trt.vs.ctrl ~ operator)
-emmeans(pvcfit1, pairwise ~ operator)
-confint( emmeans(pvcfit1, pairwise ~ operator)$contrasts )
+operator_pairwise <- emmeans(pvcfit1, pairwise ~ operator)
+operator_pairwise
+confint(operator_pairwise$contrasts)
+
+operator_vs_control <- emmeans(pvcfit1, trt.vs.ctrl ~ operator)
+operator_vs_control
+confint(operator_vs_control$contrasts)
 
 # emmeans does not calculate means from your data directly. Instead it
 # calculates the mean of the predictions for a set of typical
