@@ -613,56 +613,6 @@ Examples:
 Use `multcomp` package.
 
 
-
-## $R^2$
-
-"coefficient of determination"
-
-<br>
-
-**How much of the variation in the data is explained by a model?**
-
-> * We can think of there being a pool of variance in the data, varying around the overall mean<span class="tip">*<span class="tiptext">If the model omits the intercept with `~0+...`, `summary( )` will instead view this pool of variance as varying around 0.</span></span>.
-
-> * Our model explains some proportion of this variance, called $R^2$.
-
-&nbsp;&nbsp;&nbsp;&nbsp; $TSS$ = Total Sum of Squares (vs mean)
-
-&nbsp;&nbsp;&nbsp;&nbsp; $RSS$ = Residual Sum of Squares
-
-$$
-R^2 = \frac{TSS-RSS}{TSS}
-$$
-
-<br>
-
-$R^2$ is reported by `summary( )` as "Multiple R-squared".
-
-
-## $R^2$
-
-"coefficient of determination"
-
-<br>
-
-With a single predictor, $R^2$ is exactly the squared Pearson correlation $r^2$.
-
-See also standardized coefficients.
-
-<br>
-
-**Overfitting:**
-
-Even a random predictor will allow a portion of the pool of variance to be removed.
-
-> * Account for this using *adjusted* $R^2$, also reported by `summary( )`.
-
-Coefficients are estimates, adding further error to predictions.
-
-> * Estimate model performance by Cross Validation, or rank models by AIC.
-
-
-
 ##
 
 Do section: Multiple factors, many levels
@@ -717,11 +667,11 @@ Need to adjust p-values for this problem (see `p.adjust( )`).
 Suppose some set of null hypotheses are true. What chance do we run of rejecting one or more of them?
 
 <div style="float: right; width: 25%; border: 1px solid #888; margin-top: 4em; padding: 0.5em">
-**What if the hypotheses are mutually exclusive?**
+**What if we have multiple hypotheses about the value of a single coefficient?**
 
-Then only one can be true, so no problem!
+Only one value can be true, so no problem!
 
-Example: reject all values outside a confidence interval.
+&rarr; Reject all values outside a confidence interval.
 </div>
 
 ### Family-Wise Error Rate (FWER) control
@@ -1019,6 +969,54 @@ Individuals tracked over time, repeated measurements, blocks/batches/plots, etc.
 
 Also consider tree methods. Gradient boosted tree methods are unreasonably effective: `xgboost`
 
+
+
+## $R^2$
+
+"coefficient of determination"
+
+<br>
+
+**How much of the variation in the data is explained by a model?**
+
+> * We can think of there being a pool of variance in the data, varying around the overall mean<span class="tip">*<span class="tiptext">If the model omits the intercept with `~0+...`, `summary( )` will instead view this pool of variance as varying around 0.</span></span>.
+
+> * Our model explains some proportion of this variance, called $R^2$.
+
+&nbsp;&nbsp;&nbsp;&nbsp; $TSS$ = Total Sum of Squares (vs mean)
+
+&nbsp;&nbsp;&nbsp;&nbsp; $RSS$ = Residual Sum of Squares
+
+$$
+R^2 = \frac{TSS-RSS}{TSS}
+$$
+
+<br>
+
+$R^2$ is reported by `summary( )` as "Multiple R-squared".
+
+
+## $R^2$
+
+"coefficient of determination"
+
+<br>
+
+With a single predictor, $R^2$ is exactly the squared Pearson correlation $r^2$.
+
+See also standardized coefficients.
+
+<br>
+
+**Overfitting:**
+
+Even a random predictor will allow a portion of the pool of variance to be removed.
+
+> * Account for this using *adjusted* $R^2$, also reported by `summary( )`.
+
+Coefficients are estimates, adding further error to predictions.
+
+> * Estimate model performance by Cross Validation, or rank models by AIC.
 
 
 

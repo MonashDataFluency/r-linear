@@ -3824,61 +3824,6 @@ Terminology is a little tricky here. The limma package refers to linear combinat
 
 <p><br> Use <code>multcomp</code> package.</p>
 
-</article></slide><slide class=""><hgroup><h2>\(R^2\)</h2></hgroup><article  id="r2" class="smaller ">
-
-<p>&ldquo;coefficient of determination&rdquo;</p>
-
-<p><br></p>
-
-<p><strong>How much of the variation in the data is explained by a model?</strong></p>
-
-<ul>
-<li>We can think of there being a pool of variance in the data, varying around the overall mean<span class="tip">*<span class="tiptext">
-If the model omits the intercept with <code>~0+...</code>, <code>summary( )</code> will instead view this pool of variance as varying around 0.</span></span>.</li>
-</ul>
-
-<ul>
-<li>Our model explains some proportion of this variance, called \(R^2\).</li>
-</ul>
-
-<p>     \(TSS\) = Total Sum of Squares (vs mean)</p>
-
-<p>     \(RSS\) = Residual Sum of Squares</p>
-
-<p>\[
-R^2 = \frac{TSS-RSS}{TSS}
-\]</p>
-
-<p><br></p>
-
-<p>\(R^2\) is reported by <code>summary( )</code> as &ldquo;Multiple R-squared&rdquo;.</p>
-
-</article></slide><slide class=""><hgroup><h2>\(R^2\)</h2></hgroup><article  id="r2-1" class="smaller ">
-
-<p>&ldquo;coefficient of determination&rdquo;</p>
-
-<p><br></p>
-
-<p>With a single predictor, \(R^2\) is exactly the squared Pearson correlation \(r^2\).</p>
-
-<p>See also standardized coefficients.</p>
-
-<p><br></p>
-
-<p><strong>Overfitting:</strong></p>
-
-<p>Even a random predictor will allow a portion of the pool of variance to be removed.</p>
-
-<ul>
-<li>Account for this using <em>adjusted</em> \(R^2\), also reported by <code>summary( )</code>.</li>
-</ul>
-
-<p>Coefficients are estimates, adding further error to predictions.</p>
-
-<ul>
-<li>Estimate model performance by Cross Validation, or rank models by AIC.</li>
-</ul>
-
 </article></slide><slide class=""><hgroup><h2></h2></hgroup><article  id="section-3" class="smaller ">
 
 <p>Do section: Multiple factors, many levels</p>
@@ -3932,11 +3877,11 @@ R^2 = \frac{TSS-RSS}{TSS}
 <p>Suppose some set of null hypotheses are true. What chance do we run of rejecting one or more of them?</p>
 
 <div style="float: right; width: 25%; border: 1px solid #888; margin-top: 4em; padding: 0.5em">
-<p><strong>What if the hypotheses are mutually exclusive?</strong></p>
+<p><strong>What if we have multiple hypotheses about the value of a single coefficient?</strong></p>
 
-<p>Then only one can be true, so no problem!</p>
+<p>Only one value can be true, so no problem!</p>
 
-<p>Example: reject all values outside a confidence interval.</p></div>
+<p>→ Reject all values outside a confidence interval.</p></div>
 
 <h3>Family-Wise Error Rate (FWER) control</h3>
 
@@ -4273,7 +4218,62 @@ R^2 = \frac{TSS-RSS}{TSS}
 <li>Neural network<br>(many linear models connected with non-linear functions)</li>
 </ul>
 
-<p>Also consider tree methods. Gradient boosted tree methods are unreasonably effective: <code>xgboost</code></p></article></slide>
+<p>Also consider tree methods. Gradient boosted tree methods are unreasonably effective: <code>xgboost</code></p>
+
+</article></slide><slide class=""><hgroup><h2>\(R^2\)</h2></hgroup><article  id="r2" class="smaller ">
+
+<p>&ldquo;coefficient of determination&rdquo;</p>
+
+<p><br></p>
+
+<p><strong>How much of the variation in the data is explained by a model?</strong></p>
+
+<ul>
+<li>We can think of there being a pool of variance in the data, varying around the overall mean<span class="tip">*<span class="tiptext">
+If the model omits the intercept with <code>~0+...</code>, <code>summary( )</code> will instead view this pool of variance as varying around 0.</span></span>.</li>
+</ul>
+
+<ul>
+<li>Our model explains some proportion of this variance, called \(R^2\).</li>
+</ul>
+
+<p>     \(TSS\) = Total Sum of Squares (vs mean)</p>
+
+<p>     \(RSS\) = Residual Sum of Squares</p>
+
+<p>\[
+R^2 = \frac{TSS-RSS}{TSS}
+\]</p>
+
+<p><br></p>
+
+<p>\(R^2\) is reported by <code>summary( )</code> as &ldquo;Multiple R-squared&rdquo;.</p>
+
+</article></slide><slide class=""><hgroup><h2>\(R^2\)</h2></hgroup><article  id="r2-1" class="smaller ">
+
+<p>&ldquo;coefficient of determination&rdquo;</p>
+
+<p><br></p>
+
+<p>With a single predictor, \(R^2\) is exactly the squared Pearson correlation \(r^2\).</p>
+
+<p>See also standardized coefficients.</p>
+
+<p><br></p>
+
+<p><strong>Overfitting:</strong></p>
+
+<p>Even a random predictor will allow a portion of the pool of variance to be removed.</p>
+
+<ul>
+<li>Account for this using <em>adjusted</em> \(R^2\), also reported by <code>summary( )</code>.</li>
+</ul>
+
+<p>Coefficients are estimates, adding further error to predictions.</p>
+
+<ul>
+<li>Estimate model performance by Cross Validation, or rank models by AIC.</li>
+</ul></article></slide>
 
 
   <slide class="backdrop"></slide>
