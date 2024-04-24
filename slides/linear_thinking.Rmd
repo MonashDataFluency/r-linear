@@ -128,7 +128,7 @@ Two vectors at right angles have a dot product of zero. They are **orthogonal**.
 
 ## Matrix vector multiplication
 
-**... is a bunch of dot products.** Taking the product of a matrix $X$ and a vector $a$ with length matching the number of columns, the result is a vector containing the dot product of each row of the matrix $X$ with the vector $a$.
+Taking the product of a matrix $X$ and a vector $a$ with length matching the number of columns, the result is a vector containing the dot product of each row of the matrix $X$ with the vector $a$:
 
 $$
 Xa =
@@ -139,7 +139,7 @@ x_{2,1} a_1 + x_{2,2} a_2 + \dots \\
 \end{bmatrix}
 $$
 
-**... is a weighted sum of columns.** Can also think of this as a weighted sum of the columns of $X$.
+Equivalently, it's a weighted sum of the columns of $X$:
 
 $$
 Xa = 
@@ -166,7 +166,7 @@ X %*% a
 ```
 
 <br>
-(It's also possible to multiply two matrices with `%*%` but we won't need this today.)
+(Can also multiply two matrices with `%*%`. We won't need this today.)
 
 
 

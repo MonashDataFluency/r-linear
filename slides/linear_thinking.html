@@ -3355,7 +3355,7 @@ a^\top b = a_1 b_1 + a_2 b_2 + \dots + a_n b_n
 
 </article></slide><slide class=""><hgroup><h2>Matrix vector multiplication</h2></hgroup><article  id="matrix-vector-multiplication" class="smaller ">
 
-<p><strong>… is a bunch of dot products.</strong> Taking the product of a matrix \(X\) and a vector \(a\) with length matching the number of columns, the result is a vector containing the dot product of each row of the matrix \(X\) with the vector \(a\).</p>
+<p>Taking the product of a matrix \(X\) and a vector \(a\) with length matching the number of columns, the result is a vector containing the dot product of each row of the matrix \(X\) with the vector \(a\):</p>
 
 <p>\[
 Xa =
@@ -3366,7 +3366,7 @@ x_{2,1} a_1 + x_{2,2} a_2 + \dots \\
 \end{bmatrix}
 \]</p>
 
-<p><strong>… is a weighted sum of columns.</strong> Can also think of this as a weighted sum of the columns of \(X\).</p>
+<p>Equivalently, it’s a weighted sum of the columns of \(X\):</p>
 
 <p>\[
 Xa = 
@@ -3390,7 +3390,7 @@ x_{2,2} \\
 
 <pre class = 'prettyprint lang-r'>X %*% a</pre>
 
-<p><br> (It’s also possible to multiply two matrices with <code>%*%</code> but we won’t need this today.)</p>
+<p><br> (Can also multiply two matrices with <code>%*%</code>. We won’t need this today.)</p>
 
 </article></slide><slide class=""><hgroup><h2>Geometry – subspaces</h2></hgroup><article  id="geometry-subspaces" class="smaller ">
 
