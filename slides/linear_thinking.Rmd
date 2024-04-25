@@ -644,21 +644,24 @@ Generally we ensure this by making the predictors for H0 a subset of the predict
 
 ## What is a p-value anyway?
 
-A p-value lets us choose our probability of falsely rejecting a true hypothesis ([type I error](https://en.wikipedia.org/wiki/Type_I_and_type_II_errors)).
+**p-values can be viewed as a strength of evidence.** <br>
+If H1 is true, $p$ heads to zero if there is a strong effect or lots of data. 
 
-If H1 is true, $p$ heads to zero as we get more and more data.
-
-If H0 is true, $p$ is a uniformly random number between 0 and 1.
+**p-values are a bit weird though.** <br>
+If H0 is true, $p$ is a uniformly random number between 0 and 1. 
 
 <br>
+<br>
+
+A p-value lets us choose our probability of falsely rejecting a true hypothesis ([type I error](https://en.wikipedia.org/wiki/Type_I_and_type_II_errors)).
 
 If we decide to reject H0 when $p \leq 0.05$, we are guaranteed a probability of 0.05 of rejecting H0 if it is actually true.
 
 <br>
 
-Suppose we perform 20 such tests. There is a high chance of falsely rejecting at least one null hypothesis.
+But suppose we perform 20 such tests. There is a high chance of rejecting at least one true null hypothesis.
 
-Need to adjust p-values for this problem (see `p.adjust( )`).
+Need to adjust p-values for this problem (see `p.adjust`).
 
 
 

@@ -3856,21 +3856,21 @@ Terminology is a little tricky here. The limma package refers to linear combinat
 
 </article></slide><slide class=""><hgroup><h2>What is a p-value anyway?</h2></hgroup><article  id="what-is-a-p-value-anyway" class="smaller ">
 
+<p><strong>p-values can be viewed as a strength of evidence.</strong> <br> If H1 is true, \(p\) heads to zero if there is a strong effect or lots of data.</p>
+
+<p><strong>p-values are a bit weird though.</strong> <br> If H0 is true, \(p\) is a uniformly random number between 0 and 1.</p>
+
+<p><br> <br></p>
+
 <p>A p-value lets us choose our probability of falsely rejecting a true hypothesis (<a href='https://en.wikipedia.org/wiki/Type_I_and_type_II_errors' title=''>type I error</a>).</p>
-
-<p>If H1 is true, \(p\) heads to zero as we get more and more data.</p>
-
-<p>If H0 is true, \(p\) is a uniformly random number between 0 and 1.</p>
-
-<p><br></p>
 
 <p>If we decide to reject H0 when \(p \leq 0.05\), we are guaranteed a probability of 0.05 of rejecting H0 if it is actually true.</p>
 
 <p><br></p>
 
-<p>Suppose we perform 20 such tests. There is a high chance of falsely rejecting at least one null hypothesis.</p>
+<p>But suppose we perform 20 such tests. There is a high chance of rejecting at least one true null hypothesis.</p>
 
-<p>Need to adjust p-values for this problem (see <code>p.adjust( )</code>).</p>
+<p>Need to adjust p-values for this problem (see <code>p.adjust</code>).</p>
 
 </article></slide><slide class=""><hgroup><h2>Multiple testing</h2></hgroup><article  id="multiple-testing" class="smaller ">
 
