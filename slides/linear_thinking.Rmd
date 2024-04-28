@@ -887,7 +887,7 @@ Do section: Testing many genes with limma
 
 ## Summary
 
-We started with **data**.
+We collect some **data** from the real world.
 
 We **fit** the data, obtaining a **model**.
 
