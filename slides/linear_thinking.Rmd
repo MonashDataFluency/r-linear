@@ -887,17 +887,19 @@ Do section: Testing many genes with limma
 
 ## Summary
 
-Should now be able to
+We started with **data**.
 
->* Fit linear models.
+We **fit** the data, obtaining a **model**.
 
->* Identify and correct problems with a model, or recognize the need for a more advanced method.
+The model lets us **predict** responses for new individuals.
 
->* Test a hypothesis using two nested linear models.
->* Test a hypothesis and calculate a CI on a linear combination of coefficients.
+(We carefully check the model is doing a good job of this with existing data.)
 
->* Test a hypothesis for many sets of responses using limma.
->* Understand the need for multiple-testing correction.
+The model lets us **estimate** quantities of interest and **test hypotheses**
+<br>(with measures of uncertainty such as CIs and p-values).
+
+*It is hard to overstate how enormously general and productive this way of doing things is.*
+
 
 
 ## Further reading
