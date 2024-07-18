@@ -78,6 +78,8 @@ Built-in to R:
 
 * [Course notes for PH525x.](http://genomicsclass.github.io/book/) Initial chapters of this edX course cover similar material to this workshop.
 
+* [StatQuest videos on linear models.](https://www.youtube.com/watch?v=PaFPbb66DxQ&list=PLblh5JKOoLUIzaEkCLIUxQFjPIlapw8nU) A friendly but thorough introduction to key ideas.
+
 * [Faraway (2014) "Linear models with R"](https://julianfaraway.github.io/faraway/LMR/)
 
 * [Harrel (2015) "Regression Modeling Strategies"](https://hbiostat.org/rms/) has detailed practical advice for creating predictive models, such as models using biomarkers. [Frank Harrell's home page.](https://hbiostat.org/)
