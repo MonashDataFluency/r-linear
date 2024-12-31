@@ -207,7 +207,7 @@ Do section: Vectors and matrices
 
 ## Models
 
-A **model** can be used to predict a **response** variable based on a set of **predictor** variables. <span class="tip">*<span class="tiptext">Alternative terms: depedent variable, independent variables.<br><br>We are using causal language, but really only describing an association.</span></span>
+A **model** can be used to predict a **response** variable based on a set of **predictor** variables. <span class="tip">*<span class="tiptext">Alternative terms: dependent variable, independent variables.<br><br>We are using causal language, but really only describing an association.</span></span>
 
 
 The prediction will usually be imperfect, due to random noise.
@@ -922,6 +922,8 @@ Faraway (2014) "Linear Models with R"
 James, Witten, Hastie and Tibshirani (2013) "An Introduction to Statistical Learning"
 
 Harrel (2015) "Regression Modeling Strategies"
+
+McElreath's "Statistical Rethinking" videos and book
 
 <br>
 **See links on the workshop home page.**
