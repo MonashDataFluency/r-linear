@@ -658,16 +658,20 @@ look(teeth$gene_pou3f3, pou3f3fit1)
 
 anova(pou3f3fit0, pou3f3fit1)
 
-confint(pou3f3fit1)["toothupper:day",]
-
-# The slopes of the lines confidently differ by at least 23.5 RPM per
-# day.
-#
 # Examining the residuals reveals a further problem: larger expression
 # values are associated with larger residuals.
 
 look(residuals(pou3f3fit1))
+
 plot(predict(pou3f3fit1), residuals(pou3f3fit1))
+
+# It's a little easier to see if we evenly space the points along the
+# x-axis using rank.
+
+plot(rank(predict(pou3f3fit1)), residuals(pou3f3fit1))
+
+# A QQ plot also shows some outliers.
+
 qqnorm(residuals(pou3f3fit1))
 qqline(residuals(pou3f3fit1))
 
@@ -678,11 +682,6 @@ log2_pou3f3fit0 <- lm(log2(gene_pou3f3) ~ tooth + day, data=teeth)
 log2_pou3f3fit1 <- lm(log2(gene_pou3f3) ~ tooth * day, data=teeth)
 
 anova(log2_pou3f3fit0, log2_pou3f3fit1)
-
-confint(log2_pou3f3fit1)["toothupper:day",]
-
-# The difference of the slopes of log2 gene expression between lower and
-# upper molars is confidently between -0.22 and 0.19.
 
 look(log2(teeth$gene_pou3f3), log2_pou3f3fit0)
 
@@ -906,6 +905,13 @@ efit <- eBayes(cfit, trend=TRUE)
 topTable(efit)
 
 # The column adj.P.Val contains FDR adjusted p-values.
+#
+# The logFC column contains the estimate for the quantity we are
+# interested in. Usually this is a log fold change, hence the column
+# name, but in this case it is a slope.
+#
+# It's common to plot the logFC column against the average log
+# expression level, an "MA plot".
 
 all_results <- topTable(efit, n=Inf)
 
@@ -914,9 +920,15 @@ table(significant)
 
 ggplot(all_results, aes(x=AveExpr, y=logFC)) +
     geom_point(size=0.1) +
-    geom_point(data=all_results[significant,], size=0.5, color="red")
+    geom_point(data=all_results[significant,], size=0.5, color="red") +
+    labs(y="slope")
 
-# 7.6 Relation to lm( ) and glht( ) ----
+# 7.6 Connections to earlier ideas ----
+#
+# This final section fills in some links between limma and earlier
+# ideas. Feel free to skip if short on time.
+
+# 7.6.1 Relation to lm( ) and glht( ) ----
 #
 # Let's look at a specific gene.
 
@@ -925,37 +937,31 @@ rnf144b_fit <- lm(rnf144b ~ tooth * day, data=teeth)
 look(rnf144b, rnf144b_fit)
 
 # We can use the same linear hypothesis with glht. The estimate is the
-# same, but limma has gained some power by shrinking the variance toward
-# the trend line, so limma's p-value is smaller.
+# same as reported by topTable, but limma gained some power by shrinking
+# the variance toward the trend line, so limma's p-value is smaller.
 
 summary( glht(rnf144b_fit, K) )
 
-# 7.7 Confidence intervals ----
+# 7.6.2 Confidence intervals ----
 #
-# Confidence Intervals should also be of interest. However note that
-# these are not adjusted for multiple testing (see Appendix B).
+# Confidence Intervals may also be of interest. However note that these
+# are not adjusted for multiple testing (see Appendix B).
 
 topTable(efit, confint=0.95)
 
-# 7.8 F test ----
+# 7.6.3 F test ----
 #
-# limma can also test several simultaneous constraints on linear
-# combinations of coefficients. Suppose we want to find *any* deviation
-# from a constant expression level. We can check for this with:
+# limma can also perform tests against a null hypothesis in which
+# several coefficients are dropped from the model, allowing tests like
+# those we have performed with anova earlier. Suppose we want to find
+# *any* deviation from a constant expression level. We can check for
+# this by dropping every coefficient except for the intercept. The
+# eBayes step is still needed.
 
-K2 <- rbind(
-    c(0,1,0,0),
-    c(0,0,1,0),
-    c(0,0,0,1))
+efit2 <- eBayes(fit, trend=TRUE)
+topTable(efit2, coef=c(2,3,4))
 
-cfit2 <- contrasts.fit(fit, t(K2))
-efit2 <- eBayes(cfit2, trend=TRUE)
-topTable(efit2)
-
-# A shortcut here would be to skip the contrasts.fit step and specify a
-# set of coefficients directly to topTable( ).
-
-# 7.9 Further exercises ----
+# 7.7 Further exercises ----
 #
 # 1. Construct and use linear combinations to find genes that:
 #

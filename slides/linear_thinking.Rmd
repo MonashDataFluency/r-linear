@@ -207,7 +207,7 @@ Do section: Vectors and matrices
 
 ## Models
 
-A **model** can be used to predict a **response** variable based on a set of **predictor** variables. <span class="tip">*<span class="tiptext">Alternative terms: dependent variable, independent variables.<br><br>We are using causal language, but really only describing an association.</span></span>
+A **model** can be used to predict a **response** variable based on a set of **predictor** variables. <span class="tip">*<span class="tiptext">Alternative terms: dependent variable, independent variables.<br><br>We are using causal language, but really only describing an association.<br><br><br>If the data is from an <b>experiment</b>, you can usually interpret an association between your treatment and outcome as causation.<br><br>If your data is <b>observational</b>, you <i>may</i> be able to infer causation, after making some assumptions, using causal theory that is well beyond this workshop (see Judea Pearl, Donald Rubin).</span></span>
 
 
 The prediction will usually be imperfect, due to random noise.
@@ -828,6 +828,8 @@ Examples:
 
 Fit using the function `glm`.
 
+`emmeans` can also be used with these models!
+
 
 ## Linear Mixed Models
 
@@ -845,6 +847,8 @@ Using random effects:
 > * Allows analysis of experiments with **nested factors**, such as repeated measurements (technical replicates).
 
 Fit using a package such as `lme4`. See example code in workshop appendix.
+
+`emmeans` can also be used with these models!
 
 
 ## Screening many responses

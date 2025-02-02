@@ -3421,7 +3421,7 @@ x_{2,2} \\
 </article></slide><slide class=""><hgroup><h2>Models</h2></hgroup><article  id="models" class="smaller ">
 
 <p>A <strong>model</strong> can be used to predict a <strong>response</strong> variable based on a set of <strong>predictor</strong> variables. <span class="tip">*<span class="tiptext">
-Alternative terms: dependent variable, independent variables.<br><br>We are using causal language, but really only describing an association.</span></span></p>
+Alternative terms: dependent variable, independent variables.<br><br>We are using causal language, but really only describing an association.<br><br><br>If the data is from an <b>experiment</b>, you can usually interpret an association between your treatment and outcome as causation.<br><br>If your data is <b>observational</b>, you <i>may</i> be able to infer causation, after making some assumptions, using causal theory that is well beyond this workshop (see Judea Pearl, Donald Rubin).</span></span></p>
 
 <p>The prediction will usually be imperfect, due to random noise.</p>
 
@@ -4063,6 +4063,8 @@ Terminology is a little tricky here. The limma package refers to linear combinat
 
 <p>Fit using the function <code>glm</code>.</p>
 
+<p><code>emmeans</code> can also be used with these models!</p>
+
 </article></slide><slide class=""><hgroup><h2>Linear Mixed Models</h2></hgroup><article  id="linear-mixed-models" class="smaller ">
 
 <p><strong>(Not covered today.)</strong></p>
@@ -4081,6 +4083,8 @@ Terminology is a little tricky here. The limma package refers to linear combinat
 </ul>
 
 <p>Fit using a package such as <code>lme4</code>. See example code in workshop appendix.</p>
+
+<p><code>emmeans</code> can also be used with these models!</p>
 
 </article></slide><slide class=""><hgroup><h2>Screening many responses</h2></hgroup><article  id="screening-many-responses" class="smaller ">
 
