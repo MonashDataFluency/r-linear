@@ -1,6 +1,8 @@
 slides > slide.title-slide {
-    background-image: url("../figures/MBP-banner.png");
+    background-image: url("../figures/MGBP-banner.png");
+    background-size: 50%;
     background-repeat: no-repeat;
+    background-position: top right;
 }
 
 h1,h2,h3 {

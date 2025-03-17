@@ -411,8 +411,14 @@ display: none;
 <div id="workshop-notes" class="section level2">
 <h2>Workshop notes</h2>
 <ul>
-<li><a href="slides/linear_thinking.html">Slideshow</a></li>
-<li><a href="topics/linear_models.html">Workshop</a></li>
+<li><p><a href="slides/linear_thinking.html">Linear models
+slideshow</a></p></li>
+<li><p><a href="topics/linear_models.html">Linear models
+workshop</a></p></li>
+<li><p><a href="slides/rnaseq_thinking.html">RNA-Seq
+slideshow</a></p></li>
+<li><p><a href="topics/rnaseq.html">RNA-Seq differential expression
+workshop</a></p></li>
 </ul>
 </div>
 <div id="setup" class="section level2">
@@ -433,10 +439,10 @@ unzip(&quot;r-linear-files.zip&quot;)
 # Install some CRAN packages:
 install.packages(c(
     &quot;tidyverse&quot;, &quot;multcomp&quot;, &quot;emmeans&quot;, 
-    &quot;lme4&quot;, &quot;lmerTest&quot;, &quot;pbkrtest&quot;, &quot;BiocManager&quot;))
+    &quot;lme4&quot;, &quot;lmerTest&quot;, &quot;pbkrtest&quot;, &quot;seriation&quot;, &quot;BiocManager&quot;))
 
 # Install some Bioconductor packages:
-BiocManager::install(c(&quot;limma&quot;,&quot;edgeR&quot;,&quot;topconfects&quot;))</code></pre>
+BiocManager::install(c(&quot;limma&quot;,&quot;edgeR&quot;,&quot;ComplexHeatmap&quot;,&quot;topconfects&quot;))</code></pre>
 <p>Now load the file <code>linear_models.R</code> in the
 <code>r-linear-files</code> folder.</p>
 </div>
@@ -476,14 +482,16 @@ suitable for advanced questions about experimental design and
 analysis.</p></li>
 </ul>
 <p><br></p>
+<!--
+* [Monash Data Fluency](https://www.monash.edu/data-fluency)
+-->
 <ul>
-<li><p><a href="https://www.monash.edu/data-fluency">Monash Data
-Fluency</a></p></li>
-<li><p><a href="https://www.monash.edu/researchinfrastructure/bioinformatics">Monash
-Bioinformatics Platform</a></p></li>
-<li><p><a href="https://www.monash.edu/researchinfrastructure/bioinformatics/training">More
-workshop material from Monash Bioinformatics Platform</a></p></li>
+<li><a href="https://www.monash.edu/researchinfrastructure/mgbp">Monash
+Genomics and Bioinformatics Platform</a></li>
 </ul>
+<!--
+* [More workshop material from Monash Genomics and Bioinformatics Platform](https://www.monash.edu/researchinfrastructure/bioinformatics/training)
+-->
 <p><br></p>
 <ul>
 <li><p><a href="http://genomicsclass.github.io/book/">Course notes for

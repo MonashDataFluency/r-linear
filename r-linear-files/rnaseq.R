@@ -1,0 +1,405 @@
+
+
+
+#///////////////////
+# 1 Preparation ----
+#
+# Setup as we did in linear_models.R.
+
+library(edgeR)      # cpm, etc -- RNA-Seq normalization
+library(limma)      # lmFit, etc -- fitting many models
+library(multcomp)   # glht -- linear hypotheses
+library(tidyverse)  # working with data frames, plotting
+
+teeth <- read_csv("r-linear-files/teeth.csv")
+
+teeth$tooth <- factor(teeth$tooth, levels=c("lower","upper"))
+teeth$mouse <- factor(teeth$mouse)
+
+# A convenience to examine different model fits
+more_data <- expand.grid(
+    day=seq(14.3,18.2,by=0.01),
+    tooth=factor(c("lower","upper"), levels=c("lower","upper")))
+
+look <- function(y, fit=NULL) {
+    p <- ggplot(teeth,aes(x=day,group=tooth))
+    if (!is.null(fit)) {
+        more_ci <- cbind(
+            more_data,
+            predict(fit, more_data, interval="confidence"))
+        p <- p +
+            geom_ribbon(aes(ymin=lwr,ymax=upr), data=more_ci, alpha=0.1) +
+            geom_line(aes(y=fit,color=tooth), data=more_ci)
+    }
+    p + geom_point(aes(y=y,color=tooth)) +
+        labs(y=deparse(substitute(y)))
+}
+
+
+
+#/////////////////////////////////////
+# 2 Testing many genes with limma ----
+#
+# In this section we look at fitting the same matrix of predictors X to
+# many different sets of responses y. We will use the package limma from
+# Bioconductor. This is a very brief demonstration, and there is much
+# more to this package. See the RNAseq123 tutorial at https://bioconduct
+# or.org/packages/release/workflows/vignettes/RNAseq123/inst/doc/limmaWo
+# rkflow.html and the usersguide.pdf at
+# https://bioconductor.org/packages/release/bioc/html/limma.html
+
+library(edgeR)
+library(limma)
+
+# 2.1 Load the data ----
+#
+# Actually in the teeth dataset, the expression level of all genes was
+# measured!
+
+counts_df <- read_csv("r-linear-files/teeth-read-counts.csv")
+counts <- as.matrix( select(counts_df, -gene) )
+rownames(counts) <- counts_df$gene
+
+dim(counts)
+counts[1:5,]
+
+# 2.2 Model matrix ----
+#
+# The column names match our teeth data frame.
+
+colnames(counts)
+teeth$sample
+
+# We will use limma to fit a linear model to each gene. The same model
+# formula will be used in each case. limma doesn't automatically convert
+# a formula into a model matrix, so we have to do this step manually.
+# Here I am using a model formula that treats the upper and lower teeth
+# as following a different linear trend over time.
+#
+# I'm going to rescale the time from zero to one, to aid interpretation.
+
+teeth$time <- (teeth$day - 14.5) / (18-14.5)
+teeth
+
+X <- model.matrix(~ tooth * time, data=teeth)
+X
+
+# limma refers to this matrix as the "design".
+
+# 2.3 Remove low expression genes ----
+#
+# There is little chance of detecting differential expression in genes
+# with very low read counts. Including these genes will require a larger
+# False Discovery Rate correction, and also confuses limma's Empirical
+# Bayes parameter estimation. edgeR provides a function filterByExpr
+# that performs their recommended level of filtering. The filtering
+# takes into account the complexity of the model being fitted, so the
+# "design" matrix is also needed.
+
+keep <- filterByExpr(counts, design=X)
+table(keep)
+
+counts_kept <- counts[keep, ]
+dim(counts_kept)
+
+# 2.4 Normalize, log transform ----
+#
+# Different samples may have produced different numbers of reads. We now
+# normalize this away by converting the read counts to Reads Per
+# Million, and log2 transform the results. There are some subtleties
+# here which we breeze over lightly: "TMM" normalization is used as a
+# small adjustment to the total number of reads in each sample. A small
+# constant "prior count" is added to the counts to avoid calculating
+# log2(0). The edgeR and limma manuals describe these steps in more
+# detail.
+
+dgelist <- calcNormFactors(DGEList(counts_kept))
+dgelist$samples
+
+log2_cpms <- cpm(dgelist, log=TRUE, prior.count=1)
+
+log2_cpms[1:5,]
+
+# 2.5 Fitting a model to and testing each gene ----
+#
+# We are now ready to fit a linear model to each gene.
+
+fit <- lmFit(log2_cpms, X)
+
+class(fit)
+fit$coefficients[1:5,]
+
+# Significance testing in limma is by the use of linear hypotheses
+# (which limma refers to as "contrasts"). A difference between glht and
+# limma's contrasts.fit is that limma expects the linear combinations to
+# be in columns rather than rows.
+#
+# We will first look for genes where the slope over time is not flat,
+# *averaging* the lower and upper teeth.
+
+# Lower slope: c(0,0,1,0)
+# Upper slope: c(0,0,1,1)
+
+K <- rbind( average_slope=c(0,0,1,0.5) )
+cfit <- contrasts.fit(fit, t(K))         #linear combinations in columns!
+efit <- eBayes(cfit, trend=TRUE)
+
+# The call to eBayes does Empirical Bayes squeezing of the residual
+# variance for each gene (see Appendix). This is a bit of magic that
+# allows limma to work well with small numbers of samples.
+
+topTable(efit)
+
+# The column adj.P.Val contains FDR adjusted p-values.
+#
+# The logFC column contains the estimate for the quantity we are
+# interested in, usually this is a log2 fold change. Here, it's the log2
+# fold change from day 14.5 to day 18.
+#
+# It's common to plot the logFC column against the average log
+# expression level, an "MA plot".
+
+all_results <- topTable(efit, n=Inf)
+
+significant <- all_results$adj.P.Val <= 0.05
+table(significant)
+
+ggplot(all_results, aes(x=AveExpr, y=logFC)) +
+    geom_point(size=0.1) +
+    geom_point(data=all_results[significant,], size=0.5, color="red")
+
+# 2.6 Connections to earlier ideas ----
+#
+# This final section fills in some links between limma and earlier
+# ideas. Feel free to skip if short on time.
+
+# 2.6.1 Relation to lm( ) and glht( ) ----
+#
+# Let's look at a specific gene.
+
+rnf144b <- log2_cpms["Rnf144b",]
+rnf144b_fit <- lm(rnf144b ~ tooth * time, data=teeth)
+
+# This is needed to make look() work with the rescaled time
+more_data$time <- (more_data$day - 14.5) / (18-14.5)
+
+look(rnf144b, rnf144b_fit)
+
+# We can use the same linear hypothesis with glht. The estimate is the
+# same as reported by topTable, but limma gained some power by shrinking
+# the variance toward the trend line, so limma's p-value is smaller.
+
+summary( glht(rnf144b_fit, K) )
+
+# 2.6.2 Confidence intervals ----
+#
+# Confidence Intervals may also be of interest. However note that these
+# are not adjusted for multiple testing (see Appendix).
+
+topTable(efit, confint=0.95)
+
+# 2.6.3 F test ----
+#
+# limma can also perform tests against a null hypothesis in which
+# several coefficients are dropped from the model, allowing tests like
+# those we have performed with anova earlier. Suppose we want to find
+# *any* deviation from a constant expression level. We can check for
+# this by dropping every coefficient except for the intercept. The
+# eBayes step is still needed.
+
+efit2 <- eBayes(fit, trend=TRUE)
+F_test_results <- topTable(efit2, coef=c(2,3,4))
+F_test_results
+
+# 2.7 Diagnostic plots ----
+
+plotMDS(log2_cpms)
+
+plotSA(efit)
+
+efit$df.prior
+
+# A heatmap of variable genes can also be a great way to reveal features
+# of a dataset. Here I show the top 200 genes by range of log2
+# expression. Expression is shown as x-scores (scaled to mean zero,
+# standard deviation one per gene). Genes are ordered so as to cluster
+# similar patterns of expression. Heatmaps are a complex topic! There
+# are a lot of alternatives to what I've done here in terms of gene
+# selection, scaling, and clustering.
+
+library(ComplexHeatmap)
+library(seriation)
+
+gene_ranges <- apply(log2_cpms,1,max) - apply(log2_cpms,1,min)
+genes_wanted <- gene_ranges |> sort(decreasing=TRUE) |> head(100) |> names()
+
+x <- log2_cpms[genes_wanted,]
+z <- t(scale(t(x)))
+ordering <- seriate(dist(z), method="OLO")
+
+Heatmap(
+    z,
+    name="z score",
+    show_row_names=FALSE,
+    cluster_rows=as.dendrogram(ordering[[1]]),
+    cluster_columns=FALSE)
+
+# For a complex experiment like this, ggplot2 can also be used to look
+# at genes in detail in creative ways. Lets look at the top genes we
+# discovered earlier.
+
+genes_wanted <- rownames(F_test_results)
+
+melted_df <- reshape2::melt(log2_cpms, varnames=c("gene","sample"), value.name="log2_cpm") |>
+    filter(gene %in% genes_wanted) |>
+    mutate(gene = factor(gene, genes_wanted)) |>
+    left_join(teeth, by="sample")
+
+ggplot(melted_df) +
+    aes(x=day, y=log2_cpm, color=tooth) +
+    facet_wrap(~gene, scale="free_y", ncol=5) +
+    geom_line() +
+    geom_point()
+
+# 2.8 Differential expression methods in general usage ----
+#
+# Above, we did a fairly straightforward log transformation of the count
+# data. Personally I think this is adequate for most cases, but some
+# further refinements have been developed.
+#
+# A step up from this, and probably the most popular method, is "voom".
+# This again works on log transformed data, but uses a precision weight
+# for each individual count, derived from an initial fit of the data, to
+# account for the larger amount of noise associated with lower
+# expression levels on a log scale. With the eBayes(trend=TRUE) method
+# we used above, we did accounted for this only at the gene level. With
+# "voom", the adjustment is applied at the inidividual count level,
+# based on the predicted expression level from the initial fit and also
+# the library size for each sample, so it is more fine-grained.
+
+voomed_fit <- voomLmFit(dgelist, design=X)
+voomed_cfit <- contrasts.fit(voomed_fit, t(K))
+voomed_efit <- eBayes(voomed_cfit, trend=TRUE)
+topTable(voomed_efit)
+
+# The results with this data are quite similar. Voom may have advantages
+# where samples have different library sizes. It also has an extension
+# to account for samples of varying quality with "sample weights".
+#
+# A further step is to use a negative-binomial GLM. Popular packages are
+# DESeq2 and edgeR. Here we'll demonstrate edgeR. edgeR does a number of
+# sophisticated things beyond using a GLM, and the authors seem to
+# always working on it to make it better. Here we use the edgeR "quasi-
+# likelihood" method, their latest iteration.
+
+dgelist_with_disp <- estimateDisp(dgelist, X)
+edger_fit <- glmQLFit(dgelist_with_disp, X)
+edger_results <- glmQLFTest(edger_fit, contrast=t(K))
+topTags(edger_results)
+
+# This is a more principled approach than the log-counts based methods.
+# I would note however that GLMs attempt to be unbiassed on a linear
+# scale, and are therefore not robust to large positive counts. We
+# sometimes see "significant" results based on large counts in just one
+# or two samples.
+#
+# All of these methods produce similar numbers of significant genes with
+# this data.
+
+decideTests(efit) |> summary()
+decideTests(voomed_efit) |> summary()
+decideTests(edger_results) |> summary()
+
+# 2.9 Further exercises ----
+#
+# 1. Construct and use linear combinations to find genes that:
+#
+#     A. Differ in slope between lower and upper molars.
+#
+#     B. Differ in expression on day 16 between the lower and upper
+# molars. (Hint: this can be viewed as the difference in predictions
+# between two individual samples.)
+#
+#     C. Construct a pair of linear combinations that when used together
+# in an F test find genes with non-zero slope in either or both the
+# lower and upper molars.
+#
+# 2. Construct a model matrix in which the change over time is
+# quadratic, and some linear combinations to interrogate it.
+#
+
+
+#///////////////////////////////
+# 3 Appendix: more on limma ----
+
+# 3.1 Empirical Bayes variance squeezing ----
+#
+# In limma, Empirical Bayes squeezing of the residual variance acts as
+# though we have some number of extra "prior" observations of the
+# variance. These are also counted as extra degrees of freedom in F
+# tests. The "prior" observations act to squeeze the estimated residual
+# variance toward a trend line that is a function of the average
+# expression level.
+
+efit <- eBayes(cfit, trend=TRUE)
+
+efit$df.prior
+efit$df.residual
+efit$df.total
+plotSA(efit)
+points(efit$Amean, efit$s2.post^0.25, col="red", cex=0.2)
+
+# The total effective degrees of freedom is the "prior" degrees of
+# freedom plus the normal residual degrees of freedom. As can be seen in
+# the plot, compared to the residual variance (black dots), this
+# produces a posterior residual variance (efit$s2.post, red dots) that
+# is squeezed toward the trend line.
+#
+# It's worthwhile checking df.prior when using limma, as a low value may
+# indicate a problem with a data-set.
+
+# 3.2 Top confident effect sizes ----
+#
+# A little self-promotion: With limma we are able to find genes where
+# our effect of interest is significantly different from zero. However
+# we may make many thousands of discoveries, too many to easily follow
+# up, and some of the effects discovered may be tiny. I have developed a
+# method to rank genes by confident effect size, with multiple testing
+# correction, implemented in the package topconfects. This method builds
+# on the treat method provided by limma.
+#
+# This is performed with the limma_confects function. limma_confects
+# incorporates the Empirical Bayes variance squeezing step, so remember
+# to specify trend=TRUE if using trend based variance squeezing.
+
+library(topconfects)
+
+result <- limma_confects(cfit, "average_slope", trend=TRUE, fdr=0.05)
+result
+
+# Results are ranked by "confect", confident effect size. If you select
+# genes with abs(confect) >= some value, those genes will have a
+# magnitude of effect greater than that threshold, with controlled FDR.
+# (Exactly the same set of genes is found using treat with this
+# threshold.)
+#
+# Compared to the "most significant" gene, the top gene by topconfects
+# has a larger slope (but lower overall average expression).
+
+hbby <- log2_cpms["Hbb-y",]
+hbby_fit <- lm(hbby ~ tooth * day, data=teeth)
+look(hbby, hbby_fit)
+
+# Highlight genes with logFC confidently larger than 1.
+ggplot(result$table, aes(x=AveExpr, y=effect)) +
+    geom_point(size=0.1) +
+    geom_point(
+        data=filter(result$table, abs(confect) >= 1),
+        size=0.5, color="red")
+
+# See also "False Coverage-statement Rate" for a generally applicable
+# approach to multiple-testing corrected confidence intervals.
+#
+# ---
+
+sessionInfo()

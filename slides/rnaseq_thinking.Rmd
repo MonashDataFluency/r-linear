@@ -1,0 +1,44 @@
+---
+title: "RNA-Seq differential expression analysis in R slideshow"
+author: "Paul Harrison"
+output: 
+    ioslides_presentation:
+        widescreen: true
+        smaller: true
+        css: style.css
+        incremental: true
+        mathjax: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+---
+
+## Screening many responses
+
+"High throughput" biological datasets we can view as containing many sets of responses.
+
+Typical example is RNA-Seq gene expression.
+
+<img src="../figures/igv.png" height="450">
+
+
+## Screening many responses
+
+"High throughput" biological datasets we can view as containing many sets of responses.
+
+Typical example is RNA-Seq gene expression.
+
+> * Perform RNA-Seq on a set of biological samples.
+> * Number of RNA molecules seen for each gene in each sample is counted.
+
+> * Linear model formula based on experiment design.
+> * Each gene can be viewed as a separate set of responses.
+
+<br>
+
+Key features:
+
+> * A test is performed for each gene. Multiple testing adjustment is crucial!
+> * Residual standard deviation is similar between genes. "Empirical Bayes" shrinking of these standard deviations overcomes problems with small numbers of samples.
+
+<br>
+
+Use Bioconductor packages such as `limma` (fit many linear models) or `edgeR` (fit many GLMs).
+

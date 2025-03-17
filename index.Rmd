@@ -8,8 +8,11 @@ output:
 
 ## Workshop notes
 
-* [Slideshow](slides/linear_thinking.html)
-* [Workshop](topics/linear_models.html)
+* [Linear models slideshow](slides/linear_thinking.html)
+* [Linear models workshop](topics/linear_models.html)
+
+* [RNA-Seq slideshow](slides/rnaseq_thinking.html)
+* [RNA-Seq differential expression workshop](topics/rnaseq.html)
 
 ## Setup
 
@@ -27,10 +30,10 @@ unzip("r-linear-files.zip")
 # Install some CRAN packages:
 install.packages(c(
     "tidyverse", "multcomp", "emmeans", 
-    "lme4", "lmerTest", "pbkrtest", "BiocManager"))
+    "lme4", "lmerTest", "pbkrtest", "seriation", "BiocManager"))
 
 # Install some Bioconductor packages:
-BiocManager::install(c("limma","edgeR","topconfects"))
+BiocManager::install(c("limma","edgeR","ComplexHeatmap","topconfects"))
 ```
 
 Now load the file `linear_models.R` in the `r-linear-files` folder.
@@ -68,11 +71,15 @@ Built-in to R:
 
 <br>
 
+<!--
 * [Monash Data Fluency](https://www.monash.edu/data-fluency)
+-->
 
-* [Monash Bioinformatics Platform](https://www.monash.edu/researchinfrastructure/bioinformatics)
+* [Monash Genomics and Bioinformatics Platform](https://www.monash.edu/researchinfrastructure/mgbp)
 
-* [More workshop material from Monash Bioinformatics Platform](https://www.monash.edu/researchinfrastructure/bioinformatics/training)
+<!--
+* [More workshop material from Monash Genomics and Bioinformatics Platform](https://www.monash.edu/researchinfrastructure/bioinformatics/training)
+-->
 
 <br>
 

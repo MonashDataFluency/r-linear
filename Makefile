@@ -1,7 +1,9 @@
 
 RMDS=index.Rmd \
      slides/linear_thinking.Rmd \
+     slides/rnaseq_thinking.Rmd \
      topics/linear_models.Rmd \
+	 topics/rnaseq.Rmd \
 	 topics/solutions.Rmd
 
 HTMLS=$(patsubst %.Rmd,%.html,$(RMDS))
@@ -31,8 +33,8 @@ all : $(HTMLS) r-linear-files.zip
 r-linear-files/%.R : topics/%.Rmd purify.py
 	python3 purify.py <$< >$@
 
-r-linear-files.zip : r-linear-files/linear_models.R r-linear-files/*
+r-linear-files.zip : r-linear-files/linear_models.R r-linear-files/rnaseq.R r-linear-files/*
 	zip -FSr r-linear-files.zip r-linear-files
 
 clean :
-	rm -f $(HTMLS) r-linear-files/linear_models.R
+	rm -f $(HTMLS) r-linear-files/linear_models.R r-linear-files/rnaseq.R
