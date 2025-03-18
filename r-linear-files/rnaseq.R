@@ -107,16 +107,15 @@ dim(counts_kept)
 # Different samples may have produced different numbers of reads. We now
 # normalize this away by converting the read counts to Reads Per
 # Million, and log2 transform the results. There are some subtleties
-# here which we breeze over lightly: "TMM" normalization is used as a
-# small adjustment to the total number of reads in each sample. A small
-# constant "prior count" is added to the counts to avoid calculating
-# log2(0). The edgeR and limma manuals describe these steps in more
-# detail.
+# here: "TMM" normalization is used as a small adjustment to the total
+# number of reads in each sample. A small constant "prior count" is
+# added to the counts to avoid calculating log2(0). The edgeR and limma
+# manuals describe these steps in more detail.
 
 dgelist <- calcNormFactors(DGEList(counts_kept))
 dgelist$samples
 
-log2_cpms <- cpm(dgelist, log=TRUE, prior.count=1)
+log2_cpms <- cpm(dgelist, log=TRUE, prior.count=2)
 
 log2_cpms[1:5,]
 
@@ -146,7 +145,8 @@ efit <- eBayes(cfit, trend=TRUE)
 
 # The call to eBayes does Empirical Bayes squeezing of the residual
 # variance for each gene (see Appendix). This is a bit of magic that
-# allows limma to work well with small numbers of samples.
+# allows limma to work well with small numbers of samples. We're now
+# ready to look at the results.
 
 topTable(efit)
 
@@ -156,73 +156,94 @@ topTable(efit)
 # interested in, usually this is a log2 fold change. Here, it's the log2
 # fold change from day 14.5 to day 18.
 #
-# It's common to plot the logFC column against the average log
-# expression level, an "MA plot".
+# We can also ask for results for all genes:
 
 all_results <- topTable(efit, n=Inf)
 
 significant <- all_results$adj.P.Val <= 0.05
 table(significant)
 
+# or
+
+dt <- decideTests(efit)
+summary(dt)
+
+# 2.6 Diagnostic plots ----
+
+# 2.6.1 MD plot ----
+#
+# As always, diagnostic plots are an essential part of the process.
+#
+# It's common to plot the logFC column against the average log
+# expression level, an "MD plot" (also sometimes called an "MA plot").
+
+plotMD(efit, status=dt[,1])
+
+# Or do it ourselves:
 ggplot(all_results, aes(x=AveExpr, y=logFC)) +
     geom_point(size=0.1) +
     geom_point(data=all_results[significant,], size=0.5, color="red")
 
-# 2.6 Connections to earlier ideas ----
+# 2.6.2 MDS plot ----
 #
-# This final section fills in some links between limma and earlier
-# ideas. Feel free to skip if short on time.
-
-# 2.6.1 Relation to lm( ) and glht( ) ----
+# A commonly used first look at the quality of the data is provided by
+# limma's MDS plot. This is very similar to a PCA plot. A difference is
+# that it concentrates by default on the top 500 most different genes
+# when comparing each pair of samples. The percentages shown on the axes
+# refer to variance explained in these comparisons.
 #
-# Let's look at a specific gene.
-
-rnf144b <- log2_cpms["Rnf144b",]
-rnf144b_fit <- lm(rnf144b ~ tooth * time, data=teeth)
-
-# This is needed to make look() work with the rescaled time
-more_data$time <- (more_data$day - 14.5) / (18-14.5)
-
-look(rnf144b, rnf144b_fit)
-
-# We can use the same linear hypothesis with glht. The estimate is the
-# same as reported by topTable, but limma gained some power by shrinking
-# the variance toward the trend line, so limma's p-value is smaller.
-
-summary( glht(rnf144b_fit, K) )
-
-# 2.6.2 Confidence intervals ----
-#
-# Confidence Intervals may also be of interest. However note that these
-# are not adjusted for multiple testing (see Appendix).
-
-topTable(efit, confint=0.95)
-
-# 2.6.3 F test ----
-#
-# limma can also perform tests against a null hypothesis in which
-# several coefficients are dropped from the model, allowing tests like
-# those we have performed with anova earlier. Suppose we want to find
-# *any* deviation from a constant expression level. We can check for
-# this by dropping every coefficient except for the intercept. The
-# eBayes step is still needed.
-
-efit2 <- eBayes(fit, trend=TRUE)
-F_test_results <- topTable(efit2, coef=c(2,3,4))
-F_test_results
-
-# 2.7 Diagnostic plots ----
+# With the MDS plot we are looking for variables in the experiment like
+# treatment groups and batch effects to be reflected in the layout.
+# Here, pleasingly, dimension one corresponds to time. Some separation
+# is seen between corresponding upper and lower molars. There seem to be
+# other things going on in the second dimension that may represent
+# unexpected sources of variation in the data.
 
 plotMDS(log2_cpms)
 
+# 2.6.3 SA plot ----
+#
+# As always, residuals are of interest. Here we will plot the residual
+# standard deviation of each gene on a square root scale, versus the
+# average log expression level. We also see the trend line that was
+# fitted during the Empirical Bayes step.
+#
+# When we used cpm() earlier to log transform the data, we gave a "prior
+# count" to damp down variation at low expression levels. We can see
+# there is still some mean-variance trend, but limma was able to model
+# it.
+
 plotSA(efit)
 
-efit$df.prior
+# 2.6.4 Melting the data and using ggplot ----
+#
+# For a complex experiment like this, ggplot2 can also be used to look
+# at genes in detail in creative ways. Lets look at the top genes we
+# discovered earlier. To use ggplot, we need to "melt" the data into a
+# "long" data frame. I use reshape2::melt() here because the data is in
+# a matrix. If it were in a data frame, I would have used
+# tidyr::pivot_longer().
 
-# A heatmap of variable genes can also be a great way to reveal features
-# of a dataset. Here I show the top 200 genes by range of log2
-# expression. Expression is shown as x-scores (scaled to mean zero,
-# standard deviation one per gene). Genes are ordered so as to cluster
+genes_wanted <- rownames(all_results) |> head(20)
+
+melted_df <-
+    reshape2::melt(log2_cpms, varnames=c("gene","sample"), value.name="log2_cpm") |>
+    filter(gene %in% genes_wanted) |>
+    mutate(gene = factor(gene, genes_wanted)) |>
+    left_join(teeth, by="sample")
+
+ggplot(melted_df) +
+    aes(x=day, y=log2_cpm, color=tooth) +
+    facet_wrap(~gene, scale="free_y", ncol=5) +
+    geom_line() +
+    geom_point()
+
+# 2.6.5 Heatmap ----
+#
+# A heatmap of variable genes can be a great way to reveal features of a
+# dataset. Here I show the top 200 genes selected by range of log2
+# expression. Expression is shown as z-scores (i.e. scaled to have zero
+# mean, and unit standard deviation). Genes are ordered so as to cluster
 # similar patterns of expression. Heatmaps are a complex topic! There
 # are a lot of alternatives to what I've done here in terms of gene
 # selection, scaling, and clustering.
@@ -244,42 +265,81 @@ Heatmap(
     cluster_rows=as.dendrogram(ordering[[1]]),
     cluster_columns=FALSE)
 
-# For a complex experiment like this, ggplot2 can also be used to look
-# at genes in detail in creative ways. Lets look at the top genes we
-# discovered earlier.
+# When we looked for genes changing over time, that's what we found.
+# When we let the data speak for itself we may see many strange things!
+# This may point us at important things to include in our model or to
+# normalize out of the data.
 
-genes_wanted <- rownames(F_test_results)
+# 2.7 Connections to earlier ideas ----
 
-melted_df <- reshape2::melt(log2_cpms, varnames=c("gene","sample"), value.name="log2_cpm") |>
-    filter(gene %in% genes_wanted) |>
-    mutate(gene = factor(gene, genes_wanted)) |>
-    left_join(teeth, by="sample")
+# 2.7.1 Relation to lm( ) and glht( ) ----
+#
+# Let's look at a specific gene.
 
-ggplot(melted_df) +
-    aes(x=day, y=log2_cpm, color=tooth) +
-    facet_wrap(~gene, scale="free_y", ncol=5) +
-    geom_line() +
-    geom_point()
+rnf144b <- log2_cpms["Rnf144b",]
+rnf144b_fit <- lm(rnf144b ~ tooth * time, data=teeth)
 
+# This is needed to make look() work with the rescaled time
+more_data$time <- (more_data$day - 14.5) / (18-14.5)
+
+look(rnf144b, rnf144b_fit)
+
+# We can use the same linear hypothesis with glht. The estimate is the
+# same as reported by topTable, but limma gained some power by shrinking
+# the variance toward the trend line, so limma's p-value is smaller.
+
+summary( glht(rnf144b_fit, K) )
+
+# 2.7.2 Confidence intervals ----
+#
+# Confidence Intervals may also be of interest. However note that these
+# are not adjusted for multiple testing (see Appendix).
+
+topTable(efit, confint=0.95)
+
+# 2.7.3 F test ----
+#
+# limma can also perform tests against a null hypothesis in which
+# several coefficients are dropped from the model, allowing tests like
+# those we have performed with anova earlier. Suppose we want to find
+# *any* deviation from a constant expression level. We can check for
+# this by dropping every coefficient except for the intercept. The
+# eBayes step is still needed.
+
+efit2 <- eBayes(fit, trend=TRUE)
+F_test_results <- topTable(efit2, coef=c(2,3,4))
+F_test_results
+
+# 2.7.4 Visualize different sets of genes ----
+#
+# Try visualizing different sets of genes, either using the ggplot2
+# facet method or the Heatmap method we saw earlier.
+#
+# Try the top genes from the F test we just did, or another test of your
+# own devising.
+#
+# Try a random sample of genes using sample().
+#
 # 2.8 Differential expression methods in general usage ----
 #
 # Above, we did a fairly straightforward log transformation of the count
-# data. Personally I think this is adequate for most cases, but some
-# further refinements have been developed.
+# data, followed by linear modelling. Personally I think this is
+# adequate for most cases, but some further refinements have been
+# developed.
 #
 # A step up from this, and probably the most popular method, is "voom".
 # This again works on log transformed data, but uses a precision weight
 # for each individual count, derived from an initial fit of the data, to
 # account for the larger amount of noise associated with lower
 # expression levels on a log scale. With the eBayes(trend=TRUE) method
-# we used above, we did accounted for this only at the gene level. With
+# we used above, we accounted for this only at the gene level. With
 # "voom", the adjustment is applied at the inidividual count level,
 # based on the predicted expression level from the initial fit and also
 # the library size for each sample, so it is more fine-grained.
 
-voomed_fit <- voomLmFit(dgelist, design=X)
+voomed_fit <- voomLmFit(dgelist, design=X, plot=TRUE)
 voomed_cfit <- contrasts.fit(voomed_fit, t(K))
-voomed_efit <- eBayes(voomed_cfit, trend=TRUE)
+voomed_efit <- eBayes(voomed_cfit)
 topTable(voomed_efit)
 
 # The results with this data are quite similar. Voom may have advantages
@@ -298,10 +358,10 @@ edger_results <- glmQLFTest(edger_fit, contrast=t(K))
 topTags(edger_results)
 
 # This is a more principled approach than the log-counts based methods.
-# I would note however that GLMs attempt to be unbiassed on a linear
-# scale, and are therefore not robust to large positive counts. We
-# sometimes see "significant" results based on large counts in just one
-# or two samples.
+# I would note however that GLMs attempt to fit the mean expected
+# expression levels on a linear scale, and can be overly influenced by
+# large individual counts. We sometimes see "significant" results based
+# on large counts in just one or two samples.
 #
 # All of these methods produce similar numbers of significant genes with
 # this data.
@@ -316,7 +376,7 @@ decideTests(edger_results) |> summary()
 #
 #     A. Differ in slope between lower and upper molars.
 #
-#     B. Differ in expression on day 16 between the lower and upper
+#     B. Differ in expression at time 0.5 between the lower and upper
 # molars. (Hint: this can be viewed as the difference in predictions
 # between two individual samples.)
 #

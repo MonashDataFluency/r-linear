@@ -1,6 +1,5 @@
 ---
 title: "RNA-Seq differential expression analysis in R slideshow"
-author: "Paul Harrison"
 output: 
     ioslides_presentation:
         widescreen: true
@@ -14,16 +13,12 @@ output:
 
 "High throughput" biological datasets we can view as containing many sets of responses.
 
-Typical example is RNA-Seq gene expression.
+A typical example is RNA-Seq gene expression.
 
 <img src="../figures/igv.png" height="450">
 
 
-## Screening many responses
-
-"High throughput" biological datasets we can view as containing many sets of responses.
-
-Typical example is RNA-Seq gene expression.
+## RNA-Seq
 
 > * Perform RNA-Seq on a set of biological samples.
 > * Number of RNA molecules seen for each gene in each sample is counted.
@@ -42,3 +37,17 @@ Key features:
 
 Use Bioconductor packages such as `limma` (fit many linear models) or `edgeR` (fit many GLMs).
 
+
+## Further resources
+
+### From the authors of limma and edgeR
+
+> * ["RNA-seq analysis is easy as 1-2-3 with limma, Glimma and edgeR"](https://bioconductor.org/packages/release/workflows/vignettes/RNAseq123/inst/doc/limmaWorkflow.html)
+
+> * ["A guide to creating design matrices for gene expression experiments"](https://bioconductor.org/packages/release/workflows/vignettes/RNAseq123/inst/doc/designmatrices.html)
+
+### From Monash
+
+> * [MGBP's RNA-Seq end-to-end workshop](https://monashbioinformaticsplatform.github.io/RNAseq_workshop_2024/)
+
+> * [Degust](https://degust.erc.monash.edu/) for web-based differential expression analysis

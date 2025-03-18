@@ -1,6 +1,5 @@
 ---
 title: "Linear models in R slideshow"
-author: "Paul Harrison"
 output: 
     ioslides_presentation:
         widescreen: true
