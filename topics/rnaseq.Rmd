@@ -184,6 +184,22 @@ ggplot(all_results, aes(x=AveExpr, y=logFC)) +
     geom_point(data=all_results[significant,], size=0.5, color="red")
 ```
 
+### Volcano plot
+
+Often people will choose genes based both on FDR and log fold change thresholds. The volcano plot provides a way to visualize this. Volcano plots show log fold change on the x-axis and p-values on the y-axis on a log scale. Usually the adjusted p-value (FDR) is used, but you may also sometimes see unadjusted p-values being used.
+
+```{r}
+chosen_results <- all_results |>
+    filter(adj.P.Val <= 0.05, abs(logFC) >= 1)
+
+ggplot(all_results, aes(x=logFC, y=-log10(adj.P.Val))) + 
+    geom_point(size=0.1) +
+    geom_point(data=chosen_results, size=0.5, color="red")
+```
+
+If p-values simply got smaller according to the magnitude of log fold change, the plot would be a perfect V shape. However because different genes have different residual standard deviation, the arms of the V are puffier.
+
+
 ### MDS plot
 
 A commonly used first look at the quality of the data is provided by limma's MDS plot. This is very similar to a PCA plot. A difference is that it concentrates by default on the top 500 most different genes when comparing each pair of samples. The percentages shown on the axes refer to variance explained in these comparisons.
@@ -293,13 +309,15 @@ F_test_results
 ```
 
 
-### Visualize different sets of genes {.challenge}
+## Visualize different sets of genes {.challenge}
 
 Try visualizing different sets of genes, either using the ggplot2 facet method or the Heatmap method we saw earlier.
 
-Try the top genes from the F test we just did, or another test of your own devising.
+Some possible sets of genes are:
 
-Try a random sample of genes using `sample()`.
+* The top genes from the F test we just did, or another test of your own devising.
+* The largest log fold changes in the `all_results` table, ignoring p-values.
+* A random sample of genes, using `sample()`.
 
 
 ## Differential expression methods in general usage

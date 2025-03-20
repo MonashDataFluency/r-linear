@@ -184,7 +184,27 @@ ggplot(all_results, aes(x=AveExpr, y=logFC)) +
     geom_point(size=0.1) +
     geom_point(data=all_results[significant,], size=0.5, color="red")
 
-# 2.6.2 MDS plot ----
+# 2.6.2 Volcano plot ----
+#
+# Often people will choose genes based both on FDR and log fold change
+# thresholds. The volcano plot provides a way to visualize this. Volcano
+# plots show log fold change on the x-axis and p-values on the y-axis on
+# a log scale. Usually the adjusted p-value (FDR) is used, but you may
+# also sometimes see unadjusted p-values being used.
+
+chosen_results <- all_results |>
+    filter(adj.P.Val <= 0.05, abs(logFC) >= 1)
+
+ggplot(all_results, aes(x=logFC, y=-log10(adj.P.Val))) +
+    geom_point(size=0.1) +
+    geom_point(data=chosen_results, size=0.5, color="red")
+
+# If p-values simply got smaller according to the magnitude of log fold
+# change, the plot would be a perfect V shape. However because different
+# genes have different residual standard deviation, the arms of the V
+# are puffier.
+
+# 2.6.3 MDS plot ----
 #
 # A commonly used first look at the quality of the data is provided by
 # limma's MDS plot. This is very similar to a PCA plot. A difference is
@@ -201,7 +221,7 @@ ggplot(all_results, aes(x=AveExpr, y=logFC)) +
 
 plotMDS(log2_cpms)
 
-# 2.6.3 SA plot ----
+# 2.6.4 SA plot ----
 #
 # As always, residuals are of interest. Here we will plot the residual
 # standard deviation of each gene on a square root scale, versus the
@@ -215,7 +235,7 @@ plotMDS(log2_cpms)
 
 plotSA(efit)
 
-# 2.6.4 Melting the data and using ggplot ----
+# 2.6.5 Melting the data and using ggplot ----
 #
 # For a complex experiment like this, ggplot2 can also be used to look
 # at genes in detail in creative ways. Lets look at the top genes we
@@ -238,7 +258,7 @@ ggplot(melted_df) +
     geom_line() +
     geom_point()
 
-# 2.6.5 Heatmap ----
+# 2.6.6 Heatmap ----
 #
 # A heatmap of variable genes can be a great way to reveal features of a
 # dataset. Here I show the top 200 genes selected by range of log2
@@ -310,17 +330,20 @@ efit2 <- eBayes(fit, trend=TRUE)
 F_test_results <- topTable(efit2, coef=c(2,3,4))
 F_test_results
 
-# 2.7.4 Visualize different sets of genes ----
+# 2.8 Visualize different sets of genes ----
 #
 # Try visualizing different sets of genes, either using the ggplot2
 # facet method or the Heatmap method we saw earlier.
 #
-# Try the top genes from the F test we just did, or another test of your
+# Some possible sets of genes are:
+#
+# * The top genes from the F test we just did, or another test of your
 # own devising.
+# * The largest log fold changes in the all_results table, ignoring
+# p-values.
+# * A random sample of genes, using sample().
 #
-# Try a random sample of genes using sample().
-#
-# 2.8 Differential expression methods in general usage ----
+# 2.9 Differential expression methods in general usage ----
 #
 # Above, we did a fairly straightforward log transformation of the count
 # data, followed by linear modelling. Personally I think this is
@@ -370,7 +393,7 @@ decideTests(efit) |> summary()
 decideTests(voomed_efit) |> summary()
 decideTests(edger_results) |> summary()
 
-# 2.9 Further exercises ----
+# 2.10 Further exercises ----
 #
 # 1. Construct and use linear combinations to find genes that:
 #
