@@ -4,12 +4,18 @@
 #///////////////////
 # 1 Preparation ----
 #
-# Setup as we did in linear_models.R.
+# We load some new packages.
 
-library(edgeR)      # cpm, etc -- RNA-Seq normalization
-library(limma)      # lmFit, etc -- fitting many models
-library(multcomp)   # glht -- linear hypotheses
-library(tidyverse)  # working with data frames, plotting
+library(edgeR)          # cpm, etc -- RNA-Seq normalization
+library(limma)          # lmFit, etc -- fitting many models
+library(ComplexHeatmap) # Heatmap
+library(seriation)      # seriate -- nice clustering and ordering
+library(reshape2)       # melt -- matrix to long data frame
+
+library(multcomp)       # glht -- linear hypotheses
+library(tidyverse)      # working with data frames, plotting
+
+# Setup as before with the teeth dataset, if you haven't already.
 
 teeth <- read_csv("r-linear-files/teeth.csv")
 
@@ -47,9 +53,6 @@ look <- function(y, fit=NULL) {
 # or.org/packages/release/workflows/vignettes/RNAseq123/inst/doc/limmaWo
 # rkflow.html and the usersguide.pdf at
 # https://bioconductor.org/packages/release/bioc/html/limma.html
-
-library(edgeR)
-library(limma)
 
 # 2.1 Load the data ----
 #
@@ -247,7 +250,7 @@ plotSA(efit)
 genes_wanted <- rownames(all_results) |> head(20)
 
 melted_df <-
-    reshape2::melt(log2_cpms, varnames=c("gene","sample"), value.name="log2_cpm") |>
+    melt(log2_cpms, varnames=c("gene","sample"), value.name="log2_cpm") |>
     filter(gene %in% genes_wanted) |>
     mutate(gene = factor(gene, genes_wanted)) |>
     left_join(teeth, by="sample")
@@ -267,9 +270,6 @@ ggplot(melted_df) +
 # similar patterns of expression. Heatmaps are a complex topic! There
 # are a lot of alternatives to what I've done here in terms of gene
 # selection, scaling, and clustering.
-
-library(ComplexHeatmap)
-library(seriation)
 
 gene_ranges <- apply(log2_cpms,1,max) - apply(log2_cpms,1,min)
 genes_wanted <- gene_ranges |> sort(decreasing=TRUE) |> head(100) |> names()
@@ -292,7 +292,33 @@ Heatmap(
 
 # 2.7 Connections to earlier ideas ----
 
-# 2.7.1 Relation to lm( ) and glht( ) ----
+# 2.7.1 F test ----
+#
+# limma can also perform tests against a null hypothesis in which
+# several coefficients are dropped from the model, allowing tests like
+# those we have performed with anova earlier. Suppose we want to find
+# *any* deviation from a constant expression level. We can check for
+# this by dropping every coefficient except for the intercept. The
+# eBayes step is still needed.
+
+efit2 <- eBayes(fit, trend=TRUE)
+F_test_results <- topTable(efit2, coef=c(2,3,4))
+F_test_results
+
+# 2.7.2 Challenge - visualize different sets of genes ----
+#
+# Try visualizing different sets of genes, either using the ggplot2
+# facet method or the Heatmap method we saw earlier.
+#
+# Some possible sets of genes are:
+#
+# * The top genes from the F test we just did, or another test of your
+# own devising.
+# * The largest log fold changes in the all_results table, ignoring
+# p-values.
+# * A random sample of genes, using sample().
+#
+# 2.7.3 Relation to lm( ) and glht( ) ----
 #
 # Let's look at a specific gene.
 
@@ -310,40 +336,16 @@ look(rnf144b, rnf144b_fit)
 
 summary( glht(rnf144b_fit, K) )
 
-# 2.7.2 Confidence intervals ----
+# 2.7.4 Confidence intervals ----
 #
 # Confidence Intervals may also be of interest. However note that these
 # are not adjusted for multiple testing (see Appendix).
 
 topTable(efit, confint=0.95)
 
-# 2.7.3 F test ----
-#
-# limma can also perform tests against a null hypothesis in which
-# several coefficients are dropped from the model, allowing tests like
-# those we have performed with anova earlier. Suppose we want to find
-# *any* deviation from a constant expression level. We can check for
-# this by dropping every coefficient except for the intercept. The
-# eBayes step is still needed.
+# 2.8 Differential expression methods in general usage ----
 
-efit2 <- eBayes(fit, trend=TRUE)
-F_test_results <- topTable(efit2, coef=c(2,3,4))
-F_test_results
-
-# 2.8 Visualize different sets of genes ----
-#
-# Try visualizing different sets of genes, either using the ggplot2
-# facet method or the Heatmap method we saw earlier.
-#
-# Some possible sets of genes are:
-#
-# * The top genes from the F test we just did, or another test of your
-# own devising.
-# * The largest log fold changes in the all_results table, ignoring
-# p-values.
-# * A random sample of genes, using sample().
-#
-# 2.9 Differential expression methods in general usage ----
+# 2.8.1 limma-voom ----
 #
 # Above, we did a fairly straightforward log transformation of the count
 # data, followed by linear modelling. Personally I think this is
@@ -360,14 +362,18 @@ F_test_results
 # based on the predicted expression level from the initial fit and also
 # the library size for each sample, so it is more fine-grained.
 
-voomed_fit <- voomLmFit(dgelist, design=X, plot=TRUE)
+voomed <- voom(dgelist, design=X, plot=TRUE)
+voomed_fit <- lmFit(voomed, design=X)
 voomed_cfit <- contrasts.fit(voomed_fit, t(K))
 voomed_efit <- eBayes(voomed_cfit)
 topTable(voomed_efit)
 
-# The results with this data are quite similar. Voom may have advantages
-# where samples have different library sizes. It also has an extension
-# to account for samples of varying quality with "sample weights".
+# The results with this data are quite similar. Voom may have an
+# advantage where samples have different library sizes. It also has an
+# extension to account for samples of varying quality by estimating
+# "sample weights".
+
+# 2.8.2 edgeR ----
 #
 # A further step is to use a negative-binomial GLM. Popular packages are
 # DESeq2 and edgeR. Here we'll demonstrate edgeR. edgeR does a number of
@@ -393,7 +399,7 @@ decideTests(efit) |> summary()
 decideTests(voomed_efit) |> summary()
 decideTests(edger_results) |> summary()
 
-# 2.10 Further exercises ----
+# 2.9 Further exercises ----
 #
 # 1. Construct and use linear combinations to find genes that:
 #

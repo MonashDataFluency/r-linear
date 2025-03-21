@@ -28,7 +28,7 @@ A typical example is RNA-Seq gene expression.
 
 <br>
 
-Key features:
+### Key features
 
 > * A test is performed for each gene. Multiple testing adjustment is crucial!
 > * Residual standard deviation is similar between genes. "Empirical Bayes" shrinking of these standard deviations overcomes problems with small numbers of samples.
@@ -40,7 +40,7 @@ Use Bioconductor packages such as `limma` (fit many linear models) or `edgeR` (f
 
 ## Further resources
 
-### From the authors of limma and edgeR
+### From the authors of limma and edgeR at WEHI
 
 > * ["RNA-seq analysis is easy as 1-2-3 with limma, Glimma and edgeR"](https://bioconductor.org/packages/release/workflows/vignettes/RNAseq123/inst/doc/limmaWorkflow.html)
 

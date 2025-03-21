@@ -8,8 +8,6 @@ library(MASS)       # ginv -- coefficient estimation
 library(splines)    # ns, bs -- spline curves
 library(multcomp)   # glht -- linear hypotheses
 library(emmeans)    # estimated marginal means
-library(edgeR)      # cpm, etc -- RNA-Seq normalization
-library(limma)      # lmFit, etc -- fitting many models
 library(tidyverse)  # working with data frames, plotting
 
 # Much of what we will be using is built into R without loading any

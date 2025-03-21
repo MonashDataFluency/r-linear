@@ -61,7 +61,8 @@ Built-in to R:
 `limma` and `edgeR` -- fitting many models to gene expression data: 
 
     DGEList, calcNormFactors, cpm,
-    lmFit, contrasts.fit, eBayes, plotSA, topTable
+    voom, lmFit, contrasts.fit, eBayes, topTable,
+    plotMDS, plotSA
 
 ## Links
 

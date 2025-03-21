@@ -5,20 +5,29 @@ editor_options:
   chunk_output_type: console
 ---
 
-# Preparation
-
-Setup as we did in linear_models.R.
-
 ```{r echo=FALSE}
 knitr::opts_chunk$set(fig.align="center", fig.width=5,fig.height=5)
 ```
 
-```{r message=F, warning=F}
-library(edgeR)      # cpm, etc -- RNA-Seq normalization
-library(limma)      # lmFit, etc -- fitting many models
-library(multcomp)   # glht -- linear hypotheses
-library(tidyverse)  # working with data frames, plotting
+# Preparation
 
+We load some new packages.
+
+```{r message=F, warning=F}
+library(edgeR)          # cpm, etc -- RNA-Seq normalization
+library(limma)          # lmFit, etc -- fitting many models
+library(ComplexHeatmap) # Heatmap
+library(seriation)      # seriate -- nice clustering and ordering
+library(reshape2)       # melt -- matrix to long data frame
+
+library(multcomp)       # glht -- linear hypotheses
+library(tidyverse)      # working with data frames, plotting
+```
+
+
+Setup as before with the teeth dataset, if you haven't already.
+
+```{r}
 teeth <- read_csv("r-linear-files/teeth.csv")
 
 teeth$tooth <- factor(teeth$tooth, levels=c("lower","upper"))
@@ -48,11 +57,6 @@ look <- function(y, fit=NULL) {
 # Testing many genes with limma
 
 In this section we look at fitting the same matrix of predictors X to many different sets of responses y. We will use the package `limma` from Bioconductor. This is a very brief demonstration, and there is much more to this package. See the RNAseq123 tutorial at https://bioconductor.org/packages/release/workflows/vignettes/RNAseq123/inst/doc/limmaWorkflow.html and the usersguide.pdf at https://bioconductor.org/packages/release/bioc/html/limma.html
-
-```{r}
-library(edgeR)
-library(limma)
-```
 
 ## Load the data
 
@@ -228,7 +232,7 @@ For a complex experiment like this, ggplot2 can also be used to look at genes in
 genes_wanted <- rownames(all_results) |> head(20)
 
 melted_df <- 
-    reshape2::melt(log2_cpms, varnames=c("gene","sample"), value.name="log2_cpm") |> 
+    melt(log2_cpms, varnames=c("gene","sample"), value.name="log2_cpm") |> 
     filter(gene %in% genes_wanted) |>
     mutate(gene = factor(gene, genes_wanted)) |>
     left_join(teeth, by="sample")
@@ -245,9 +249,6 @@ ggplot(melted_df) +
 A heatmap of variable genes can be a great way to reveal features of a dataset. Here I show the top 200 genes selected by range of log2 expression. Expression is shown as z-scores (i.e. scaled to have zero mean, and unit standard deviation). Genes are ordered so as to cluster similar patterns of expression. Heatmaps are a complex topic! There are a lot of alternatives to what I've done here in terms of gene selection, scaling, and clustering.
 
 ```{r message=FALSE}
-library(ComplexHeatmap)
-library(seriation)
-
 gene_ranges <- apply(log2_cpms,1,max) - apply(log2_cpms,1,min) 
 genes_wanted <- gene_ranges |> sort(decreasing=TRUE) |> head(100) |> names()
 
@@ -267,6 +268,28 @@ When we looked for genes changing over time, that's what we found. When we let t
 
 
 ## Connections to earlier ideas
+
+### F test
+
+`limma` can also perform tests against a null hypothesis in which several coefficients are dropped from the model, allowing tests like those we have performed with `anova` earlier. Suppose we want to find *any* deviation from a constant expression level. We can check for this by dropping every coefficient except for the intercept. The `eBayes` step is still needed.
+
+```{r}
+efit2 <- eBayes(fit, trend=TRUE)
+F_test_results <- topTable(efit2, coef=c(2,3,4))
+F_test_results
+```
+
+
+### Challenge - visualize different sets of genes {.challenge}
+
+Try visualizing different sets of genes, either using the ggplot2 facet method or the Heatmap method we saw earlier.
+
+Some possible sets of genes are:
+
+* The top genes from the F test we just did, or another test of your own devising.
+* The largest log fold changes in the `all_results` table, ignoring p-values.
+* A random sample of genes, using `sample()`.
+
 
 ### Relation to lm( ) and glht( )
 
@@ -298,42 +321,25 @@ topTable(efit, confint=0.95)
 ```
 
 
-### F test
-
-`limma` can also perform tests against a null hypothesis in which several coefficients are dropped from the model, allowing tests like those we have performed with `anova` earlier. Suppose we want to find *any* deviation from a constant expression level. We can check for this by dropping every coefficient except for the intercept. The `eBayes` step is still needed.
-
-```{r}
-efit2 <- eBayes(fit, trend=TRUE)
-F_test_results <- topTable(efit2, coef=c(2,3,4))
-F_test_results
-```
-
-
-## Visualize different sets of genes {.challenge}
-
-Try visualizing different sets of genes, either using the ggplot2 facet method or the Heatmap method we saw earlier.
-
-Some possible sets of genes are:
-
-* The top genes from the F test we just did, or another test of your own devising.
-* The largest log fold changes in the `all_results` table, ignoring p-values.
-* A random sample of genes, using `sample()`.
-
-
 ## Differential expression methods in general usage
+
+### limma-voom
 
 Above, we did a fairly straightforward log transformation of the count data, followed by linear modelling. Personally I think this is adequate for most cases, but some further refinements have been developed.
 
 A step up from this, and probably the most popular method, is "voom". This again works on log transformed data, but uses a precision weight for each individual count, derived from an initial fit of the data, to account for the larger amount of noise associated with lower expression levels on a log scale. With the `eBayes(trend=TRUE)` method we used above, we accounted for this only at the gene level. With "voom", the adjustment is applied at the inidividual count level, based on the predicted expression level from the initial fit and also the library size for each sample, so it is more fine-grained.
 
 ```{r}
-voomed_fit <- voomLmFit(dgelist, design=X, plot=TRUE)
+voomed <- voom(dgelist, design=X, plot=TRUE)
+voomed_fit <- lmFit(voomed, design=X)
 voomed_cfit <- contrasts.fit(voomed_fit, t(K))
 voomed_efit <- eBayes(voomed_cfit)
 topTable(voomed_efit)
 ```
 
-The results with this data are quite similar. Voom may have advantages where samples have different library sizes. It also has an extension to account for samples of varying quality with "sample weights".
+The results with this data are quite similar. Voom may have an advantage where samples have different library sizes. It also has an extension to account for samples of varying quality by estimating "sample weights".
+
+### edgeR
 
 A further step is to use a negative-binomial GLM. Popular packages are DESeq2 and edgeR. Here we'll demonstrate edgeR. edgeR does a number of sophisticated things beyond using a GLM, and the authors seem to always working on it to make it better. Here we use the edgeR "quasi-likelihood" method, their latest iteration.
 
