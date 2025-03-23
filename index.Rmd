@@ -101,12 +101,11 @@ Built-in to R:
 * [The Art of Linear Algebra](https://github.com/kenjihiranabe/The-Art-of-Linear-Algebra/blob/main/The-Art-of-Linear-Algebra.pdf) for intuition about matrices and vectors -- sections 1-3 are relevant to this workshop.
 
 * Mixed effects models are a popular next step beyond the fixed effects models covered in this workshop.
-    * [Mixed Models in R](https://m-clark.github.io/mixed-models-with-R/)
+    * [Mixed Models in R](https://m-clark.github.io/mixed-models-with-R/)<br><br>
 
 * Testing for differential gene expression often uses linear models. The developers of `limma` and `edgeR` at [WEHI](https://www.wehi.edu.au/research/research-fields/bioinformatics) have written some good introductions to this topic:
     * ["RNA-seq analysis is easy as 1-2-3 with limma, Glimma and edgeR"](https://bioconductor.org/packages/release/workflows/vignettes/RNAseq123/inst/doc/limmaWorkflow.html)
-    * ["A guide to creating design matrices for gene expression experiments"](https://bioconductor.org/packages/release/workflows/vignettes/RNAseq123/inst/doc/designmatrices.html) (design matrix = model matrix)
-    * For samples of variable sequencing depth or quality, limma's `voom` or `voomWithQualityWeights` can be used to account for heteroscedasticity. If using a model other than `~ 0 + group`, read the note in the documentation for `contrasts.fit` and consider using `contrastAsCoef`.
+    * ["A guide to creating design matrices for gene expression experiments"](https://bioconductor.org/packages/release/workflows/vignettes/RNAseq123/inst/doc/designmatrices.html) (design matrix = model matrix)<br><br>
 
 * [MGBP's RNA-Seq end-to-end workshop](https://monashbioinformaticsplatform.github.io/RNAseq_workshop_2024/)
 

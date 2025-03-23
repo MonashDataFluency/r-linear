@@ -56,7 +56,7 @@ look <- function(y, fit=NULL) {
 
 # Testing many genes with limma
 
-In this section we look at fitting the same matrix of predictors X to many different sets of responses y. We will use the package `limma` from Bioconductor. This is a very brief demonstration, and there is much more to this package. See the RNAseq123 tutorial at https://bioconductor.org/packages/release/workflows/vignettes/RNAseq123/inst/doc/limmaWorkflow.html and the usersguide.pdf at https://bioconductor.org/packages/release/bioc/html/limma.html
+In this section we look at fitting the same matrix of predictors X to many different sets of responses y. We will use the package `limma` from Bioconductor.
 
 ## Load the data
 
@@ -361,17 +361,42 @@ decideTests(edger_results) |> summary()
 ```
 
 
+### Typical design matrix setup
+
+Traditionally the design matrix for differential expression does not include an intercept, using a formula like `~ 0 + group`. This makes it easier to write out contrasts, at least for simple experimental designs.
+
+As we discussed earlier, this doesn't make a difference to the results. Well, it shouldn't make a difference to the results. Because of a calculation shortcut the limma-voom method takes when using weights, there can be very slight differences if using this method, with perfectly accurate results if `~ 0 + group` is used and very slightly inaccurate results if `~ group` is used. For more complex designs, such as designs that account for a batch effect, `contrastAsCoef()` could potentially be used to get perfectly accurate results with the limma-voom method. See the note in the documentation for `contrasts.fit`. I have never seen anyone bother to do this in practice though!
+
+For example our PVC dataset earlier would traditionally be set up like this.
+
+```{r message=FALSE}
+pvc <- read_csv("r-linear-files/pvc.csv")
+
+pvc_design <- model.matrix(~ 0 + operator + resin, data=pvc)
+
+pvc_contrasts <- makeContrasts(
+    Bob_vs_Alice = operatorBob - operatorAlice,
+    Carl_vs_Alice = operatorCarl - operatorAlice,
+    Carl_vs_Bob = operatorCarl - operatorBob,
+    levels=pvc_design)
+
+pvc_contrasts
+```
+
+It is a very common pattern in RNA-Seq experiments to have a set of treatment groups and a set of batches, with all of the treatments performed once in each batch. Including the batch in the model then often increases the statistical power to detect differences between groups.
+
+
 ## Further exercises {.challenge}
 
-1. Construct and use linear combinations to find genes that:
+How would you find genes that:
 
-    A. Differ in slope between lower and upper molars.
+1. Differ in slope between lower and upper molars?
 
-    B. Differ in expression at time 0.5 between the lower and upper molars. (Hint: this can be viewed as the difference in predictions between two individual samples.)
+2. Differ in expression at time 0.5 between the lower and upper molars? (Hint: this can be viewed as the difference in predictions between two individual samples.)
 
-    C. Construct a pair of linear combinations that when used together in an F test find genes with non-zero slope in either or both the lower and upper molars.
+2. Have non-zero slope in either or both the lower and upper molars?
 
-2. Construct a model matrix in which the change over time is quadratic, and some linear combinations to interrogate it.
+3. Have a non-linear patter or expression, such as quadratic?
 
 
 # Appendix: more on limma
