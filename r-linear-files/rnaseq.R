@@ -260,7 +260,7 @@ ggplot(melted_df) +
 # 2.6.6 Heatmap ----
 #
 # A heatmap of variable genes can be a great way to reveal features of a
-# dataset. Here I show the top 200 genes selected by range of log2
+# dataset. Here I show the top 100 genes selected by range of log2
 # expression. Expression is shown as z-scores (i.e. scaled to have zero
 # mean, and unit standard deviation). Genes are ordered so as to cluster
 # similar patterns of expression. Heatmaps are a complex topic! There
