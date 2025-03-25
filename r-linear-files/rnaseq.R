@@ -267,19 +267,29 @@ ggplot(melted_df) +
 # are a lot of alternatives to what I've done here in terms of gene
 # selection, scaling, and clustering.
 
+# Select some genes to show
 gene_ranges <- apply(log2_cpms,1,max) - apply(log2_cpms,1,min)
 genes_wanted <- gene_ranges |> sort(decreasing=TRUE) |> head(100) |> names()
 
+# z-transformation
 x <- log2_cpms[genes_wanted,]
 z <- t(scale(t(x)))
+
+# Hierarchical clustering of genes, refined with Optimal Leaf Ordering
 ordering <- seriate(dist(z), method="OLO")
+
+# Annotate with the original range of the data
+row_anno = rowAnnotation(
+    "log2 CPM"=anno_points(x,
+        which="row", border=FALSE, size=unit(1,"mm"), width=unit(20,"mm")))
 
 Heatmap(
     z,
     name="z score",
     show_row_names=FALSE,
     cluster_rows=as.dendrogram(ordering[[1]]),
-    cluster_columns=FALSE)
+    cluster_columns=FALSE,
+    right_annotation=row_anno)
 
 # When we looked for genes changing over time, that's what we found.
 # When we let the data speak for itself we may see many strange things!

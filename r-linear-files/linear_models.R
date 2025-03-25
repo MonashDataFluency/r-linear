@@ -302,7 +302,8 @@ anova(outfit0, outfit)
 # but I think it is the safest way. Once we start using multiple
 # predictors, the meaning of the output from anova with a single model
 # is likely to be not quite what you want, read the documentation
-# carefully. drop1(fit, test="F") should usually be used instead.
+# carefully (?anova.lm). drop1(fit, test="F") should usually be used
+# instead.
 #
 # summary( ) also outputs p-values. Too many p-values, summary( )
 # doesn't respect the hierarchy of terms in the model. The p-value for
@@ -694,10 +695,10 @@ log2_smoc1fit <- lm(log2(gene_smoc1) ~ tooth + day, data=teeth)
 
 look(log2(teeth$gene_smoc1), log2_smoc1fit)
 
-# In this case, log transformation does not remove the curve. If you
-# think this is a problem for *linear* models, you are mistaken! With a
-# little *feature engineering* we can fit a quadratic curve.
-# Calculations can be included in the formula if wrapped in I( ):
+# In this case, log transformation can not remove the curve. Can we
+# model this *curve* with a *linear* model? Yes we can! With a little
+# *feature engineering* we can fit a quadratic curve. Calculations can
+# be included in the formula if wrapped in I( ):
 
 curved_fit <- lm(log2(gene_smoc1) ~ tooth + day + I(day^2), data=teeth)
 look(log2(teeth$gene_smoc1), curved_fit)

@@ -29,7 +29,7 @@ unzip("r-linear-files.zip")
 
 # Install some CRAN packages:
 install.packages(c(
-    "tidyverse", "multcomp", "emmeans", 
+    "tidyverse", "reshape2", "multcomp", "emmeans", 
     "lme4", "lmerTest", "pbkrtest", "seriation", "BiocManager"))
 
 # Install some Bioconductor packages:
