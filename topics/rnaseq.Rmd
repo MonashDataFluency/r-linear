@@ -299,6 +299,7 @@ Some possible sets of genes are:
 * The top genes from the F test we just did, or another test of your own devising.
 * The largest log fold changes in the `all_results` table, ignoring p-values.
 * A random sample of genes, using `sample()`.
+* Heatmap with many more genes shown.
 
 
 ### Relation to lm( ) and glht( )

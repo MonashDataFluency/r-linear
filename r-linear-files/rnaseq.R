@@ -323,6 +323,7 @@ F_test_results
 # * The largest log fold changes in the all_results table, ignoring
 # p-values.
 # * A random sample of genes, using sample().
+# * Heatmap with many more genes shown.
 #
 # 2.7.3 Relation to lm( ) and glht( ) ----
 #
