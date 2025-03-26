@@ -91,3 +91,29 @@ We recommended people use RStuio Cloud, but left open the option of using RStudi
 2022-05-25
 Just a note that making the second break a 20 minute lunch break may be better.
 
+
+
+2025-03-24,25,266
+
+I expanded the RNA-Seq section before this workshop. Because this section has been rushed in the past, and because of the added material, we added some extra time.
+
+We ran this workshop in person. We had a Slack channel for people to share code, etc, and also used the Carpentries sticky-note system.
+
+People had difficulty attending the whole workshop. Some people could only make some days. Others had to duck out to look after experiments. Making sure the workshop is run at a convenient seems important.
+
+We ran 10.5 hours total (including breaks):
+
+Day 1: 12:30pm - 5:00pm with a 10 minute and 20 minute break
+Day 2: 12:30pm - 5:00pm with a 10 minute and 20 minute break
+Day 3: 12:30pm - 2:00pm
+
+Day 1:
+Finished teaching at 4:45pm. We completed up to the anova() part of "multiple factors, many levels".
+
+Day 2:
+Finished teaching at 4:45pm. We completed the RNA-Seq section up to first getting topTable() and decideTests() restuls.
+
+Day 3:
+Finished on the dot at 2pm. Spent a lot of time on reading diagnostic plots, which I think went well. Skipped some of the "connection to earlier ideas section". Spent about 15 minutes on the challenge, people seemed into it, but only one (helper) gave an example set of genes in the Slack.
+
+
